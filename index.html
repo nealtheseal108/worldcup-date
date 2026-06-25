@@ -528,30 +528,83 @@ async function copyImage(){
   }catch(e){hint('Copy not supported here, use Save photo instead 💜');}
 }
 
-/* ---------- background music: Still Woozy - Shotput (slowed + reverb) ---------- */
+/* ---------- background music: looping playlist with fade transitions ----------
+   Shotput (slowed+reverb) -> Heat Waves -> Babydoll -> Flight's Booked -> loop  */
+var MUSIC=[
+  {id:'K4Fk9Clc12w', label:'Still Woozy - Shotput (slowed + reverb)'},
+  {id:'mRD0-GxqHVo', label:'Glass Animals - Heat Waves'},
+  {id:'nb8CnIo_-_A', label:'Dominic Fike - Babydoll'},
+  {id:'hb24kZ0fiEA', label:"Drake - Flight's Booked"}
+];
+var MAXVOL=45, FADE_MS=2500, FADE_TICK=80;
 var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
+var trackIdx=0, fadeTimer=null, endWatch=null;
+
 function onYouTubeIframeAPIReady(){
   ytPlayer=new YT.Player('ythost',{
-    videoId:'K4Fk9Clc12w',
+    videoId:MUSIC[0].id,
     playerVars:{autoplay:0,playsinline:1,controls:0,rel:0},
-    events:{'onReady':function(){musicReady=true;if(musicWanted)startMusic();}}
+    events:{
+      'onReady':function(){musicReady=true;if(musicWanted)startMusic();},
+      'onStateChange':onPlayerState,
+      'onError':function(){nextTrack();}   // skip any track that won't play
+    }
   });
+}
+function clearFade(){if(fadeTimer){clearInterval(fadeTimer);fadeTimer=null;}}
+function fadeTo(target,done){
+  clearFade();
+  var start; try{start=ytPlayer.getVolume();}catch(e){start=target;}
+  var steps=Math.max(1,Math.round(FADE_MS/FADE_TICK)), i=0;
+  fadeTimer=setInterval(function(){
+    i++; var v=start+(target-start)*(i/steps);
+    try{ytPlayer.setVolume(Math.max(0,Math.min(100,v)));}catch(e){}
+    if(i>=steps){clearFade();if(done)done();}
+  },FADE_TICK);
+}
+function armEndWatch(){
+  if(endWatch)clearInterval(endWatch);
+  endWatch=setInterval(function(){
+    if(!musicOn)return;
+    try{
+      var d=ytPlayer.getDuration(), t=ytPlayer.getCurrentTime();
+      if(d>0 && (d-t)<=(FADE_MS/1000)+0.3){clearInterval(endWatch);endWatch=null;fadeTo(0);}  // fade out into the next song
+    }catch(e){}
+  },300);
+}
+function nextTrack(){
+  trackIdx=(trackIdx+1)%MUSIC.length;
+  try{ytPlayer.setVolume(0);ytPlayer.loadVideoById(MUSIC[trackIdx].id);ytPlayer.playVideo();}catch(e){}
+  updateMusicBtn();
+}
+function onPlayerState(e){
+  if(e.data===YT.PlayerState.ENDED){nextTrack();}
+  else if(e.data===YT.PlayerState.PLAYING){if(musicOn)fadeTo(MAXVOL);armEndWatch();}  // fade the new track in
 }
 function startMusic(){
   musicWanted=true;
   if(!musicReady||!ytPlayer)return;
-  try{ytPlayer.unMute();ytPlayer.setVolume(45);ytPlayer.playVideo();musicOn=true;updateMusicBtn();}catch(e){}
+  try{
+    ytPlayer.unMute();musicOn=true;
+    var st=ytPlayer.getPlayerState&&ytPlayer.getPlayerState();
+    if(st===2){ytPlayer.playVideo();}            // resume after a manual pause
+    else{ytPlayer.setVolume(0);ytPlayer.playVideo();}
+    fadeTo(MAXVOL);armEndWatch();updateMusicBtn();
+  }catch(e){}
 }
 function toggleMusic(){
   if(!musicOn){startMusic();}
-  else{try{ytPlayer.pauseVideo();}catch(e){}musicOn=false;updateMusicBtn();}
+  else{try{ytPlayer.pauseVideo();}catch(e){}musicOn=false;clearFade();if(endWatch){clearInterval(endWatch);endWatch=null;}updateMusicBtn();}
 }
-function updateMusicBtn(){const b=document.getElementById('musicBtn');if(b)b.textContent=musicOn?'🔊':'🎵';}
+function updateMusicBtn(){
+  var b=document.getElementById('musicBtn');
+  if(b){b.textContent=musicOn?'🔊':'🎵';b.title=(musicOn?'Now playing: ':'Play: ')+MUSIC[trackIdx].label;}
+}
 /* autoplay policies: kick off on the first interaction anywhere */
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
 </script>
 <div id="ythost"></div>
-<button id="musicBtn" title="Still Woozy - Shotput (slowed + reverb)" onclick="toggleMusic()">🎵</button>
+<button id="musicBtn" title="Play: Shotput → Heat Waves → Babydoll → Flight's Booked" onclick="toggleMusic()">🎵</button>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
