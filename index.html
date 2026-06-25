@@ -7,7 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='52' font-size='80' text-anchor='middle' dominant-baseline='central'>%F0%9F%92%9C</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
   :root{
     --lav:#7c4dca; --lav2:#9b72e8; --lav3:#c4b5fd; --accent:#b57edc; --accent2:#6a4fe0;
@@ -26,7 +26,7 @@
   .wrap{max-width:680px;margin:0 auto}
   .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
   .topbar .ball{font-size:22px}
-  .topbar h1{font-family:'Geist Mono',ui-monospace,monospace;font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
+  .topbar h1{font-family:'Space Mono',ui-monospace,monospace;font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
   .progress{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
   .dot{width:34px;height:5px;border-radius:3px;background:rgba(255,255,255,.35)}
   .dot.on{background:var(--sun)}
@@ -34,7 +34,7 @@
   .step{display:none;animation:fade .35s ease}
   .step.active{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .eyebrow{font-family:'Geist Mono',ui-monospace,monospace;color:var(--lav);font-weight:500;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+  .eyebrow{font-family:'Space Mono',ui-monospace,monospace;color:var(--lav);font-weight:500;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
   h2{font-size:24px;line-height:1.2;margin-bottom:6px}
   .sub{color:var(--muted);font-size:14.5px;margin-bottom:20px;line-height:1.5}
   .cards{display:grid;gap:12px}
@@ -58,6 +58,7 @@
   .card .desc{font-size:13.5px;color:var(--muted);line-height:1.45}
   .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--lav);background:#efe7fb;border-radius:20px;padding:2px 9px;margin-top:8px}
   .veg{color:#1c7a4a;background:#e3f6ea}
+  .price{color:#7a5a16;background:#fdf0c8;letter-spacing:1px}
 
   .nav{display:flex;justify-content:space-between;margin-top:22px;gap:10px;flex-wrap:wrap}
   button.btn{font:inherit;font-weight:700;border:none;border-radius:11px;padding:12px 22px;cursor:pointer;transition:.15s}
@@ -71,7 +72,7 @@
   .hero{text-align:center;padding:8px 0 4px}
   .hero .big{font-size:46px;margin-bottom:8px}
   .hero h2{font-size:27px}
-  .pill{font-family:'Geist Mono',ui-monospace,monospace;display:inline-flex;gap:7px;align-items:center;background:#efe7fb;color:var(--lav);font-weight:500;font-size:11.5px;letter-spacing:.3px;padding:6px 13px;border-radius:30px;margin-bottom:14px}
+  .pill{font-family:'Space Mono',ui-monospace,monospace;display:inline-flex;gap:7px;align-items:center;background:#efe7fb;color:var(--lav);font-weight:500;font-size:11.5px;letter-spacing:.3px;padding:6px 13px;border-radius:30px;margin-bottom:14px}
 
   .iti-head{text-align:center;margin-bottom:14px}
   .iti-head .big{font-size:38px}
@@ -100,7 +101,7 @@
   .perk .pe{font-size:20px}
   .cheeky{text-align:center;font-style:italic;color:var(--muted);font-size:13.5px;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
   .printrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
-  .sectlabel{font-family:'Geist Mono',ui-monospace,monospace;font-size:10.5px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+  .sectlabel{font-family:'Space Mono',ui-monospace,monospace;font-size:10.5px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
 
   /* shareable card */
   .sharewrap{margin-top:6px}
@@ -130,13 +131,13 @@
   .tk-pickname{font-size:21px;font-weight:800;line-height:1.1}
   .tk-picksub{font-size:13px;color:#9b93b5;margin-top:3px}
   .tk-ticker{position:relative;height:34px;margin:0 -18px 16px;background:linear-gradient(90deg,#1a1330,#241a44,#1a1330);border-top:1px solid #3a2d63;border-bottom:1px solid #3a2d63;overflow:hidden;display:flex;align-items:center}
-  .tk-track{white-space:nowrap;font-family:'Geist Mono','Courier New',monospace;font-weight:500;font-size:13px;color:#a78bfa;letter-spacing:1px;animation:tick 22s linear infinite;will-change:transform}
+  .tk-track{white-space:nowrap;font-family:'Space Mono','Courier New',monospace;font-weight:500;font-size:13px;color:#a78bfa;letter-spacing:1px;animation:tick 22s linear infinite;will-change:transform}
   @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   .tk-stats{display:flex;gap:18px;margin-bottom:12px}
   .tk-stats>div{flex:1}
   .tk-lbl{font-size:12px;letter-spacing:1.5px;color:#8a82a6;font-weight:700;margin-bottom:2px}
   .tk-val{font-size:25px;font-weight:800;color:#fff}
-  .tk-comp{font-family:'Geist Mono','Courier New',monospace;font-size:12.5px;color:#9b93b5;line-height:1.8;border-top:1px dashed #333a47;padding-top:10px;margin-bottom:11px}
+  .tk-comp{font-family:'Space Mono','Courier New',monospace;font-size:12.5px;color:#9b93b5;line-height:1.8;border-top:1px dashed #333a47;padding-top:10px;margin-bottom:11px}
   .tk-comp b{color:#d7d2ea}
   .tk-foot{display:flex;justify-content:space-between;font-family:'Courier New',monospace;font-size:12px;color:#7c7595;letter-spacing:1px}
   .capturing .tk-track{animation:none!important;transform:none!important}
@@ -156,7 +157,7 @@
     background:linear-gradient(135deg,#7c4dca,#9b72e8);box-shadow:0 2px 10px rgba(124,77,202,.5)}
   .pb-meta{min-width:0}
   .pb-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .pb-artist{font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#bcb2d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .pb-artist{font-family:'Space Mono',ui-monospace,monospace;font-size:11px;color:#bcb2d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
   .pb-controls{display:flex;align-items:center;gap:4px;flex:none}
   .pb-btn{background:transparent;border:none;color:#e8e4f6;font-size:16px;cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.15s;line-height:1}
   .pb-btn:hover{background:rgba(167,139,250,.22)}
@@ -231,7 +232,7 @@
     <section class="step" id="step2">
       <div class="eyebrow">Step 2 of 3</div>
       <h2>Pick our game-time snack!</h2>
-      <p class="sub">Something yummy AND healthy to fuel the match. All vegetarian, grab it before kickoff!</p>
+      <p class="sub">Something yummy AND healthy to fuel the match. All vegetarian and easy on the wallet, grab it before kickoff!</p>
       <div class="cards" id="duringCards"></div>
       <div class="nav">
         <button class="btn ghost" onclick="go(1)">← Back</button>
@@ -243,7 +244,7 @@
     <section class="step" id="step3">
       <div class="eyebrow">Step 3 of 3</div>
       <h2>Where are we eating after?!</h2>
-      <p class="sub">Vegetarian-friendly and picked to dodge the post-match crowds. There's an Indian spot in every list for our anniversary. 💜</p>
+      <p class="sub">Vegetarian and picked to dodge the post-match crowds. We're students, so a quick heads up on cost: <b>$</b> is wallet-friendly, <b>$$$</b> is a splurge, and 🚆 marks spots right on our 2 Line ride home. There's an Indian pick in every list for our anniversary. 💜</p>
       <div class="cards" id="afterCards"></div>
       <div class="nav">
         <button class="btn ghost" onclick="go(2)">← Back</button>
@@ -292,7 +293,7 @@
         <h2 id="itiTitle">Our Big Date!</h2>
         <div class="venue" id="itiVenue"></div>
         <div class="lovenote">Made with love for Sidhya, the love of Neal's life 💜</div>
-        <div class="sub" style="margin-top:6px">Monday, July 6, 2026 · Round of 16 · Kickoff 5:00 PM</div>
+        <div class="sub" style="margin-top:6px">Monday, July 6, 2026 · Round of 16 · Kickoff 5:00 PM · Full time ~6:30 PM</div>
       </div>
 
       <div class="sectlabel">Step 1 · two routes that cross 🚆</div>
@@ -389,10 +390,10 @@ const VENUES = {
       {e:"🇬🇷",t:"Lola",d:"Bright Greek small plates a short walk away. Veg spreads, pita, and salads before kickoff."}
     ],
     after:[
-      {e:"🍛",t:"ROTI Cuisine of India",d:"Authentic Indian right in Lower Queen Anne. Tons of veg, perfect for our anniversary dinner. 💜",res:true},
-      {e:"🍕",t:"Via Tribunali",d:"Low-key Neapolitan pizza in Queen Anne, easy veg margherita and marinara. Relaxed vibe.",res:false},
-      {e:"🍝",t:"Messina Modern Italian",d:"Date-night Italian steps from the arena with veg pasta. Cozy and romantic!",res:true},
-      {e:"🧆",t:"Café Suliman",d:"Keep it easy with warm vegetarian Levantine comfort food near the festival.",res:false}
+      {e:"🧆",t:"Café Suliman",d:"Warm vegetarian Levantine comfort food near the festival. Easy, tasty, and kind to a student budget.",p:"$"},
+      {e:"🍕",t:"Via Tribunali",d:"Low-key Neapolitan pizza in Queen Anne, easy veg margherita and marinara. Relaxed and affordable.",p:"$$"},
+      {e:"🍛",t:"ROTI Cuisine of India",d:"Authentic Indian right in Lower Queen Anne. Tons of veg, perfect for our anniversary dinner. 💜",p:"$$"},
+      {e:"🍝",t:"Messina Modern Italian",d:"Date-night Italian steps from the arena with veg pasta. Cozy and romantic, save it for a splurge.",p:"$$$"}
     ]
   },
   pier:{
@@ -408,10 +409,10 @@ const VENUES = {
       {e:"🥪",t:"Sisters European Café",d:"Veg salads and toasted focaccia sandwiches. Hearty and easy to carry to the pier."}
     ],
     after:[
-      {e:"🍛",t:"Zaika",d:"Modern Indian on Pike St with big veg and vegan menus and a full bar. Our anniversary pick. 💜",res:true},
-      {e:"🍝",t:"La Fontana Siciliana",d:"Cozy, quiet Sicilian three blocks from the market, lovely veg pastas. Tucked-away date feel.",res:true},
-      {e:"🕯️",t:"Cotto Belltown",d:"Intimate candle-lit bistro, housemade pasta and wood-fired veg pizza. Calmer early evening.",res:true},
-      {e:"🍷",t:"Neb Wine Bar",d:"Intimate Italian wine bar, share rustic wood-fired veg plates and a bottle.",res:true}
+      {e:"🍛",t:"Zaika",d:"Modern Indian on Pike St with big veg and vegan menus. Our anniversary pick, and not too pricey. 💜",p:"$$"},
+      {e:"🍝",t:"La Fontana Siciliana",d:"Cozy, quiet Sicilian three blocks from the market, lovely veg pastas. A tucked-away splurge.",p:"$$$"},
+      {e:"🕯️",t:"Cotto Belltown",d:"Intimate candle-lit bistro, housemade pasta and wood-fired veg pizza. Lovely, but a splurge.",p:"$$$"},
+      {e:"🍷",t:"Neb Wine Bar",d:"Italian wine bar with rustic wood-fired veg plates. Romantic, but the priciest of the bunch.",p:"$$$"}
     ]
   },
   house:{
@@ -427,20 +428,20 @@ const VENUES = {
       {e:"🧆",t:"Falafel King",d:"Grab a veg falafel wrap over at nearby Pike Place and bring it in. Easy protein for the match!"}
     ],
     after:[
-      {e:"🍛",t:"Zaika",d:"Modern Indian a few blocks away on Pike St, huge veg menu. Our anniversary pick. 💜",res:true},
-      {e:"🍲",t:"Wild Ginger",d:"Downtown Pacific Rim favorite with great tofu and veg dishes, house-made sambals. A notch nicer.",res:true},
-      {e:"🥔",t:"Tulio",d:"Rustic downtown Italian famous for sweet potato gnocchi and thoughtful veg options.",res:true},
-      {e:"🥟",t:"Din Tai Fung",d:"In the same building, order the veggie dumplings and greens. No trek after the game.",res:true}
+      {e:"🥟",t:"Din Tai Fung",d:"In the same building, order the veggie dumplings and greens. No trek after the game, and easy on the wallet.",p:"$$"},
+      {e:"🍛",t:"Zaika",d:"Modern Indian a few blocks away on Pike St, huge veg menu. Our anniversary pick. 💜",p:"$$"},
+      {e:"🍲",t:"Wild Ginger",d:"Downtown Pacific Rim favorite with great tofu and veg dishes. A notch nicer, save for a splurge.",p:"$$$"},
+      {e:"🥔",t:"Tulio",d:"Rustic downtown Italian famous for sweet potato gnocchi and thoughtful veg options. A splurge.",p:"$$$"}
     ]
   }
 };
 
 /* Eastside dinner options on the 2 Line home (near stations) — shown for every venue */
 const EASTSIDE = [
-  {e:"🍜",t:"Kati Vegan Thai",d:"All-vegan Thai in Old Bellevue, a short stroll from Bellevue Downtown station on our 2 Line ride home. Panang, pad thai, the works. 💜",east:true},
-  {e:"🧆",t:"Mediterranean Kitchen",d:"Big Middle-Eastern spread by Bellevue Downtown Park, near the Bellevue station. Falafel, fattoush, hummus, an easy veg feast.",east:true},
-  {e:"🍛",t:"Mayuri",d:"Eastside Indian institution with a huge veg menu out by Overlake, a sweet anniversary stop right by the 2 Line. 💜",east:true},
-  {e:"🍤",t:"Pon Proem Thai",d:"Cozy family Thai in Mercer Island town center by the station, most dishes go tofu or veg. Quiet stop on the way home.",east:true}
+  {e:"🍜",t:"Kati Vegan Thai",d:"All-vegan Thai in Old Bellevue, a short stroll from Bellevue Downtown station on our 2 Line ride home. Panang, pad thai, the works. 💜",p:"$$",east:true},
+  {e:"🧆",t:"Mediterranean Kitchen",d:"Big Middle-Eastern spread by Bellevue Downtown Park, near the Bellevue station. Falafel, fattoush, hummus, a cheap and cheerful veg feast.",p:"$",east:true},
+  {e:"🍛",t:"Mayuri",d:"Eastside Indian institution with a huge veg menu out by Overlake, a sweet anniversary stop right by the 2 Line. 💜",p:"$$",east:true},
+  {e:"🍤",t:"Pon Proem Thai",d:"Cozy family Thai in Mercer Island town center by the station, most dishes go tofu or veg. Easy, filling, and budget-friendly.",p:"$",east:true}
 ];
 
 const pick = {venue:null, during:null, after:null};
@@ -471,7 +472,7 @@ function foodCards(which){
     c.innerHTML=`<div class="emoji">${item.e}</div><div>
       <div class="ttl">${item.t}</div>
       <div class="desc">${item.d}</div>
-      <span class="tag veg">🌱 vegetarian</span>${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
+      <span class="tag veg">🌱 vegetarian</span>${item.p?` <span class="tag price">${item.p}</span>`:''}${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
     c.onclick=()=>{
       pick[which]=item; foodCards(which);
       document.getElementById(which==='during'?'next2':'next3').disabled=false;
@@ -504,7 +505,7 @@ function reveal(){
     ['~3:45 PM','<b>Arrive Westlake together.</b>', v.transferLine],
     ['4:00 PM',`<b>Snack: ${pick.during.t}!</b>`, pick.during.d+' Then clear security and find a great spot.'],
     ['5:00 PM','<b>Kickoff, Round of 16! ⚽</b>','Watch party at '+v.name+'. Jerseys on! 💜'],
-    ['~7:00 PM','<b>Full time!</b>','Soak up the atmosphere and let the first crowd wave clear out.'],
+    ['~6:30 PM','<b>Full time!</b>','Game wraps up around 6:30. Soak up the atmosphere, grab a few photos, and let the first crowd wave clear out. (A little later if it goes to extra time and penalties!)'],
     ['7:30 PM',`<b>Dinner: ${pick.after.t}!</b>`, pick.after.d],
     ['~9:30 PM','<b>Easy ride home.</b>','Back on the 2 Line from Westlake. It runs until midnight, so we just reverse the morning routes.']
   ];
@@ -513,7 +514,7 @@ function reveal(){
   document.getElementById('safetyBox').innerHTML='🛟 <b>Good to know:</b> '+v.safety+
     ' If the US is playing, expect the biggest crowds of the tournament, so we get there early and post up near an exit!';
   document.getElementById('reserveNote').innerHTML =
-    '✅ <b>All booked, babu!</b> 💜 Neal has already locked in our 7:30 PM table at '+pick.after.t+' (these spots are bound to book out for the Round of 16, so it is handled). Just show up, his treat.';
+    '✅ <b>All booked, babu!</b> 💜 Neal has already sorted our 7:30 PM table at '+pick.after.t+'. Nothing to plan or pay for tonight, just show up and enjoy. His treat.';
   go(4);
 }
 venueCards();
@@ -551,9 +552,10 @@ async function copyImage(){
 }
 
 /* ---------- background music: looping playlist with fade transitions ----------
-   Shotput (slowed+reverb) -> Heat Waves -> Babydoll -> Flight's Booked -> loop  */
+   Shotput (slowed+reverb) -> Link Up -> Heat Waves -> Babydoll -> Flight's Booked -> loop  */
 var MUSIC=[
   {id:'K4Fk9Clc12w', title:'Shotput (slowed + reverb)', artist:'Still Woozy'},
+  {id:'1_w9ZtbHj_E', title:'Link Up', artist:'Don Toliver'},
   {id:'c9jTdUBMys8', title:'Heat Waves', artist:'Glass Animals'},
   {id:'nb8CnIo_-_A', title:'Babydoll', artist:'Dominic Fike'},
   {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake'}
