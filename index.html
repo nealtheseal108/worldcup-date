@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sidhya & Neal's World Cup Date 💜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lav:#7c4dca; --lav2:#9b72e8; --lav3:#c4b5fd; --accent:#b57edc;
+    --sun:#ffd166; --ink:#2e1f47; --paper:#faf7ff;
+    --card:#ffffff; --line:#e7ddf7; --muted:#6b5d82;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Fraunces',Georgia,'Times New Roman',serif;
+    background:linear-gradient(160deg,#7c4dca 0%,#9b72e8 45%,#c4b5fd 100%);
+    color:var(--ink);min-height:100vh;padding:24px 16px;
+  }
+  h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Playfair Display',Georgia,serif;letter-spacing:.2px}
+  .fancy{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-weight:700}
+  .lovenote{font-family:'Playfair Display',Georgia,serif;font-style:italic}
+  .wrap{max-width:680px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
+  .topbar .ball{font-size:22px}
+  .topbar h1{font-size:15px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
+  .progress{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+  .dot{width:34px;height:5px;border-radius:3px;background:rgba(255,255,255,.35)}
+  .dot.on{background:var(--sun)}
+  .panel{background:var(--paper);border-radius:18px;padding:26px 22px 28px;box-shadow:0 18px 50px rgba(53,28,94,.32)}
+  .step{display:none;animation:fade .35s ease}
+  .step.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .eyebrow{color:var(--lav);font-weight:800;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+  h2{font-size:24px;line-height:1.2;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:14.5px;margin-bottom:20px;line-height:1.5}
+  .cards{display:grid;gap:12px}
+
+  /* venue cards (with art banner) */
+  .vcard{border:2px solid var(--line);background:var(--card);border-radius:16px;overflow:hidden;cursor:pointer;transition:.15s;position:relative}
+  .vcard:hover{border-color:var(--lav2);transform:translateY(-2px);box-shadow:0 10px 26px rgba(124,77,202,.2)}
+  .vcard.sel{border-color:var(--lav);box-shadow:0 0 0 3px rgba(124,77,202,.22)}
+  .vcard .art{width:100%;display:block;height:118px}
+  .vcard .vbody{padding:14px 15px 16px}
+  .vcard .ttl{font-weight:800;font-size:16.5px;margin-bottom:4px}
+  .vcard .desc{font-size:13.5px;color:var(--muted);line-height:1.45}
+  .crown{position:absolute;top:10px;right:10px;background:var(--sun);color:#7a5a00;font-size:10.5px;font-weight:800;letter-spacing:.5px;padding:4px 11px;border-radius:20px;text-transform:uppercase;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+
+  /* food cards (emoji row) */
+  .card{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:16px;cursor:pointer;transition:.15s;display:flex;gap:14px;align-items:flex-start;position:relative}
+  .card:hover{border-color:var(--lav2);transform:translateY(-2px);box-shadow:0 8px 22px rgba(124,77,202,.18)}
+  .card.sel{border-color:var(--lav);background:#f3ecfc;box-shadow:0 0 0 3px rgba(124,77,202,.18)}
+  .card .emoji{font-size:26px;line-height:1}
+  .card .ttl{font-weight:700;font-size:16px;margin-bottom:3px}
+  .card .desc{font-size:13.5px;color:var(--muted);line-height:1.45}
+  .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--lav);background:#efe7fb;border-radius:20px;padding:2px 9px;margin-top:8px}
+  .veg{color:#1c7a4a;background:#e3f6ea}
+
+  .nav{display:flex;justify-content:space-between;margin-top:22px;gap:10px;flex-wrap:wrap}
+  button.btn{font:inherit;font-weight:700;border:none;border-radius:11px;padding:12px 22px;cursor:pointer;transition:.15s}
+  .primary{background:var(--lav);color:#fff}
+  .primary:hover{background:#6a3cb8}
+  .primary:disabled{background:#d6c8f0;cursor:not-allowed}
+  .ghost{background:transparent;color:var(--muted)}
+  .ghost:hover{color:var(--ink)}
+  .namein{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:11px;font:inherit;margin-top:4px}
+  .namein:focus{outline:none;border-color:var(--lav)}
+  .hero{text-align:center;padding:8px 0 4px}
+  .hero .big{font-size:46px;margin-bottom:8px}
+  .hero h2{font-size:27px}
+  .pill{display:inline-flex;gap:7px;align-items:center;background:#efe7fb;color:var(--lav);font-weight:800;font-size:12.5px;padding:6px 13px;border-radius:30px;margin-bottom:14px}
+
+  .iti-head{text-align:center;margin-bottom:14px}
+  .iti-head .big{font-size:38px}
+  .iti-head h2{font-size:24px;margin-top:4px}
+  .iti-head .venue{color:var(--lav);font-weight:700;margin-top:4px}
+  .lovenote{color:var(--accent);font-weight:600;font-size:13px;margin-top:6px}
+
+  /* split-then-merge plans */
+  .twoplan{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+  .plan{background:#f3ecfc;border:1px solid #e0d3f7;border-radius:12px;padding:12px 13px}
+  .plan h4{font-size:13px;color:var(--lav);margin-bottom:6px}
+  .plan p{font-size:12.5px;line-height:1.45;color:var(--ink)}
+  .plan .who{font-weight:800}
+  .merge{background:var(--lav);color:#fff;text-align:center;font-weight:700;font-size:13.5px;border-radius:12px;padding:11px;margin:10px 0 4px}
+
+  .time{display:flex;gap:14px;padding:13px 0;border-top:1px dashed var(--line)}
+  .time:first-of-type{border-top:none}
+  .time .clk{font-weight:800;color:var(--lav);min-width:74px;font-size:14px;padding-top:1px}
+  .time .body{font-size:14px;line-height:1.5}
+  .time .body b{font-size:14.5px}
+  .time .body small{color:var(--muted);display:block;margin-top:2px}
+  .note{background:#fff6e0;border:1px solid #f3e2a8;border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5;margin-top:14px;color:#6b5a16}
+  .safety{background:#f1ecfc;border:1px solid #ddd0f5;border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5;margin-top:12px;color:#4a3578}
+  .perks{display:grid;gap:8px;margin-top:14px}
+  .perk{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13.5px;line-height:1.4}
+  .perk .pe{font-size:20px}
+  .cheeky{text-align:center;font-style:italic;color:var(--muted);font-size:13.5px;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
+  .printrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .sectlabel{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+
+  /* shareable card */
+  .sharewrap{margin-top:6px}
+  .sharecard{position:relative;border-radius:18px;padding:24px 20px 22px;color:#fff;text-align:center;overflow:hidden;
+    background:linear-gradient(155deg,#7c4dca,#9b72e8 55%,#b57edc);box-shadow:0 12px 30px rgba(53,28,94,.35)}
+  .sharecard .conf{position:absolute;inset:0;opacity:.18;font-size:22px;line-height:1.9;word-spacing:6px;pointer-events:none}
+  .sharecard .stamp{position:relative;display:inline-block;background:var(--sun);color:#7a5a00;font-weight:800;font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:20px;margin-bottom:12px}
+  .sharecard h3{position:relative;font-size:26px;line-height:1.15;margin-bottom:8px}
+  .sharecard .names{position:relative;font-weight:700;font-size:16px;margin-bottom:3px}
+  .sharecard .meta{position:relative;font-size:13px;opacity:.95;line-height:1.5}
+  .sharecard .vtag{position:relative;display:inline-block;margin-top:11px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);border-radius:30px;padding:6px 14px;font-weight:700;font-size:13px}
+  .sharehint{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}
+
+  .foot{text-align:center;color:rgba(255,255,255,.92);font-size:12px;margin-top:16px;line-height:1.5}
+
+  /* Kalshi-style ticket card */
+  .ticket{background:#0e1116;border:1px solid #2a2f3a;border-radius:18px;padding:18px 18px 15px;color:#e8e6f0;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.45)}
+  .tk-top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;letter-spacing:1px}
+  .tk-cat{color:#cfc7e8;display:flex;gap:8px;align-items:center}
+  .tk-bars{color:#a78bfa;font-size:11px;letter-spacing:-2px}
+  .tk-brand{color:#b9a5f0;font-size:16px;font-weight:800}
+  .tk-divider{border-top:1px dashed #333a47;margin:12px 0 14px}
+  .tk-title{font-size:25px;font-weight:800;line-height:1.13;margin-bottom:16px}
+  .tk-pick{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+  .tk-thumb{width:52px;height:52px;border-radius:10px;overflow:hidden;flex:none}
+  .tk-thumb svg{width:100%;height:100%;display:block}
+  .tk-pickname{font-size:21px;font-weight:800;line-height:1.1}
+  .tk-picksub{font-size:13px;color:#9b93b5;margin-top:3px}
+  .tk-ticker{position:relative;height:34px;margin:0 -18px 16px;background:linear-gradient(90deg,#1a1330,#241a44,#1a1330);border-top:1px solid #3a2d63;border-bottom:1px solid #3a2d63;overflow:hidden;display:flex;align-items:center}
+  .tk-track{white-space:nowrap;font-family:'Courier New',monospace;font-weight:700;font-size:13px;color:#a78bfa;letter-spacing:1px;animation:tick 22s linear infinite;will-change:transform}
+  @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .tk-stats{display:flex;gap:18px;margin-bottom:12px}
+  .tk-stats>div{flex:1}
+  .tk-lbl{font-size:12px;letter-spacing:1.5px;color:#8a82a6;font-weight:700;margin-bottom:2px}
+  .tk-val{font-size:25px;font-weight:800;color:#fff}
+  .tk-comp{font-family:'Courier New',monospace;font-size:12.5px;color:#9b93b5;line-height:1.8;border-top:1px dashed #333a47;padding-top:10px;margin-bottom:11px}
+  .tk-comp b{color:#d7d2ea}
+  .tk-foot{display:flex;justify-content:space-between;font-family:'Courier New',monospace;font-size:12px;color:#7c7595;letter-spacing:1px}
+  .capturing .tk-track{animation:none!important;transform:none!important}
+  .sharerow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .sharerow .btn{flex:1;min-width:104px}
+  .lav2btn{background:#efe7fb;color:#5e3aa6}
+  .lav2btn:hover{background:#e3d6f7}
+  /* floating music button */
+  #musicBtn{position:fixed;right:16px;bottom:16px;z-index:50;width:52px;height:52px;border-radius:50%;border:none;background:var(--lav);color:#fff;font-size:22px;cursor:pointer;box-shadow:0 6px 18px rgba(53,28,94,.45);transition:.15s}
+  #musicBtn:hover{background:#6a3cb8;transform:scale(1.06)}
+  #ythost{position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none}
+
+  @media (max-width:520px){
+    body{padding:14px 10px}
+    .panel{padding:20px 15px 22px}
+    .topbar h1{font-size:11.5px}
+    h2{font-size:21px}
+    .hero h2{font-size:22px}
+    .hero .big{font-size:38px}
+    .sub{font-size:14px}
+    .twoplan{grid-template-columns:1fr}
+    .time .clk{min-width:60px;font-size:13px}
+    .nav .btn{flex:1;text-align:center;padding:12px 14px}
+    .vcard .art{height:104px}
+    .sharecard h3{font-size:23px}
+  }
+  @media print{
+    body{background:#fff;padding:0;color:#000}
+    .topbar,.progress,.nav,.printrow,.foot,.sharehint{display:none!important}
+    .panel{box-shadow:none;padding:0}
+    .note,.safety,.crown,.cheeky,.lovenote,.sharecard,.perk,.plan,.merge{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><span class="ball">⚽</span><h1>Sidhya & Neal · World Cup Date · July 6</h1></div>
+  <div class="progress">
+    <div class="dot on" id="d0"></div><div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+  </div>
+
+  <div class="panel">
+
+    <!-- STEP 0 -->
+    <section class="step active" id="step0">
+      <div class="hero">
+        <div class="big">⚽💜</div>
+        <div class="pill">HAPPY 8 MONTHS · ROUND OF 16 · 5 PM!</div>
+        <h2>Hey Sidhu, you get to pick our <span class="fancy">date</span>!!</h2>
+        <p class="sub" style="margin-top:10px">Happy 8 months babu!! 💜 To celebrate us, Neal sorted ALL the boring World Cup
+        logistics (the trains, the timing, the no car needed stuff) just for you, the absolute love of his life. The fun
+        part is 100% yours: where we watch, what we snack on during the game, and where we eat after. Everything is
+        vegetarian, promise. Tap through and this prints out our entire plan at the
+        end (plus a little card you can share). Let's gooo!! 💜⚽</p>
+        <input class="namein" id="nameField" value="Sidhya" maxlength="24">
+      </div>
+      <div class="nav"><span></span><button class="btn primary" onclick="go(1)">Let's go! →</button></div>
+    </section>
+
+    <!-- STEP 1 -->
+    <section class="step" id="step1">
+      <div class="eyebrow">Step 1 of 3</div>
+      <h2>Where should we watch, baby?</h2>
+      <p class="sub">Pike Place or Seattle Center are our top two, plus a comfy indoor backup. All reachable by train, and our two routes cross on the way. Pick your vibe!</p>
+      <div class="cards" id="venueCards"></div>
+      <div class="nav">
+        <button class="btn ghost" onclick="go(0)">← Back</button>
+        <button class="btn primary" id="next1" disabled onclick="go(2)">Next! →</button>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step" id="step2">
+      <div class="eyebrow">Step 2 of 3</div>
+      <h2>Pick our game-time snack!</h2>
+      <p class="sub">Something yummy AND healthy to fuel the match. All vegetarian, grab it before kickoff!</p>
+      <div class="cards" id="duringCards"></div>
+      <div class="nav">
+        <button class="btn ghost" onclick="go(1)">← Back</button>
+        <button class="btn primary" id="next2" disabled onclick="go(3)">Next! →</button>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step" id="step3">
+      <div class="eyebrow">Step 3 of 3</div>
+      <h2>Where are we eating after?!</h2>
+      <p class="sub">Vegetarian-friendly and picked to dodge the post-match crowds. There's an Indian spot in every list for our anniversary. 💜</p>
+      <div class="cards" id="afterCards"></div>
+      <div class="nav">
+        <button class="btn ghost" onclick="go(2)">← Back</button>
+        <button class="btn primary" id="next3" disabled onclick="reveal()">Show me our date! ✨</button>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="step" id="step4">
+
+      <!-- shareable ticket card -->
+      <div class="sharewrap">
+        <div class="sectlabel">📸 Your shareable card</div>
+        <div class="ticket" id="shareCard">
+          <div class="tk-top">
+            <div class="tk-cat"><span class="tk-bars">▮▮▮</span> WORLD CUP</div>
+            <div class="tk-brand">Sidhu&nbsp;💜&nbsp;Neal</div>
+          </div>
+          <div class="tk-divider"></div>
+          <div class="tk-title">I'm going with my <span class="fancy" style="color:#cdbdf7">boyfriend</span>!</div>
+          <div class="tk-pick">
+            <div class="tk-thumb">
+              <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="#2a1f4d"/><path d="M26 40 C8 28 12 14 22 18 C25 19 26 22 26 22 C26 22 27 19 30 18 C40 14 44 28 26 40 Z" fill="#b9a5f0"/></svg>
+            </div>
+            <div><div class="tk-pickname" id="tkVenue">Seattle Center</div>
+            <div class="tk-picksub">Round of 16 · Yes, we're going 💜</div></div>
+          </div>
+          <div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div>
+          <div class="tk-stats">
+            <div><div class="tk-lbl">KICKOFF</div><div class="tk-val">5:00 PM</div></div>
+            <div><div class="tk-lbl">TOGETHER</div><div class="tk-val">8 MONTHS 💜</div></div>
+          </div>
+          <div class="tk-comp" id="tkComp"></div>
+          <div class="tk-foot"><span id="tkDate">7.06.26 · 5:00PM</span><span>GOING 💜</span></div>
+        </div>
+        <div class="sharerow">
+          <button class="btn primary" onclick="savePhoto()">⬇️ Save photo</button>
+          <button class="btn lav2btn" onclick="shareCard()">📤 Share</button>
+          <button class="btn lav2btn" onclick="copyImage()">🖼️ Copy image</button>
+        </div>
+        <div class="sharehint" id="shareHint">Save it, then drop it into WhatsApp or iMessage 💜</div>
+      </div>
+
+      <div class="iti-head" style="margin-top:18px">
+        <div class="big">📋💜</div>
+        <h2 id="itiTitle">Our Big Date!</h2>
+        <div class="venue" id="itiVenue"></div>
+        <div class="lovenote">Made with love for Sidhya, the love of Neal's life 💜</div>
+        <div class="sub" style="margin-top:6px">Monday, July 6, 2026 · Round of 16 · Kickoff 5:00 PM</div>
+      </div>
+
+      <div class="sectlabel">Step 1 · two routes that cross 🚆</div>
+      <div class="twoplan">
+        <div class="plan">
+          <h4>🟣 Sidhya, from Crossroads</h4>
+          <p><span class="who">2:35 PM</span> Catch the <b>B Line</b> from Crossroads to <b>Overlake Village</b> station, then tap onto the <b>2 Line</b>.</p>
+        </div>
+        <div class="plan">
+          <h4>🟢 Neal, from Sammamish</h4>
+          <p><span class="who">2:25 PM</span> Catch Metro <b>269</b> from downtown Sammamish to <b>Marymoor Village</b> station, then board the <b>2 Line</b>.</p>
+        </div>
+      </div>
+      <div class="merge">💜 Our paths cross: we meet on the 2 Line around 3:00 PM and ride into Seattle together!</div>
+
+      <div class="sectlabel">Step 2 · the rest of the day, together</div>
+      <div id="timeline"></div>
+
+      <div class="perks">
+        <div class="perk"><span class="pe">👕</span><div>Wear your <b>batch jersey</b>, babu! We're matching the World Cup energy. 💜</div></div>
+        <div class="perk"><span class="pe">💜</span><div>Today's on Neal, a little <b>treat</b> for you. Just show up and enjoy the day with me.</div></div>
+      </div>
+
+      <div class="safety" id="safetyBox"></div>
+      <div class="note" id="reserveNote"></div>
+      <div class="cheeky">Sex is not included in this date unfortunately. 💔😅</div>
+
+      <div class="printrow">
+        <button class="btn primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+        <button class="btn ghost" onclick="go(0)">↺ Start over</button>
+      </div>
+    </section>
+
+  </div>
+  <div class="foot">No car needed, every leg is train and bus on the 2 Line!<br>The 2 Line runs until midnight, so there is never a rush home. 💜</div>
+</div>
+
+<script>
+/* ---------- venue illustrations (custom lavender art) ---------- */
+const ART = {
+  mural:`<svg class="art" viewBox="0 0 400 118" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b79bf0"/><stop offset="1" stop-color="#e9ddff"/></linearGradient></defs>
+    <rect width="400" height="118" fill="url(#sky1)"/>
+    <circle cx="330" cy="32" r="16" fill="#fff3c4" opacity=".8"/>
+    <!-- space needle -->
+    <g fill="#5e3aa6"><rect x="92" y="40" width="6" height="60"/><path d="M70 44 q25 -16 50 0 q-8 10 -25 10 q-17 0 -25 -10z"/><rect x="88" y="20" width="14" height="22"/><circle cx="95" cy="18" r="4"/></g>
+    <!-- ferris wheel -->
+    <g stroke="#6a44b8" stroke-width="2.5" fill="none"><circle cx="300" cy="62" r="30"/><line x1="300" y1="32" x2="300" y2="92"/><line x1="270" y1="62" x2="330" y2="62"/><line x1="279" y1="41" x2="321" y2="83"/><line x1="321" y1="41" x2="279" y2="83"/></g>
+    <line x1="300" y1="92" x2="288" y2="100" stroke="#6a44b8" stroke-width="2.5"/><line x1="300" y1="92" x2="312" y2="100" stroke="#6a44b8" stroke-width="2.5"/>
+    <!-- crowd -->
+    <g fill="#7c4dca"><circle cx="30" cy="104" r="9"/><circle cx="55" cy="106" r="10"/><circle cx="120" cy="106" r="10"/><circle cx="160" cy="104" r="9"/><circle cx="200" cy="106" r="10"/><circle cx="240" cy="105" r="9"/></g>
+    <rect x="0" y="106" width="400" height="12" fill="#6a44b8"/>
+    <text x="14" y="24" font-family="Arial" font-size="12" font-weight="bold" fill="#5e3aa6">SEATTLE CENTER</text>
+  </svg>`,
+  pier:`<svg class="art" viewBox="0 0 400 118" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3c9e8"/><stop offset="1" stop-color="#c9b3f2"/></linearGradient></defs>
+    <rect width="400" height="118" fill="url(#sky2)"/>
+    <circle cx="60" cy="34" r="15" fill="#ffe6a8"/>
+    <!-- mountains -->
+    <path d="M0 70 L60 40 L110 70 Z" fill="#9b7fd6" opacity=".7"/><path d="M90 70 L150 44 L210 70 Z" fill="#8a6dc9" opacity=".6"/>
+    <!-- water -->
+    <rect x="0" y="70" width="400" height="48" fill="#7c63c0"/>
+    <g stroke="#9c86d8" stroke-width="2"><line x1="20" y1="84" x2="60" y2="84"/><line x1="120" y1="92" x2="170" y2="92"/><line x1="250" y1="86" x2="300" y2="86"/></g>
+    <!-- great wheel -->
+    <g stroke="#fff" stroke-width="2.5" fill="none" opacity=".95"><circle cx="320" cy="56" r="28"/><line x1="320" y1="28" x2="320" y2="84"/><line x1="292" y1="56" x2="348" y2="56"/><line x1="300" y1="36" x2="340" y2="76"/><line x1="340" y1="36" x2="300" y2="76"/></g>
+    <rect x="316" y="84" width="8" height="20" fill="#fff" opacity=".9"/>
+    <!-- market sign -->
+    <rect x="120" y="40" width="86" height="20" rx="3" fill="#c0392b"/><text x="163" y="54" font-family="Arial" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">PUBLIC MARKET</text>
+    <text x="14" y="22" font-family="Arial" font-size="12" font-weight="bold" fill="#6a3cb8">PIER 62 · PIKE PLACE</text>
+  </svg>`,
+  house:`<svg class="art" viewBox="0 0 400 118" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="sky3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9b72e8"/><stop offset="1" stop-color="#d7c8f6"/></linearGradient></defs>
+    <rect width="400" height="118" fill="url(#sky3)"/>
+    <!-- mall facade -->
+    <rect x="40" y="22" width="320" height="96" rx="6" fill="#6a44b8"/>
+    <rect x="56" y="34" width="288" height="72" rx="4" fill="#2e1f47"/>
+    <!-- glowing screen -->
+    <rect x="70" y="44" width="260" height="52" rx="3" fill="#b57edc"/>
+    <circle cx="200" cy="70" r="15" fill="#fff"/><path d="M200 60 l4 8 l-8 0 z M200 80 l4 -8 l-8 0 z" fill="#7c4dca"/>
+    <g fill="#ffd166"><circle cx="120" cy="70" r="3"/><circle cx="280" cy="70" r="3"/></g>
+    <text x="200" y="113" font-family="Arial" font-size="11" font-weight="bold" fill="#3d2a63" text-anchor="middle">SEATTLE SOCCER HOUSE · PACIFIC PLACE</text>
+  </svg>`
+};
+
+/* ---------- data ---------- */
+const VENUES = {
+  mural:{
+    name:"Mural Amphitheatre, Seattle Center",
+    short:"Seattle Center · Mural Amphitheatre",
+    desc:"The city's signature OUTDOOR watch party! DJs, performances, a beer garden, and huge crowd energy. Free, no registration. The indoor Armory next door is our rain or cool-down backup, same campus.",
+    crown:true,
+    transferLine:"Hop the <b>Monorail</b> at Westlake (2 min) straight into Seattle Center!",
+    safety:"Free with no registration, and the open Seattle Center campus has lots of exits, so it is the easiest of the options to move through or step out of in a big crowd. The indoor Armory next door is our backup if it rains or the Mural packs out. Bags are screened at entry.",
+    during:[
+      {e:"🥗",t:"Armory Food Court",d:"Dozens of stalls right by the Mural! Veg grain bowls, salads, falafel wraps. Fast and healthy."},
+      {e:"🧆",t:"Café Suliman",d:"Casual Levantine mezze, hummus, and fresh salads. Loads of vegetarian, light and comforting."},
+      {e:"🇬🇷",t:"Lola",d:"Bright Greek small plates a short walk away. Veg spreads, pita, and salads before kickoff."}
+    ],
+    after:[
+      {e:"🍛",t:"ROTI Cuisine of India",d:"Authentic Indian right in Lower Queen Anne. Tons of veg, perfect for our anniversary dinner. 💜",res:true},
+      {e:"🍕",t:"Via Tribunali",d:"Low-key Neapolitan pizza in Queen Anne, easy veg margherita and marinara. Relaxed vibe.",res:false},
+      {e:"🍝",t:"Messina Modern Italian",d:"Date-night Italian steps from the arena with veg pasta. Cozy and romantic!",res:true},
+      {e:"🧆",t:"Café Suliman",d:"Keep it easy with warm vegetarian Levantine comfort food near the festival.",res:false}
+    ]
+  },
+  pier:{
+    name:"Pier 62 Waterfront",
+    short:"Pier 62 · Pike Place Waterfront",
+    desc:"The most scenic option! A giant LED wall on the water with Puget Sound and the Olympics behind it, beer garden and food trucks. Free, but tickets are required and not every match is shown, so we confirm July 6. No barge, we do the free dockside party.",
+    crown:false,
+    transferLine:"Short walk downhill from Westlake to Pike Place and the Pier 62 waterfront!",
+    safety:"Free but ticketed, so we register in advance and confirm July 6 is on their schedule, and since we do not have barge tickets it is the free dockside party. It is a confined pier with limited entry and exit, so we arrive 30 plus minutes early for screening. No backpacks, bags must stay under 14 by 6 by 14 inches. Blankets allowed.",
+    during:[
+      {e:"🥗",t:"Michou",d:"Power Greens and quinoa-kale salads, fresh from local ingredients. The veg standout of the market."},
+      {e:"🧆",t:"Falafel King",d:"Fresh falafel wraps, plates, and salads. Quick vegetarian Middle-Eastern grab-and-go!"},
+      {e:"🥪",t:"Sisters European Café",d:"Veg salads and toasted focaccia sandwiches. Hearty and easy to carry to the pier."}
+    ],
+    after:[
+      {e:"🍛",t:"Zaika",d:"Modern Indian on Pike St with big veg and vegan menus and a full bar. Our anniversary pick. 💜",res:true},
+      {e:"🍝",t:"La Fontana Siciliana",d:"Cozy, quiet Sicilian three blocks from the market, lovely veg pastas. Tucked-away date feel.",res:true},
+      {e:"🕯️",t:"Cotto Belltown",d:"Intimate candle-lit bistro, housemade pasta and wood-fired veg pizza. Calmer early evening.",res:true},
+      {e:"🍷",t:"Neb Wine Bar",d:"Intimate Italian wine bar, share rustic wood-fired veg plates and a bottle.",res:true}
+    ]
+  },
+  house:{
+    name:"Seattle Soccer House, Pacific Place",
+    short:"Seattle Soccer House · Pacific Place",
+    desc:"The wildest screen in town! A 4-story interior LED wall inside the downtown Pacific Place mall, daily through the last Seattle match July 6. Fully indoor and climate-controlled, basically on top of Westlake station.",
+    crown:false,
+    transferLine:"We are basically there! Pacific Place is right across from Westlake station.",
+    safety:"Fully indoor mall, climate-controlled with no weather risk, plus multiple floors and exits. Bags are screened at entry. The most low-key, comfy option if it is hot or busy.",
+    during:[
+      {e:"🥣",t:"Café Yumm!",d:"Healthy veg rice and bean bowls and salads in the downtown core. Quick, light, filling!"},
+      {e:"🍜",t:"Thai Ginger",d:"Right inside Pacific Place. Fresh Thai with tofu and lots of veg options before kickoff."},
+      {e:"🧆",t:"Falafel King",d:"Grab a veg falafel wrap over at nearby Pike Place and bring it in. Easy protein for the match!"}
+    ],
+    after:[
+      {e:"🍛",t:"Zaika",d:"Modern Indian a few blocks away on Pike St, huge veg menu. Our anniversary pick. 💜",res:true},
+      {e:"🍲",t:"Wild Ginger",d:"Downtown Pacific Rim favorite with great tofu and veg dishes, house-made sambals. A notch nicer.",res:true},
+      {e:"🥔",t:"Tulio",d:"Rustic downtown Italian famous for sweet potato gnocchi and thoughtful veg options.",res:true},
+      {e:"🥟",t:"Din Tai Fung",d:"In the same building, order the veggie dumplings and greens. No trek after the game.",res:true}
+    ]
+  }
+};
+
+const pick = {venue:null, during:null, after:null};
+
+function venueCards(){
+  const wrap=document.getElementById('venueCards'); wrap.innerHTML='';
+  Object.entries(VENUES).forEach(([key,v])=>{
+    const c=document.createElement('div');
+    c.className='vcard'+(pick.venue===key?' sel':'');
+    c.innerHTML=`${v.crown?'<span class="crown">👑 Top pick</span>':''}
+      ${ART[key]}
+      <div class="vbody"><div class="ttl">${v.name}</div><div class="desc">${v.desc}</div></div>`;
+    c.onclick=()=>{
+      if(pick.venue!==key){pick.during=null;pick.after=null;}
+      pick.venue=key; venueCards();
+      document.getElementById('next1').disabled=false;
+    };
+    wrap.appendChild(c);
+  });
+}
+function foodCards(which){
+  const list=VENUES[pick.venue][which];
+  const wrap=document.getElementById(which==='during'?'duringCards':'afterCards');
+  wrap.innerHTML='';
+  list.forEach(item=>{
+    const c=document.createElement('div');
+    c.className='card'+(pick[which]&&pick[which].t===item.t?' sel':'');
+    c.innerHTML=`<div class="emoji">${item.e}</div><div>
+      <div class="ttl">${item.t}</div>
+      <div class="desc">${item.d}</div>
+      <span class="tag veg">🌱 vegetarian</span>${item.res?' <span class="tag">reserve ahead</span>':''}</div>`;
+    c.onclick=()=>{
+      pick[which]=item; foodCards(which);
+      document.getElementById(which==='during'?'next2':'next3').disabled=false;
+    };
+    wrap.appendChild(c);
+  });
+}
+function go(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  for(let i=0;i<4;i++){document.getElementById('d'+i).classList.toggle('on', i<=Math.min(n,3));}
+  if(n===1) venueCards();
+  if(n===2){ foodCards('during'); document.getElementById('next2').disabled=!pick.during; }
+  if(n===3){ foodCards('after'); document.getElementById('next3').disabled=!pick.after; }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function reveal(){
+  const v=VENUES[pick.venue];
+  const name=(document.getElementById('nameField').value||'').trim()||'Sidhya';
+  document.getElementById('itiTitle').textContent = `${name} & Neal's Big Date!`;
+  document.getElementById('itiVenue').textContent = v.name;
+  // shareable ticket
+  document.getElementById('tkVenue').textContent = v.short;
+  document.getElementById('tkComp').innerHTML =
+    `WATCH&nbsp;&nbsp;<b>${v.short}</b><br>SNACK&nbsp;&nbsp;<b>${pick.during.t}</b><br>DINNER&nbsp;<b>${pick.after.t}</b>`;
+  const tk = ` ${name.toUpperCase()} ♥ NEAL · 8 MONTHS · JULY 6 2026 · WORLD CUP R16 ·`;
+  document.getElementById('tkTicker').textContent = tk.repeat(6);
+
+  const rows=[
+    ['~3:45 PM','<b>Arrive Westlake together.</b>', v.transferLine],
+    ['4:00 PM',`<b>Snack: ${pick.during.t}!</b>`, pick.during.d+' Then clear security and find a great spot.'],
+    ['5:00 PM','<b>Kickoff, Round of 16! ⚽</b>','Watch party at '+v.name+'. Jerseys on! 💜'],
+    ['~7:00 PM','<b>Full time!</b>','Soak up the atmosphere and let the first crowd wave clear out.'],
+    ['7:30 PM',`<b>Dinner: ${pick.after.t}!</b>`, pick.after.d],
+    ['~9:30 PM','<b>Easy ride home.</b>','Back on the 2 Line from Westlake. It runs until midnight, so we just reverse the morning routes.']
+  ];
+  document.getElementById('timeline').innerHTML = rows.map(r=>
+    `<div class="time"><div class="clk">${r[0]}</div><div class="body">${r[1]}<small>${r[2]}</small></div></div>`).join('');
+  document.getElementById('safetyBox').innerHTML='🛟 <b>Good to know:</b> '+v.safety+
+    ' If the US is playing, expect the biggest crowds of the tournament, so we get there early and post up near an exit!';
+  document.getElementById('reserveNote').innerHTML = pick.after.res
+    ? '📞 <b>Heads up babu:</b> Neal will book a 7:30 PM table at '+pick.after.t+' now, since July 6 fills up fast. (His treat, of course.)'
+    : '✅ '+pick.after.t+' is walk-in friendly, but heading over a little after full-time helps us skip the rush!';
+  go(4);
+}
+venueCards();
+
+/* ---------- shareable image export ---------- */
+async function cardBlob(){
+  const card=document.getElementById('shareCard');
+  card.classList.add('capturing');
+  const canvas=await html2canvas(card,{scale:2,backgroundColor:'#0e1116',useCORS:true});
+  card.classList.remove('capturing');
+  return await new Promise(r=>canvas.toBlob(r,'image/png'));
+}
+function hint(msg){const h=document.getElementById('shareHint');if(h)h.textContent=msg;}
+async function savePhoto(){
+  try{const blob=await cardBlob();const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='im-going-with-my-boyfriend.png';
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    hint('Saved! Now share it in WhatsApp or iMessage 💜');
+  }catch(e){hint('Save failed, try the Share button or just screenshot 💜');}
+}
+async function shareCard(){
+  try{const blob=await cardBlob();
+    const file=new File([blob],'im-going-with-my-boyfriend.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:"I'm going with my boyfriend!",text:"I'm going to the World Cup with my boyfriend! 💜"});
+      hint('Shared! 💜');
+    }else{await savePhoto();hint('Saved the image, attach it in your chat app 💜');}
+  }catch(e){hint('Share cancelled. You can Save photo instead 💜');}
+}
+async function copyImage(){
+  try{const blob=await cardBlob();
+    await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    hint('Copied! Paste it into WhatsApp or iMessage 💜');
+  }catch(e){hint('Copy not supported here, use Save photo instead 💜');}
+}
+
+/* ---------- background music: Still Woozy - Shotput ---------- */
+var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
+function onYouTubeIframeAPIReady(){
+  ytPlayer=new YT.Player('ythost',{
+    videoId:'0wDD7ItMjbE',
+    playerVars:{autoplay:0,playsinline:1,controls:0,rel:0},
+    events:{'onReady':function(){musicReady=true;if(musicWanted)startMusic();}}
+  });
+}
+function startMusic(){
+  musicWanted=true;
+  if(!musicReady||!ytPlayer)return;
+  try{ytPlayer.unMute();ytPlayer.setVolume(45);ytPlayer.playVideo();musicOn=true;updateMusicBtn();}catch(e){}
+}
+function toggleMusic(){
+  if(!musicOn){startMusic();}
+  else{try{ytPlayer.pauseVideo();}catch(e){}musicOn=false;updateMusicBtn();}
+}
+function updateMusicBtn(){const b=document.getElementById('musicBtn');if(b)b.textContent=musicOn?'🔊':'🎵';}
+/* autoplay policies: kick off on the first interaction anywhere */
+document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
+</script>
+<div id="ythost"></div>
+<button id="musicBtn" title="Still Woozy - Shotput" onclick="toggleMusic()">🎵</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
