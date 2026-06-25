@@ -527,11 +527,11 @@ async function copyImage(){
   }catch(e){hint('Copy not supported here, use Save photo instead 💜');}
 }
 
-/* ---------- background music: Still Woozy - Shotput ---------- */
+/* ---------- background music: Still Woozy - Shotput (slowed + reverb) ---------- */
 var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
 function onYouTubeIframeAPIReady(){
   ytPlayer=new YT.Player('ythost',{
-    videoId:'0wDD7ItMjbE',
+    videoId:'K4Fk9Clc12w',
     playerVars:{autoplay:0,playsinline:1,controls:0,rel:0},
     events:{'onReady':function(){musicReady=true;if(musicWanted)startMusic();}}
   });
@@ -550,7 +550,7 @@ function updateMusicBtn(){const b=document.getElementById('musicBtn');if(b)b.tex
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
 </script>
 <div id="ythost"></div>
-<button id="musicBtn" title="Still Woozy - Shotput" onclick="toggleMusic()">🎵</button>
+<button id="musicBtn" title="Still Woozy - Shotput (slowed + reverb)" onclick="toggleMusic()">🎵</button>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
