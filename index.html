@@ -7,26 +7,26 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='52' font-size='80' text-anchor='middle' dominant-baseline='central'>%F0%9F%92%9C</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Parisienne&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
   :root{
-    --lav:#7c4dca; --lav2:#9b72e8; --lav3:#c4b5fd; --accent:#b57edc;
+    --lav:#7c4dca; --lav2:#9b72e8; --lav3:#c4b5fd; --accent:#b57edc; --accent2:#6a4fe0;
     --sun:#ffd166; --ink:#2e1f47; --paper:#faf7ff;
     --card:#ffffff; --line:#e7ddf7; --muted:#6b5d82;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
-    font-family:'Poppins',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    font-family:'Geist',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
     background:linear-gradient(160deg,#7c4dca 0%,#9b72e8 45%,#c4b5fd 100%);
-    color:var(--ink);min-height:100vh;padding:24px 16px;
+    color:var(--ink);min-height:100vh;padding:24px 16px 96px;
   }
-  h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Poppins',system-ui,sans-serif;font-weight:700;letter-spacing:.2px}
-  .fancy{font-family:'Parisienne',cursive;font-weight:400;font-style:normal}
-  .lovenote{font-family:'Parisienne',cursive;font-weight:400;font-style:normal}
+  h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Geist',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;letter-spacing:-.02em}
+  .fancy{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;color:var(--accent2)}
+  .lovenote{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400}
   .wrap{max-width:680px;margin:0 auto}
   .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
   .topbar .ball{font-size:22px}
-  .topbar h1{font-size:15px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
+  .topbar h1{font-family:'Geist Mono',ui-monospace,monospace;font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
   .progress{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
   .dot{width:34px;height:5px;border-radius:3px;background:rgba(255,255,255,.35)}
   .dot.on{background:var(--sun)}
@@ -34,7 +34,7 @@
   .step{display:none;animation:fade .35s ease}
   .step.active{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .eyebrow{color:var(--lav);font-weight:800;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+  .eyebrow{font-family:'Geist Mono',ui-monospace,monospace;color:var(--lav);font-weight:500;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
   h2{font-size:24px;line-height:1.2;margin-bottom:6px}
   .sub{color:var(--muted);font-size:14.5px;margin-bottom:20px;line-height:1.5}
   .cards{display:grid;gap:12px}
@@ -71,13 +71,13 @@
   .hero{text-align:center;padding:8px 0 4px}
   .hero .big{font-size:46px;margin-bottom:8px}
   .hero h2{font-size:27px}
-  .pill{display:inline-flex;gap:7px;align-items:center;background:#efe7fb;color:var(--lav);font-weight:800;font-size:12.5px;padding:6px 13px;border-radius:30px;margin-bottom:14px}
+  .pill{font-family:'Geist Mono',ui-monospace,monospace;display:inline-flex;gap:7px;align-items:center;background:#efe7fb;color:var(--lav);font-weight:500;font-size:11.5px;letter-spacing:.3px;padding:6px 13px;border-radius:30px;margin-bottom:14px}
 
   .iti-head{text-align:center;margin-bottom:14px}
   .iti-head .big{font-size:38px}
   .iti-head h2{font-size:24px;margin-top:4px}
   .iti-head .venue{color:var(--lav);font-weight:700;margin-top:4px}
-  .lovenote{color:var(--accent);font-weight:600;font-size:13px;margin-top:6px}
+  .lovenote{color:var(--accent);font-weight:400;font-size:16px;margin-top:6px}
 
   /* split-then-merge plans */
   .twoplan{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
@@ -100,7 +100,7 @@
   .perk .pe{font-size:20px}
   .cheeky{text-align:center;font-style:italic;color:var(--muted);font-size:13.5px;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
   .printrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
-  .sectlabel{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+  .sectlabel{font-family:'Geist Mono',ui-monospace,monospace;font-size:10.5px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
 
   /* shareable card */
   .sharewrap{margin-top:6px}
@@ -130,13 +130,13 @@
   .tk-pickname{font-size:21px;font-weight:800;line-height:1.1}
   .tk-picksub{font-size:13px;color:#9b93b5;margin-top:3px}
   .tk-ticker{position:relative;height:34px;margin:0 -18px 16px;background:linear-gradient(90deg,#1a1330,#241a44,#1a1330);border-top:1px solid #3a2d63;border-bottom:1px solid #3a2d63;overflow:hidden;display:flex;align-items:center}
-  .tk-track{white-space:nowrap;font-family:'Courier New',monospace;font-weight:700;font-size:13px;color:#a78bfa;letter-spacing:1px;animation:tick 22s linear infinite;will-change:transform}
+  .tk-track{white-space:nowrap;font-family:'Geist Mono','Courier New',monospace;font-weight:500;font-size:13px;color:#a78bfa;letter-spacing:1px;animation:tick 22s linear infinite;will-change:transform}
   @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   .tk-stats{display:flex;gap:18px;margin-bottom:12px}
   .tk-stats>div{flex:1}
   .tk-lbl{font-size:12px;letter-spacing:1.5px;color:#8a82a6;font-weight:700;margin-bottom:2px}
   .tk-val{font-size:25px;font-weight:800;color:#fff}
-  .tk-comp{font-family:'Courier New',monospace;font-size:12.5px;color:#9b93b5;line-height:1.8;border-top:1px dashed #333a47;padding-top:10px;margin-bottom:11px}
+  .tk-comp{font-family:'Geist Mono','Courier New',monospace;font-size:12.5px;color:#9b93b5;line-height:1.8;border-top:1px dashed #333a47;padding-top:10px;margin-bottom:11px}
   .tk-comp b{color:#d7d2ea}
   .tk-foot{display:flex;justify-content:space-between;font-family:'Courier New',monospace;font-size:12px;color:#7c7595;letter-spacing:1px}
   .capturing .tk-track{animation:none!important;transform:none!important}
@@ -145,8 +145,30 @@
   .lav2btn{background:#efe7fb;color:#5e3aa6}
   .lav2btn:hover{background:#e3d6f7}
   /* floating music button */
-  #musicBtn{position:fixed;right:16px;bottom:16px;z-index:50;width:52px;height:52px;border-radius:50%;border:none;background:var(--lav);color:#fff;font-size:22px;cursor:pointer;box-shadow:0 6px 18px rgba(53,28,94,.45);transition:.15s}
-  #musicBtn:hover{background:#6a3cb8;transform:scale(1.06)}
+  /* Spotify-style bottom player bar */
+  #playerbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:9px 16px;background:rgba(18,12,34,.93);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-top:1px solid rgba(167,139,250,.32);box-shadow:0 -6px 26px rgba(18,8,38,.45);color:#fff;
+    transform:translateY(120%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  #playerbar.show{transform:none}
+  .pb-info{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
+  .pb-art{width:42px;height:42px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;font-size:21px;
+    background:linear-gradient(135deg,#7c4dca,#9b72e8);box-shadow:0 2px 10px rgba(124,77,202,.5)}
+  .pb-meta{min-width:0}
+  .pb-title{font-family:'Geist',sans-serif;font-weight:700;font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pb-artist{font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#bcb2d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .pb-controls{display:flex;align-items:center;gap:4px;flex:none}
+  .pb-btn{background:transparent;border:none;color:#e8e4f6;font-size:16px;cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.15s;line-height:1}
+  .pb-btn:hover{background:rgba(167,139,250,.22)}
+  .pb-btn:active{transform:scale(.92)}
+  .pb-play{background:#fff;color:#34206b;width:42px;height:42px;font-size:16px}
+  .pb-play:hover{background:#ece6fb;transform:scale(1.06)}
+  @media (max-width:520px){
+    #playerbar{padding:8px 11px;gap:8px}
+    .pb-art{width:38px;height:38px;font-size:18px}
+    .pb-btn{width:36px;height:36px;font-size:15px}
+    .pb-play{width:40px;height:40px}
+  }
   #ythost{position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none}
 
   @media (max-width:520px){
@@ -531,10 +553,10 @@ async function copyImage(){
 /* ---------- background music: looping playlist with fade transitions ----------
    Shotput (slowed+reverb) -> Heat Waves -> Babydoll -> Flight's Booked -> loop  */
 var MUSIC=[
-  {id:'K4Fk9Clc12w', label:'Still Woozy - Shotput (slowed + reverb)'},
-  {id:'mRD0-GxqHVo', label:'Glass Animals - Heat Waves'},
-  {id:'nb8CnIo_-_A', label:'Dominic Fike - Babydoll'},
-  {id:'hb24kZ0fiEA', label:"Drake - Flight's Booked"}
+  {id:'K4Fk9Clc12w', title:'Shotput (slowed + reverb)', artist:'Still Woozy'},
+  {id:'c9jTdUBMys8', title:'Heat Waves', artist:'Glass Animals'},
+  {id:'nb8CnIo_-_A', title:'Babydoll', artist:'Dominic Fike'},
+  {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake'}
 ];
 var MAXVOL=45, FADE_MS=2500, FADE_TICK=80;
 var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
@@ -545,12 +567,13 @@ function onYouTubeIframeAPIReady(){
     videoId:MUSIC[0].id,
     playerVars:{autoplay:0,playsinline:1,controls:0,rel:0},
     events:{
-      'onReady':function(){musicReady=true;if(musicWanted)startMusic();},
+      'onReady':function(){musicReady=true;showPlayerBar();updatePlayerBar();if(musicWanted)startMusic();},
       'onStateChange':onPlayerState,
       'onError':function(){nextTrack();}   // skip any track that won't play
     }
   });
 }
+function showPlayerBar(){var pb=document.getElementById('playerbar');if(pb)pb.classList.add('show');}
 function clearFade(){if(fadeTimer){clearInterval(fadeTimer);fadeTimer=null;}}
 function fadeTo(target,done){
   clearFade();
@@ -572,14 +595,21 @@ function armEndWatch(){
     }catch(e){}
   },300);
 }
-function nextTrack(){
-  trackIdx=(trackIdx+1)%MUSIC.length;
-  try{ytPlayer.setVolume(0);ytPlayer.loadVideoById(MUSIC[trackIdx].id);ytPlayer.playVideo();}catch(e){}
-  updateMusicBtn();
+function loadTrack(i){
+  trackIdx=(i+MUSIC.length)%MUSIC.length;
+  musicWanted=true;musicOn=true;
+  try{ytPlayer.unMute();ytPlayer.setVolume(0);ytPlayer.loadVideoById(MUSIC[trackIdx].id);ytPlayer.playVideo();}catch(e){}
+  updatePlayerBar();
+}
+function nextTrack(){loadTrack(trackIdx+1);}
+function prevTrack(){
+  /* if we're well into a song, "prev" restarts it (like Spotify); otherwise go back one */
+  var restart=false;try{restart=ytPlayer.getCurrentTime&&ytPlayer.getCurrentTime()>3;}catch(e){}
+  loadTrack(restart?trackIdx:trackIdx-1);
 }
 function onPlayerState(e){
   if(e.data===YT.PlayerState.ENDED){nextTrack();}
-  else if(e.data===YT.PlayerState.PLAYING){if(musicOn)fadeTo(MAXVOL);armEndWatch();}  // fade the new track in
+  else if(e.data===YT.PlayerState.PLAYING){if(musicOn)fadeTo(MAXVOL);armEndWatch();updatePlayerBar();}  // fade the new track in
 }
 function startMusic(){
   musicWanted=true;
@@ -589,22 +619,38 @@ function startMusic(){
     var st=ytPlayer.getPlayerState&&ytPlayer.getPlayerState();
     if(st===2){ytPlayer.playVideo();}            // resume after a manual pause
     else{ytPlayer.setVolume(0);ytPlayer.playVideo();}
-    fadeTo(MAXVOL);armEndWatch();updateMusicBtn();
+    fadeTo(MAXVOL);armEndWatch();updatePlayerBar();
   }catch(e){}
 }
 function toggleMusic(){
   if(!musicOn){startMusic();}
-  else{try{ytPlayer.pauseVideo();}catch(e){}musicOn=false;clearFade();if(endWatch){clearInterval(endWatch);endWatch=null;}updateMusicBtn();}
+  else{try{ytPlayer.pauseVideo();}catch(e){}musicOn=false;clearFade();if(endWatch){clearInterval(endWatch);endWatch=null;}updatePlayerBar();}
 }
-function updateMusicBtn(){
-  var b=document.getElementById('musicBtn');
-  if(b){b.textContent=musicOn?'🔊':'🎵';b.title=(musicOn?'Now playing: ':'Play: ')+MUSIC[trackIdx].label;}
+function updatePlayerBar(){
+  var t=MUSIC[trackIdx];
+  var ti=document.getElementById('pbTitle'), ar=document.getElementById('pbArtist'), pl=document.getElementById('pbPlay');
+  if(ti)ti.textContent=t.title;
+  if(ar)ar.textContent=t.artist;
+  if(pl){pl.textContent=musicOn?'⏸':'▶';pl.title=musicOn?'Pause':'Play';}
 }
 /* autoplay policies: kick off on the first interaction anywhere */
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
 </script>
 <div id="ythost"></div>
-<button id="musicBtn" title="Play: Shotput → Heat Waves → Babydoll → Flight's Booked" onclick="toggleMusic()">🎵</button>
+<div id="playerbar" role="region" aria-label="Music player">
+  <div class="pb-info">
+    <div class="pb-art">🎧</div>
+    <div class="pb-meta">
+      <div class="pb-title" id="pbTitle">Shotput (slowed + reverb)</div>
+      <div class="pb-artist" id="pbArtist">Still Woozy</div>
+    </div>
+  </div>
+  <div class="pb-controls">
+    <button class="pb-btn" id="pbPrev" onclick="prevTrack()" title="Previous" aria-label="Previous track">⏮</button>
+    <button class="pb-btn pb-play" id="pbPlay" onclick="toggleMusic()" title="Play" aria-label="Play or pause">▶</button>
+    <button class="pb-btn" id="pbNext" onclick="nextTrack()" title="Next" aria-label="Next track">⏭</button>
+  </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
