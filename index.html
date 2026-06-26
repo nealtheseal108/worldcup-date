@@ -203,10 +203,29 @@
     .sharecard h3{font-size:23px}
   }
   @media print{
-    body{background:#fff;padding:0;color:#000}
-    .topbar,.progress,.nav,.printrow,.foot,.sharehint{display:none!important}
-    .panel{box-shadow:none;padding:0}
-    .note,.safety,.crown,.cheeky,.lovenote,.sharecard,.perk,.plan,.merge{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    @page{margin:0}
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    body{background:#0e1116;padding:0;margin:0}
+    .wrap{max-width:none;margin:0;padding:0}
+    .topbar,.matchup,.progress,.datemap,#playerbar,.nav,.printrow,.foot,.sharehint,.sharerow,.iti-head,.sectlabel,.twoplan,.merge,#timeline,.note,.safety,.perks,.cheeky{display:none!important}
+    .step:not(.active){display:none!important}
+    .panel{box-shadow:none;padding:0;background:transparent;border-radius:0}
+    .sharewrap{margin:0}
+    /* the ticket card becomes a full-page wall poster */
+    .ticket{min-height:100vh;border:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:8vh 9vw!important}
+    .ticket .tk-top{font-size:20px}
+    .ticket .tk-brand{font-size:34px}
+    .ticket .tk-title{font-size:46px;line-height:1.12;margin:14px 0 26px}
+    .ticket .tk-pick{margin-bottom:26px}
+    .ticket .tk-thumb{width:88px;height:88px}
+    .ticket .tk-pickname{font-size:32px}
+    .ticket .tk-picksub{font-size:17px}
+    .ticket .tk-ticker{height:46px;margin:6px 0 22px}
+    .ticket .tk-track{font-size:19px}
+    .ticket .tk-lbl{font-size:15px}
+    .ticket .tk-val{font-size:40px}
+    .ticket .tk-comp{font-size:18px;line-height:2.1}
+    .ticket .tk-foot{font-size:16px;margin-top:10px}
   }
 </style>
 </head>
@@ -219,8 +238,8 @@
     <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
   </div>
 
-  <div class="datemap">
-    <div class="cap">tap a spot — i'll worm us there 💜</div>
+  <div class="datemap" style="display:none">
+    <div class="cap">tap a spot, i'll worm us there 💜</div>
     <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Route map from the Eastside to Seattle">
       <defs><linearGradient id="wormgrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9b72e8"/><stop offset="1" stop-color="#7c4dca"/></linearGradient></defs>
       <rect width="640" height="200" rx="12" fill="#f1ebfc"/>
@@ -253,7 +272,7 @@
         <div class="big">⚽💜</div>
         <div class="pill">HAPPY 8 MONTHS · ROUND OF 16 · 5 PM!</div>
         <h2>hey sidhu, you get to pick our <span class="fancy">date!!</span></h2>
-        <p class="sub" style="margin-top:10px">happy 8 months babu!! 💜 i handled all the boring stuff (trains, timing, no car needed) so you just pick the fun: where we watch, what we snack on, where we eat after. you choose and i'll plan around it, type beat 🤩 let's gooo ‼️⚽</p>
+        <p class="sub" style="margin-top:10px">happy 8 months babu!! 💜 i handled all the boring stuff (trains, timing, no car needed) so you just pick the fun: where we watch, what we snack on, where we eat after. you choose and i'll plan around it 🤩 let's gooo ‼️⚽</p>
         <input class="namein" id="nameField" value="Sidhya" maxlength="24">
       </div>
       <div class="nav"><span></span><button class="btn primary" onclick="go(1)">Let's go! →</button></div>
@@ -444,9 +463,9 @@ const VENUES = {
     transferLine:"Hop the <b>Monorail</b> at Westlake (2 min) straight into Seattle Center!",
     safety:"i've already got us sorted, and the open Seattle Center campus has lots of exits, so it is the easiest of the options to move through or step out of in a big crowd. The indoor Armory next door is our backup if it rains or the Mural packs out. Bags are screened at entry.",
     during:[
-      {e:"🌮",t:"Sal y Limón",d:"buzzy michoacán spot that literally plays the games on big screens — load up on veggie tacos, chips n guac before kickoff 🤩",p:"$$",r:4.7,rc:"1.1k"},
+      {e:"🌮",t:"Sal y Limón",d:"buzzy michoacán spot that literally plays the games on big screens, load up on veggie tacos, chips n guac before kickoff 🤩",p:"$$",r:4.7,rc:"1.1k"},
       {e:"🍦",t:"Molly Moon's",d:"seattle's iconic scoop shop, real vegan flavors too. quick sweet stop on the way in 💜",p:"$",r:4.6,rc:"1.5k"},
-      {e:"🥐",t:"Macrina Bakery",d:"belltown institution since '93 — almond croissants n veggie sandwiches to grab on the walk over.",p:"$",r:4.5,rc:"1.3k"}
+      {e:"🥐",t:"Macrina Bakery",d:"belltown institution since '93, almond croissants n veggie sandwiches to grab on the walk over.",p:"$",r:4.5,rc:"1.3k"}
     ],
     after:[
       {e:"🧆",t:"Café Suliman",d:"Warm vegetarian Levantine comfort food near the festival. Easy, tasty, and kind to a student budget.",p:"$"},
@@ -465,10 +484,10 @@ const VENUES = {
     safety:"The dockside party is free and first-come, so we get there early to claim a good spot by the rail. It is a confined pier with limited entry and exit, so we arrive 30 plus minutes early for screening. No backpacks, bags must stay under 14 by 6 by 14 inches. Blankets allowed.",
     during:[
       {e:"🥟",t:"Piroshky Piroshky",d:"pike place legend, the line says it all. vegan potato-mushroom piroshki for the walk to the pier, like $7.",p:"$",r:4.5,rc:"5.8k"},
-      {e:"🧀",t:"Beecher's",d:"the 'world's best' mac n cheese (oprah-approved), totally meat-free — grab a hot cup to split before kickoff.",p:"$$",r:4.6,rc:"2.5k"},
-      {e:"🍩",t:"Daily Dozen Doughnut",d:"warm mini cinnamon-sugar donuts straight off the lil robot — a market rite of passage (cash only).",p:"$",r:4.3,rc:"1.2k"},
-      {e:"🥢",t:"Mee Sum Pastry",d:"pillowy veggie hum bao from a tiny market window since the 80s — portable n a few bucks.",p:"$",r:4.4,rc:"1.2k"},
-      {e:"🫓",t:"The Crumpet Shop",d:"seattle's og crumpets since '76 — go jam or ricotta-honey, hold the butter to keep it veg.",p:"$",r:4.7,rc:"1.5k"}
+      {e:"🧀",t:"Beecher's",d:"the 'world's best' mac n cheese (oprah-approved), totally meat-free, grab a hot cup to split before kickoff.",p:"$$",r:4.6,rc:"2.5k"},
+      {e:"🍩",t:"Daily Dozen Doughnut",d:"warm mini cinnamon-sugar donuts straight off the lil robot, a market rite of passage (cash only).",p:"$",r:4.3,rc:"1.2k"},
+      {e:"🥢",t:"Mee Sum Pastry",d:"pillowy veggie hum bao from a tiny market window since the 80s, portable n a few bucks.",p:"$",r:4.4,rc:"1.2k"},
+      {e:"🫓",t:"The Crumpet Shop",d:"seattle's og crumpets since '76, go jam or ricotta-honey, hold the butter to keep it veg.",p:"$",r:4.7,rc:"1.5k"}
     ],
     after:[
       {e:"🍛",t:"Zaika",d:"Modern Indian on Pike St with big veg and vegan menus. Our anniversary pick, and not too pricey. 💜",p:"$$"},
@@ -483,12 +502,12 @@ const VENUES = {
     transferLine:"We are basically there! Pacific Place is right across from Westlake station.",
     safety:"Fully indoor mall, climate-controlled with no weather risk, plus multiple floors and exits. Bags are screened at entry. The most low-key, comfy option if it is hot or busy.",
     during:[
-      {e:"🍩",t:"Top Pot Doughnuts",d:"obama-famous hand-forged donuts — maple bar + a raspberry glazed n we're set 🤩",p:"$",r:4.5,rc:"2.9k"},
-      {e:"🍕",t:"Serious Pie",d:"tom douglas's blistered wood-fired pies — the foraged mushroom + truffle one is veg n unreal, split it.",p:"$$",r:4.5,rc:"4.6k"},
-      {e:"🍜",t:"Noi Thai",d:"slick downtown thai, the whole veg section is actually vegan — tofu pad see ew before the game.",p:"$$",r:4.4,rc:"2.9k"}
+      {e:"🍩",t:"Top Pot Doughnuts",d:"obama-famous hand-forged donuts, maple bar + a raspberry glazed n we're set 🤩",p:"$",r:4.5,rc:"2.9k"},
+      {e:"🍕",t:"Serious Pie",d:"tom douglas's blistered wood-fired pies, the foraged mushroom + truffle one is veg n unreal, split it.",p:"$$",r:4.5,rc:"4.6k"},
+      {e:"🍜",t:"Noi Thai",d:"slick downtown thai, the whole veg section is actually vegan, tofu pad see ew before the game.",p:"$$",r:4.4,rc:"2.9k"}
     ],
     after:[
-      {e:"🥟",t:"Din Tai Fung (Pacific Place)",d:"in the same building — order the veggie dumplings n greens, no trek after the game, easy on the wallet.",p:"$$"},
+      {e:"🥟",t:"Din Tai Fung (Pacific Place)",d:"in the same building, order the veggie dumplings n greens, no trek after the game, easy on the wallet.",p:"$$"},
       {e:"🍛",t:"Zaika",d:"Modern Indian a few blocks away on Pike St, huge veg menu. Our anniversary pick. 💜",p:"$$"},
       {e:"🍔",t:"Veggie Grill",d:"100% plant-based fast-casual, so the whole menu is fair game: vegan burgers, bowls, crispy tenders. Open late.",p:"$$"},
       {e:"🍕",t:"MOD Pizza",d:"Build-your-own personal pizza, unlimited veggies and vegan cheese for one flat price. Open late.",p:"$"},
@@ -497,15 +516,15 @@ const VENUES = {
   }
 };
 
-/* Eastside dinner options on the 2 Line home (near stations) — shown for every venue */
+/* Eastside dinner options on the 2 Line home (near stations), shown for every venue */
 const EASTSIDE = [
-  {e:"🌶️",t:"Araya's Place",d:"iconic all-vegan thai since '87, so you can order LITERALLY anything — old bellevue by east main station 💜",p:"$$",r:4.5,rc:"1.6k",east:true},
-  {e:"🥟",t:"Din Tai Fung (Bellevue)",d:"world-famous soup dumplings, 18 folds each — full veggie lineup (green dumplings, vegan buns). by bellevue downtown station.",p:"$$",r:4.4,rc:"5.4k",east:true},
-  {e:"🌮",t:"Cactus",d:"eastside fave voted best mexican for years — those butternut squash enchiladas go crazy. bellevue square.",p:"$$",r:4.4,rc:"3.4k",east:true},
-  {e:"🍣",t:"Maneki",d:"seattle's oldest japanese spot (since 1904!), james beard classic — veggie rolls + agedashi tofu, cozy tatami room by the CID stop.",p:"$$",r:4.6,rc:"3.6k",east:true},
-  {e:"🍜",t:"Pho Bac Súp Shop",d:"the pham family's james-beard pho dynasty — tofu n veggie pho, best broth in the city, just off the CID stop.",p:"$",r:4.3,rc:"2.3k",east:true},
+  {e:"🌶️",t:"Araya's Place",d:"iconic all-vegan thai since '87, so you can order LITERALLY anything, old bellevue by east main station 💜",p:"$$",r:4.5,rc:"1.6k",east:true},
+  {e:"🥟",t:"Din Tai Fung (Bellevue)",d:"world-famous soup dumplings, 18 folds each, full veggie lineup (green dumplings, vegan buns). by bellevue downtown station.",p:"$$",r:4.4,rc:"5.4k",east:true},
+  {e:"🌮",t:"Cactus",d:"eastside fave voted best mexican for years, those butternut squash enchiladas go crazy. bellevue square.",p:"$$",r:4.4,rc:"3.4k",east:true},
+  {e:"🍣",t:"Maneki",d:"seattle's oldest japanese spot (since 1904!), james beard classic, veggie rolls + agedashi tofu, cozy tatami room by the CID stop.",p:"$$",r:4.6,rc:"3.6k",east:true},
+  {e:"🍜",t:"Pho Bac Súp Shop",d:"the pham family's james-beard pho dynasty, tofu n veggie pho, best broth in the city, just off the CID stop.",p:"$",r:4.3,rc:"2.3k",east:true},
   {e:"🍰",t:"Hood Famous Cafe",d:"that purple ube cheesecake everyone posts 💜 dreamy filipino dessert + ube latte, right across from the CID station.",p:"$$",r:4.6,rc:"650",east:true},
-  {e:"🍕",t:"Mioposto",d:"wood-fired neapolitan pies in mercer island town center, big veg selection — easy hop off the train.",p:"$$",r:4.3,rc:"1k",east:true}
+  {e:"🍕",t:"Mioposto",d:"wood-fired neapolitan pies in mercer island town center, big veg selection, easy hop off the train.",p:"$$",r:4.3,rc:"1k",east:true}
 ];
 
 const pick = {venue:null, during:null, after:null};
@@ -590,7 +609,7 @@ venueCards();
 var CHEEKY_HIDE_UNTIL=1782457721986; /* Thu Jun 25 2026 ~00:08 PDT (1h from when this was set) */
 function applyCheekyGate(){var el=document.getElementById('cheekyLine');if(el)el.style.display=(Date.now()<CHEEKY_HIDE_UNTIL)?'none':'';}
 applyCheekyGate();
-/* World Cup matchup — Seattle R16 = Match 94 (W81 vs W82). update when the teams are set. */
+/* World Cup matchup, Seattle R16 = Match 94 (W81 vs W82). update when the teams are set. */
 var MATCHUP = "TBD 🆚 TBD";
 var MATCHUP_NOTE = "🇺🇸 could be us!";
 function applyMatchup(){var t=document.getElementById('muText');if(t)t.textContent=MATCHUP;var n=document.getElementById('muNote');if(n)n.textContent=MATCHUP_NOTE;}
@@ -621,6 +640,7 @@ applyMatchup();
     if(pick.venue!==k){pick.during=null;pick.after=null;}
     pick.venue=k; try{venueCards();}catch(e){}
     var n=document.getElementById('next1');if(n)n.disabled=false;
+    var dm=document.querySelector('.datemap');if(dm)dm.style.display='';
     setRoute(k); selPins();
   };
   for(var k in PIN)(function(k){var e=document.getElementById(PIN[k]);if(e)e.onclick=function(){pickVenue(k);};})(k);
@@ -738,11 +758,33 @@ var MUSIC=[
   {id:'nfJReXaXkTY', title:'Passionfruit (slowed + reverb)', artist:'Drake', start:72},
   {id:'qit2Y6CyWx8', title:'Heat Waves (late night edit)', artist:'Glass Animals'},
   {id:'l8KS5HiMXn4', title:'Babydoll (slowed + reverb)', artist:'Dominic Fike'},
-  {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake'},
+  {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake', start:55},
   {id:'ISsxv6i9f_k', title:'Kiss Me More (slowed + reverb)', artist:'Doja Cat & SZA'},
   {id:'y9NPx6NDA6M', title:'Ay No Puedo', artist:'The Marías'},
   {id:'_9hkXCYiEjc', title:'No One Noticed', artist:'The Marías'}
 ];
+/* ---------- add-a-song: paste a YouTube link to drop a track into the playlist ---------- */
+function parseYouTubeId(u){
+  if(!u)return null; u=String(u).trim();
+  var m=u.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/|\/live\/)([A-Za-z0-9_-]{11})/);
+  if(m)return m[1];
+  if(/^[A-Za-z0-9_-]{11}$/.test(u))return u;
+  return null;
+}
+function saveUserSongs(){try{localStorage.setItem('wc_user_songs',JSON.stringify(MUSIC.filter(function(m){return m.userAdded;}).map(function(m){return m.id;})));}catch(e){}}
+function loadUserSongs(){try{(JSON.parse(localStorage.getItem('wc_user_songs')||'[]')||[]).forEach(function(id){if(/^[A-Za-z0-9_-]{11}$/.test(id)&&!MUSIC.some(function(m){return m.id===id;}))MUSIC.push({id:id,title:'your pick 🎵',artist:'added by you',userAdded:true});});}catch(e){}}
+function addSong(){
+  var u=prompt('paste a youtube link to add a song 🎵');
+  if(u===null)return;
+  var id=parseYouTubeId(u);
+  if(!id){hint("hmm that link didn't work, paste a normal youtube url 💜");return;}
+  if(MUSIC.some(function(m){return m.id===id;})){hint("that one's already in the playlist 💜");return;}
+  MUSIC.push({id:id,title:'your pick 🎵',artist:'added by you',userAdded:true});
+  saveUserSongs();
+  hint('added to the playlist! 🎵 playing it now');
+  if(window.loadTrack)loadTrack(MUSIC.length-1);
+}
+loadUserSongs();
 var MAXVOL=45, FADE_MS=2500, FADE_TICK=80;
 var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
 var trackIdx=0, fadeTimer=null, endWatch=null;
@@ -817,6 +859,7 @@ function toggleMusic(){
 }
 function updatePlayerBar(){
   var t=MUSIC[trackIdx];
+  if(t.userAdded && ytPlayer && ytPlayer.getVideoData){try{var vd=ytPlayer.getVideoData();if(vd&&vd.title){t.title=vd.title;if(vd.author)t.artist=vd.author;}}catch(e){}}
   var ti=document.getElementById('pbTitle'), ar=document.getElementById('pbArtist'), pl=document.getElementById('pbPlay');
   if(ti)ti.textContent=t.title;
   if(ar)ar.textContent=t.artist;
@@ -838,6 +881,7 @@ document.addEventListener('click',function once(){startMusic();document.removeEv
     <button class="pb-btn" id="pbPrev" onclick="prevTrack()" title="Previous" aria-label="Previous track">⏮</button>
     <button class="pb-btn pb-play" id="pbPlay" onclick="toggleMusic()" title="Play" aria-label="Play or pause">▶</button>
     <button class="pb-btn" id="pbNext" onclick="nextTrack()" title="Next" aria-label="Next track">⏭</button>
+    <button class="pb-btn" id="pbAdd" onclick="addSong()" title="Add a song from a YouTube link" aria-label="Add a song">➕</button>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>

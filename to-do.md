@@ -16,6 +16,8 @@ Everything lives in the single `index.html`.
 - **Now / Next:** auto-highlight the current timeline beat from the clock; show a countdown to
   kickoff (5:00 PM) and to each upcoming step.
 - Nice-to-haves: live match clock/score, 2 Line transit status, weather.
+- **Live score tracker:** during the match, show the live World Cup score + clock for our game (the matchup is already wired as the `MATCHUP` var; pull from a football score API/feed).
+- **Post-match analysis + planning:** after full time, swap in a quick post-match recap/analysis and a "what's next" planner (head to dinner now vs wait out the crowd, adjust timings based on how it went / if it went to extra time).
 - v1 needs no backend — a client-side clock that highlights the active itinerary row and shows
   "starts in X min" is enough; layer live data in later.
 
