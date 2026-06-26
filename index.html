@@ -731,7 +731,9 @@ var REST_LL={
 var _map=null,_routeLayer=null;
 function ensureMap(){
   if(_map||typeof L==='undefined')return _map;
-  _map=L.map('leafmap',{zoomControl:true,attributionControl:true,scrollWheelZoom:true,dragging:true,doubleClickZoom:true,touchZoom:true,boxZoom:true,tap:true});
+  // interactive via +/- buttons, drag, pinch + double-click; scroll-wheel zoom OFF so it
+  // can't hijack the page scroll and zoom itself off the destination when you scroll past it
+  _map=L.map('leafmap',{zoomControl:true,attributionControl:true,scrollWheelZoom:false,dragging:true,doubleClickZoom:true,touchZoom:true,boxZoom:false,tap:true});
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; OpenStreetMap, &copy; CARTO'}).addTo(_map);
   _routeLayer=L.layerGroup().addTo(_map);
   return _map;
