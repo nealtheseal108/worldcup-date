@@ -59,6 +59,7 @@
   .cards{display:grid;gap:12px}
   #duringCards,#afterCards{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
   .dishes{font-size:12px;color:#6a4fb0;font-weight:600;margin:4px 0 7px;line-height:1.4}
+  .wxcard{display:inline-flex;align-items:center;gap:7px;margin-top:10px;background:#f1ecfc;border:1px solid var(--line);border-radius:30px;padding:7px 15px;font-size:12.5px;color:#4a3578;font-weight:600;line-height:1.3}
   .love{color:#a4307a;background:#fbe0f1}
 
   /* venue cards (with art banner) */
@@ -357,6 +358,7 @@
         <div class="venue" id="itiVenue"></div>
         <div class="lovenote">made this for you sidhu 💜 love you more than anyone</div>
         <div class="sub" style="margin-top:6px">Monday, July 6, 2026 · Round of 16 · Kickoff 5:00 PM · Full time ~6:55 PM</div>
+        <div class="wxcard" id="wxcard">☁️ checking the forecast...</div>
       </div>
 
       <div class="sectlabel">Step 1 · two routes that cross 🚆</div>
@@ -378,6 +380,15 @@
       <div class="perks">
         <div class="perk"><span class="pe">👕</span><div>Wear your <b>batch jersey</b>, babu! We're matching the World Cup energy. 💜</div></div>
         <div class="perk"><span class="pe">💜</span><div>today's on me babu, just a lil <b>treat</b>. show up and enjoy the day with me, i got you 💜</div></div>
+      </div>
+
+      <div class="sectlabel">🎒 what to bring</div>
+      <div class="perks">
+        <div class="perk"><span class="pe">🧥</span><div>a light layer, babu, seattle cools off after the 6:55 final whistle.</div></div>
+        <div class="perk"><span class="pe">👜</span><div>just a small clear bag, no backpacks, bags get screened and have to stay under 14x6x14 in.</div></div>
+        <div class="perk"><span class="pe">📱</span><div>your phone set for the 2 line (orca in apple wallet works) + a lil cash, daily dozen n mee sum are cash only.</div></div>
+        <div class="perk"><span class="pe">🔋</span><div>a portable charger, we'll be out late on maps n music all day.</div></div>
+        <div class="perk"><span class="pe">🕶️</span><div>sunnies for the 5pm sun. and don't worry about the elaichi lassi, i got it 💜</div></div>
       </div>
 
       <div class="safety" id="safetyBox"></div>
@@ -580,13 +591,20 @@ function foodCards(which){
   });
 }
 function pageMusicFx(){
-  if(!musicOn||!ytPlayer||!ytPlayer.setPlaybackRate)return;
+  /* vocoder-ish gated warble fade on page turn (true vocoder DSP isn't possible on the YT stream;
+     this stutters the volume with a dip-and-return envelope to fake that robotic warble) */
+  if(!musicOn||!ytPlayer||!ytPlayer.setVolume)return;
   try{
-    var rates=ytPlayer.getAvailablePlaybackRates?ytPlayer.getAvailablePlaybackRates():[1];
-    var slow=rates.indexOf(0.5)>=0?0.5:(rates.indexOf(0.75)>=0?0.75:1);
-    if(slow===1)return;
-    ytPlayer.setPlaybackRate(slow);                       // 2.5s woozy slow-mo on each page turn
-    setTimeout(function(){try{if(musicOn&&ytPlayer.setPlaybackRate)ytPlayer.setPlaybackRate(1);}catch(e){}},2500);
+    var base=(typeof MAXVOL==='number'?MAXVOL:45), steps=16, i=0, iv=156;
+    if(window._fxTimer)clearInterval(window._fxTimer);
+    window._fxTimer=setInterval(function(){
+      i++;
+      var hump=Math.sin(Math.PI*i/steps);   // 0 -> 1 -> 0 dip envelope over ~2.5s
+      var gate=(i%2)?0.3:1;                  // rapid on/off stutter = vocoder-ish warble
+      var vol=base*(1-0.7*hump)*gate;
+      try{ytPlayer.setVolume(Math.max(0,Math.min(100,Math.round(vol))));}catch(e){}
+      if(i>=steps){clearInterval(window._fxTimer);window._fxTimer=null;try{if(musicOn)ytPlayer.setVolume(base);}catch(e){}}
+    },iv);
   }catch(e){}
 }
 function go(n){
@@ -832,6 +850,24 @@ function confirmAddSong(){
   if(window.loadTrack)loadTrack(MUSIC.length-1);
 }
 loadUserSongs();
+/* live-ish weather for the date via Open-Meteo (free, no key) */
+function wxEmoji(c){if(c==null)return '⛅';if(c===0)return '☀️';if(c<=3)return '⛅';if(c<=48)return '🌫️';if(c<=67)return '🌧️';if(c<=77)return '🌨️';if(c<=82)return '🌦️';return '⛈️';}
+function loadWeather(){
+  var el=document.getElementById('wxcard'); if(!el)return;
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=47.61&longitude=-122.335&hourly=temperature_2m,precipitation_probability,weather_code&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles&start_date=2026-07-06&end_date=2026-07-06')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var h=d&&d.hourly;
+      if(!h||!h.time||!h.time.length){el.textContent='⛅ seattle, july 6 evening';return;}
+      function at(hr){return h.time.indexOf('2026-07-06T'+hr);}
+      var i5=at('17:00'),i8=at('20:00'); if(i5<0)i5=0; if(i8<0)i8=i5;
+      var t5=Math.round(h.temperature_2m[i5]),t8=Math.round(h.temperature_2m[i8]);
+      var rain=Math.max(h.precipitation_probability[i5]||0,h.precipitation_probability[i8]||0);
+      el.textContent=wxEmoji(h.weather_code[i5])+' july 6: ~'+t5+'°F at kickoff, '+t8+'°F by full time, '+rain+'% rain';
+    })
+    .catch(function(){el.textContent='⛅ seattle, july 6 evening (forecast firms up closer to the date)';});
+}
+loadWeather();
 var MAXVOL=45, FADE_MS=2500, FADE_TICK=80;
 var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
 var trackIdx=0, fadeTimer=null, endWatch=null, repeatOne=false;
