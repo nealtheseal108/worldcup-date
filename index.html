@@ -86,6 +86,14 @@
   .ghost{background:transparent;color:var(--muted)}
   .ghost:hover{color:var(--ink)}
   .namein{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:11px;font:inherit;margin-top:4px}
+  .modal-bg{position:fixed;inset:0;z-index:200;background:rgba(30,18,55,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fade .2s ease}
+  .modal-card{background:var(--paper);border-radius:18px;padding:22px 20px;width:100%;max-width:420px;box-shadow:0 22px 60px rgba(30,12,60,.5)}
+  .modal-title{font-weight:700;font-size:19px;margin-bottom:4px}
+  .modal-sub{color:var(--muted);font-size:13.5px;margin-bottom:14px}
+  .modal-input{width:100%;padding:12px 13px;border:2px solid var(--line);border-radius:11px;font:inherit;font-size:14px}
+  .modal-input:focus{outline:none;border-color:var(--lav)}
+  .modal-err{color:#c0392b;font-size:12.5px;min-height:15px;margin:6px 2px 0}
+  .modal-row{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
   .namein:focus{outline:none;border-color:var(--lav)}
   .hero{text-align:center;padding:8px 0 4px}
   .hero .big{font-size:46px;margin-bottom:8px}
@@ -787,13 +795,18 @@ function parseYouTubeId(u){
 function saveUserSongs(){try{localStorage.setItem('wc_user_songs',JSON.stringify(MUSIC.filter(function(m){return m.userAdded;}).map(function(m){return m.id;})));}catch(e){}}
 function loadUserSongs(){try{(JSON.parse(localStorage.getItem('wc_user_songs')||'[]')||[]).forEach(function(id){if(/^[A-Za-z0-9_-]{11}$/.test(id)&&!MUSIC.some(function(m){return m.id===id;}))MUSIC.push({id:id,title:'your pick 🎵',artist:'added by you',userAdded:true});});}catch(e){}}
 function addSong(){
-  var u=prompt('paste a youtube link to add a song 🎵');
-  if(u===null)return;
-  var id=parseYouTubeId(u);
-  if(!id){hint("hmm that link didn't work, paste a normal youtube url 💜");return;}
-  if(MUSIC.some(function(m){return m.id===id;})){hint("that one's already in the playlist 💜");return;}
+  var m=document.getElementById('addSongModal'), i=document.getElementById('addSongInput'), e=document.getElementById('addSongErr');
+  if(e)e.textContent=''; if(i)i.value='';
+  if(m){m.style.display='flex'; setTimeout(function(){if(i)i.focus();},40);}
+}
+function closeAddSong(){var m=document.getElementById('addSongModal');if(m)m.style.display='none';}
+function confirmAddSong(){
+  var i=document.getElementById('addSongInput'), e=document.getElementById('addSongErr');
+  var id=parseYouTubeId(i?i.value:'');
+  if(!id){if(e)e.textContent="hmm, that doesn't look like a youtube link, try again 💜";return;}
+  if(MUSIC.some(function(m){return m.id===id;})){if(e)e.textContent="that one's already in the playlist 💜";return;}
   MUSIC.push({id:id,title:'your pick 🎵',artist:'added by you',userAdded:true});
-  saveUserSongs();
+  saveUserSongs(); closeAddSong();
   hint('added to the playlist! 🎵 playing it now');
   if(window.loadTrack)loadTrack(MUSIC.length-1);
 }
@@ -897,6 +910,18 @@ document.addEventListener('click',function once(){startMusic();document.removeEv
     <button class="pb-btn" id="pbNext" onclick="nextTrack()" title="Next" aria-label="Next track">⏭</button>
     <button class="pb-btn" id="pbLoop" onclick="toggleRepeat()" title="Loop this song" aria-label="Repeat this song">🔁</button>
     <button class="pb-btn" id="pbAdd" onclick="addSong()" title="Add a song from a YouTube link" aria-label="Add a song">➕</button>
+  </div>
+</div>
+<div id="addSongModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeAddSong()">
+  <div class="modal-card">
+    <div class="modal-title">🎵 add a song</div>
+    <div class="modal-sub">paste a youtube link and i'll drop it in the playlist</div>
+    <input id="addSongInput" class="modal-input" type="text" inputmode="url" placeholder="https://youtube.com/watch?v=..." onkeydown="if(event.key==='Enter')confirmAddSong()">
+    <div class="modal-err" id="addSongErr"></div>
+    <div class="modal-row">
+      <button class="btn ghost" onclick="closeAddSong()">cancel</button>
+      <button class="btn primary" onclick="confirmAddSong()">add it 🎵</button>
+    </div>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
