@@ -574,11 +574,23 @@ function foodCards(which){
     c.onclick=()=>{
       pick[which]=item; foodCards(which);
       document.getElementById(which==='during'?'next2':'next3').disabled=false;
+      if(pick.venue&&typeof drawRoute==='function')drawRoute(pick.venue);
     };
     wrap.appendChild(c);
   });
 }
+function pageMusicFx(){
+  if(!musicOn||!ytPlayer||!ytPlayer.setPlaybackRate)return;
+  try{
+    var rates=ytPlayer.getAvailablePlaybackRates?ytPlayer.getAvailablePlaybackRates():[1];
+    var slow=rates.indexOf(0.5)>=0?0.5:(rates.indexOf(0.75)>=0?0.75:1);
+    if(slow===1)return;
+    ytPlayer.setPlaybackRate(slow);                       // 2.5s woozy slow-mo on each page turn
+    setTimeout(function(){try{if(musicOn&&ytPlayer.setPlaybackRate)ytPlayer.setPlaybackRate(1);}catch(e){}},2500);
+  }catch(e){}
+}
 function go(n){
+  pageMusicFx();
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   for(let i=0;i<4;i++){document.getElementById('d'+i).classList.toggle('on', i<=Math.min(n,3));}
@@ -633,6 +645,16 @@ applyMatchup();
 var VENUE_LL={mural:[47.6253,-122.3536],pier:[47.6075,-122.3425],house:[47.6118,-122.3360]};
 var VENUE_LABEL={mural:'Seattle Center',pier:'Pike Place / Pier 62',house:'Pacific Place'};
 var START_NEAL=[47.6163,-122.0356], START_SIDHYA=[47.6101,-122.1265], MERCER=[47.5707,-122.2221], WESTLAKE=[47.6115,-122.3370];
+/* approx lat/lng for each pickable restaurant, keyed by its exact title (homemade lassi has no spot) */
+var REST_LL={
+  "MOD Pizza (Armory)":[47.6240,-122.3517],"Sal y Limón":[47.6248,-122.3556],"CÔBA Viet Kitchen":[47.6246,-122.3564],"Bounty Kitchen":[47.6385,-122.3560],"Macrina Bakery":[47.6392,-122.3640],
+  "Via Tribunali":[47.6361,-122.3601],"ROTI Cuisine of India":[47.6250,-122.3566],"The Sushi Samurai":[47.6376,-122.3566],"Racha Thai":[47.6248,-122.3559],"Citizen Collective":[47.6254,-122.3492],
+  "Piroshky Piroshky":[47.6101,-122.3426],"Beecher's":[47.6090,-122.3406],"Daily Dozen Doughnut":[47.6088,-122.3403],"Mee Sum Pastry":[47.6095,-122.3414],"The Crumpet Shop":[47.6089,-122.3404],"Mr. D's Greek":[47.6093,-122.3411],"El Borracho":[47.6092,-122.3407],
+  "Zaika":[47.6139,-122.3290],"Serious Pie":[47.6135,-122.3410],"Bangrak Market":[47.6151,-122.3461],"Tilikum Place Cafe":[47.6176,-122.3471],
+  "Din Tai Fung (Pacific Place)":[47.6128,-122.3360],"Veggie Grill":[47.6090,-122.3360],"Top Pot Doughnuts":[47.6156,-122.3401],"Noi Thai":[47.6076,-122.3390],
+  "Tacos Chukis":[47.6196,-122.3210],"Kizuki Ramen":[47.6146,-122.3276],"Big Mario's Pizza":[47.6135,-122.3192],"Annapurna Cafe":[47.6176,-122.3210],"Ba Bar":[47.6086,-122.3172],
+  "Araya's Place":[47.6106,-122.2052],"Din Tai Fung (Bellevue)":[47.6160,-122.2010],"Cactus":[47.6175,-122.2035],"Maneki":[47.5986,-122.3262],"Pho Bac Súp Shop":[47.5995,-122.3176],"Hood Famous Cafe":[47.5981,-122.3276],"Mioposto":[47.5876,-122.2340]
+};
 var _map=null,_routeLayer=null;
 function ensureMap(){
   if(_map||typeof L==='undefined')return _map;
@@ -652,8 +674,11 @@ function drawRoute(k){
   dot(START_NEAL,'#2f9e5e','Neal');
   dot(START_SIDHYA,'#7c4dca','Sidhya');
   dot(v,'#ffd166','💜 '+VENUE_LABEL[k],9);
-  _map.invalidateSize();
-  _map.fitBounds(L.latLngBounds(route),{padding:[28,28]});
+  var fit=route.slice();
+  function foodDot(ll,c,label){L.circleMarker(ll,{radius:7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:'bottom',className:'maptip',offset:[0,6]});fit.push(ll);}
+  var s=pick.during&&REST_LL[pick.during.t]; if(s)foodDot(s,'#e58a2b','🥨 '+pick.during.t);
+  var a=pick.after&&REST_LL[pick.after.t]; if(a)foodDot(a,'#c0398b','🍽️ '+pick.after.t);
+  _map.fitBounds(L.latLngBounds(fit),{padding:[26,26]});
   var cap=document.getElementById('mapCap'); if(cap)cap.textContent='🚆 our route to '+VENUE_LABEL[k];
 }
 window.pickVenue=function(k){
