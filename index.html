@@ -122,7 +122,7 @@
   .tk-top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;letter-spacing:1px}
   .tk-cat{color:#cfc7e8;display:flex;gap:8px;align-items:center}
   .tk-bars{color:#a78bfa;font-size:11px;letter-spacing:-2px}
-  .tk-brand{color:#b9a5f0;font-size:16px;font-weight:800}
+  .tk-brand{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;color:#c4b5fd;font-size:21px;line-height:1}
   .tk-divider{border-top:1px dashed #333a47;margin:12px 0 14px}
   .tk-title{font-size:25px;font-weight:800;line-height:1.13;margin-bottom:16px}
   .tk-pick{display:flex;gap:12px;align-items:center;margin-bottom:16px}
@@ -502,8 +502,9 @@ function reveal(){
     ['5:00 PM','<b>Kickoff, Round of 16! ⚽</b>','Watch party at '+v.name+'. Jerseys on! 💜'],
     ['~6:30 PM','<b>Full time!</b>','Game wraps up around 6:30. Soak up the atmosphere, grab a few photos, and let the first crowd wave clear out. (A little later if it goes to extra time and penalties!)'],
     ['7:30 PM',`<b>Dinner: ${pick.after.t}!</b>`, pick.after.d],
-    ['~9:00 PM','<b>Split our free malt 🥤</b>','We cash in that free malt and share it the old-school way: one straw, two of us, leaning in close. Basically kissing at that point, just saying. 😚💜'],
-    ['~9:30 PM','<b>Easy ride home.</b>','Back on the 2 Line from Westlake. It runs until midnight, so we just reverse the morning routes.']
+    ['~9:00 PM','<b>Free Salt &amp; Straw 🍦</b>','We hop off in Bellevue Downtown and cash in our free Salt &amp; Straw. Two spoons, one cup, zero regrets.'],
+    ['~9:20 PM','<b>Bellevue Downtown Park 💜</b>','A slow lap around the park and the waterfall, then a little kiss under the lights. Best part of the night, just saying. 😚'],
+    ['~9:45 PM','<b>Easy ride home.</b>','Back on the 2 Line, which runs until midnight, so there is never a rush home.']
   ];
   document.getElementById('timeline').innerHTML = rows.map(r=>
     `<div class="time"><div class="clk">${r[0]}</div><div class="body">${r[1]}<small>${r[2]}</small></div></div>`).join('');
@@ -566,22 +567,40 @@ async function cardGifBlob(onProgress){
   const wResp=await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
   const wUrl=URL.createObjectURL(await wResp.blob());
   const card=document.getElementById('shareCard');
+  const ticker=card.querySelector('.tk-ticker');
   const track=card.querySelector('.tk-track');
-  const FRAMES=12, SCALE=1.5, DELAY=90;
-  const prevAnim=track.style.animation;
-  track.style.animation='none';                          // freeze CSS animation, drive it by hand
-  const frames=[]; let w=0,h=0;
+  const SCALE=1.5, FRAMES=18, DELAY=120;
+  // ticker window geometry, relative to the card, in capture pixels
+  const cr=card.getBoundingClientRect(), tr=ticker.getBoundingClientRect();
+  const tx=Math.round((tr.left-cr.left)*SCALE), ty=Math.round((tr.top-cr.top)*SCALE);
+  const tw=Math.round(tr.width*SCALE), th=Math.round(tr.height*SCALE);
+  // 1) one STATIC base capture with the ticker text hidden (everything else frozen)
+  const pAnim=track.style.animation, pVis=track.style.visibility;
+  track.style.animation='none'; track.style.transform='none'; track.style.visibility='hidden';
+  const base=await html2canvas(card,{scale:SCALE,backgroundColor:'#0e1116',useCORS:true});
+  if(onProgress)onProgress(0.25);
+  // 2) the ticker text by itself on a transparent strip
+  track.style.visibility='visible';
+  const strip=await html2canvas(track,{scale:SCALE,backgroundColor:null,useCORS:true});
+  track.style.transform=''; track.style.animation=pAnim; track.style.visibility=pVis;
+  if(onProgress)onProgress(0.5);
+  // 3) composite: redraw the identical base each frame, scroll ONLY the clipped ticker strip
+  const loopUnit=strip.width/6;                 // ticker text is repeated 6x -> one unit = a seamless loop
+  const stripY=Math.round(ty+(th-strip.height)/2);
+  const fc=document.createElement('canvas'); fc.width=base.width; fc.height=base.height;
+  const ctx=fc.getContext('2d');
+  const gif=new GIF({workers:2,quality:10,width:base.width,height:base.height,workerScript:wUrl,background:'#0e1116',repeat:0});
   for(let i=0;i<FRAMES;i++){
-    track.style.transform='translateX(-'+(50*i/FRAMES).toFixed(3)+'%)';   // 0 -> -50% = one seamless loop
-    const c=await html2canvas(card,{scale:SCALE,backgroundColor:'#0e1116',useCORS:true});
-    w=c.width; h=c.height; frames.push(c);
-    if(onProgress)onProgress((i+1)/FRAMES*0.65);
+    const off=loopUnit*(i/FRAMES);              // gentle, slow scroll
+    ctx.clearRect(0,0,fc.width,fc.height);
+    ctx.drawImage(base,0,0);                     // identical every frame -> nothing else can move
+    ctx.save(); ctx.beginPath(); ctx.rect(tx,ty,tw,th); ctx.clip();
+    ctx.drawImage(strip, Math.round(tx-off), stripY);
+    ctx.restore();
+    gif.addFrame(ctx,{delay:DELAY,copy:true});
   }
-  track.style.transform=''; track.style.animation=prevAnim;
-  const gif=new GIF({workers:2,quality:10,width:w,height:h,workerScript:wUrl,background:'#0e1116',repeat:0});
-  frames.forEach(c=>gif.addFrame(c,{delay:DELAY,copy:true}));
   return await new Promise((res,rej)=>{
-    gif.on('progress',p=>{if(onProgress)onProgress(0.65+p*0.35);});
+    gif.on('progress',p=>{if(onProgress)onProgress(0.5+p*0.5);});
     gif.on('finished',b=>{URL.revokeObjectURL(wUrl);res(b);});
     gif.on('abort',()=>{URL.revokeObjectURL(wUrl);rej(new Error('gif aborted'));});
     gif.render();
