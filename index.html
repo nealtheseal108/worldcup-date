@@ -33,7 +33,11 @@
   .matchup .mu-note{color:#b06a00}
   .datemap{background:var(--paper);border-radius:16px;padding:8px 12px 4px;margin-bottom:14px;box-shadow:0 10px 30px rgba(53,28,94,.22)}
   .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:2px}
-  .datemap svg{width:100%;height:auto;display:block}
+  #leafmap{height:210px;border-radius:13px;overflow:hidden;background:#efeaf7}
+  .datemap .leaflet-tile-pane{filter:sepia(.5) saturate(1.5) hue-rotate(208deg) brightness(1.03)}
+  .leaflet-container{font-family:'Courier Prime',ui-monospace,monospace}
+  .maptip{background:#fff;border:none;border-radius:7px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:700;color:#3a2a63;box-shadow:0 2px 8px rgba(53,28,94,.3);padding:2px 7px;white-space:nowrap}
+  .maptip:before{display:none}
   .pin{cursor:pointer}
   .pin .dot{fill:var(--lav2);transition:.15s}
   .pin:hover .dot{fill:var(--lav)}
@@ -243,6 +247,8 @@
     .ticket .tk-foot{font-size:16px;margin-top:10px}
   }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -254,29 +260,8 @@
   </div>
 
   <div class="datemap" style="display:none">
-    <div class="cap">tap a spot, i'll worm us there 💜</div>
-    <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Route map from the Eastside to Seattle">
-      <defs><linearGradient id="wormgrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9b72e8"/><stop offset="1" stop-color="#7c4dca"/></linearGradient></defs>
-      <rect width="640" height="200" rx="12" fill="#f1ebfc"/>
-      <path d="M214 0 C246 60 232 140 256 200 L452 200 C436 130 460 70 442 0 Z" fill="#bca9ee" opacity=".5"/>
-      <g stroke="#d6c8f3" stroke-width="2" fill="none" opacity=".8"><path d="M286 64 q18 7 36 0"/><path d="M312 120 q18 7 36 0"/><path d="M372 92 q18 7 36 0"/><path d="M300 158 q18 7 36 0"/></g>
-      <text x="346" y="192" class="map-lbl" fill="#ffffff" opacity=".75">LAKE WASHINGTON</text>
-      <text x="74" y="14" class="map-lbl">SEATTLE</text>
-      <text x="566" y="14" class="map-lbl">EASTSIDE</text>
-      <g fill="none" stroke="#cdbcf0" stroke-width="3" stroke-linecap="round" stroke-dasharray="1.5 7" opacity=".85">
-        <path d="M600 150 L548 150 C520 150 506 138 470 116 C360 132 300 104 196 118 C168 122 150 120 132 112 C120 100 108 78 96 60"/>
-        <path d="M132 112 C140 110 150 108 156 106"/>
-        <path d="M132 112 C116 122 92 142 76 160"/>
-      </g>
-      <path id="dmWorm" fill="none" stroke="url(#wormgrad)" stroke-width="4.5" stroke-linecap="round"/>
-      <circle id="dmWormHead" r="5" fill="#ffffff" stroke="#7c4dca" stroke-width="2.5" opacity="0"/>
-      <circle cx="132" cy="112" r="3.5" fill="#3a2a63"/>
-      <circle cx="600" cy="150" r="5" fill="#2f9e5e"/><text x="600" y="166" class="map-lbl">NEAL</text>
-      <circle cx="548" cy="150" r="5" fill="#7c4dca"/><text x="548" y="166" class="map-lbl">SIDHYA</text>
-      <g id="pinMural" class="pin"><circle class="ring" cx="96" cy="60" r="11"/><circle class="dot" cx="96" cy="60" r="7"/><text class="lbl" x="96" y="45">SEATTLE CTR</text></g>
-      <g id="pinHouse" class="pin"><circle class="ring" cx="156" cy="106" r="11"/><circle class="dot" cx="156" cy="106" r="7"/><text class="lbl" x="156" y="125">PACIFIC PL</text></g>
-      <g id="pinPier" class="pin"><circle class="ring" cx="76" cy="160" r="11"/><circle class="dot" cx="76" cy="160" r="7"/><text class="lbl" x="76" y="180">PIKE PLACE</text></g>
-    </svg>
+    <div class="cap" id="mapCap">🚆 our route there</div>
+    <div id="leafmap"></div>
   </div>
 
   <div class="panel">
@@ -644,38 +629,41 @@ var MATCHUP_NOTE = "🇺🇸 could be us!";
 function applyMatchup(){var t=document.getElementById('muText');if(t)t.textContent=MATCHUP;var n=document.getElementById('muNote');if(n)n.textContent=MATCHUP_NOTE;}
 applyMatchup();
 
-/* ---------- date route map: worm from our two starts to the picked venue and back ---------- */
-(function(){
-  var T='M600 150 L548 150 C520 150 506 138 470 116 C360 132 300 104 196 118 C168 122 150 120 132 112';
-  var R={ mural:T+' C120 100 108 78 96 60', house:T+' C140 110 150 108 156 106', pier:T+' C116 122 92 142 76 160' };
-  var PIN={mural:'pinMural',house:'pinHouse',pier:'pinPier'};
-  var worm=document.getElementById('dmWorm'), head=document.getElementById('dmWormHead');
-  if(!worm||!head) return;
-  var len=0, t0=null;
-  function ease(x){return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;}
-  function selPins(){for(var j in PIN){var e=document.getElementById(PIN[j]);if(e)e.classList.toggle('sel',pick.venue===j);}}
-  function setRoute(k){worm.setAttribute('d',R[k]);len=worm.getTotalLength();worm.style.strokeDasharray=len+' '+len;worm.style.strokeDashoffset=len;t0=null;}
-  function frame(now){
-    if(t0===null)t0=now;
-    var e=(now-t0)%4400;                                  // out -> hold -> back -> gap
-    var p=e<1800?ease(e/1800):e<2500?1:e<4100?1-ease((e-2500)/1600):0;
-    worm.style.strokeDashoffset=len*(1-p);
-    if(p>0){head.style.opacity=1;var q=worm.getPointAtLength(len*p);head.setAttribute('cx',q.x);head.setAttribute('cy',q.y);}
-    else head.style.opacity=0;
-    requestAnimationFrame(frame);
-  }
-  window.pickVenue=function(k){
-    if(!R[k])return;
-    if(pick.venue!==k){pick.during=null;pick.after=null;}
-    pick.venue=k; try{venueCards();}catch(e){}
-    var n=document.getElementById('next1');if(n)n.disabled=false;
-    var dm=document.querySelector('.datemap');if(dm)dm.style.display='';
-    setRoute(k); selPins();
-  };
-  for(var k in PIN)(function(k){var e=document.getElementById(PIN[k]);if(e)e.onclick=function(){pickVenue(k);};})(k);
-  setRoute(pick.venue||'mural'); selPins();
-  requestAnimationFrame(frame);
-})();
+/* ---------- lavender route map (Leaflet, no API key): appears after a venue is picked ---------- */
+var VENUE_LL={mural:[47.6253,-122.3536],pier:[47.6075,-122.3425],house:[47.6118,-122.3360]};
+var VENUE_LABEL={mural:'Seattle Center',pier:'Pike Place / Pier 62',house:'Pacific Place'};
+var START_NEAL=[47.6163,-122.0356], START_SIDHYA=[47.6101,-122.1265], MERCER=[47.5707,-122.2221], WESTLAKE=[47.6115,-122.3370];
+var _map=null,_routeLayer=null;
+function ensureMap(){
+  if(_map||typeof L==='undefined')return _map;
+  _map=L.map('leafmap',{zoomControl:false,attributionControl:true,scrollWheelZoom:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; OpenStreetMap, &copy; CARTO'}).addTo(_map);
+  _routeLayer=L.layerGroup().addTo(_map);
+  return _map;
+}
+function drawRoute(k){
+  if(!ensureMap())return;
+  _map.invalidateSize();
+  if(_map.getSize().x===0){setTimeout(function(){drawRoute(k);},90);return;}  // wait for the container to have size
+  _routeLayer.clearLayers();
+  var v=VENUE_LL[k], route=[START_NEAL,START_SIDHYA,MERCER,WESTLAKE,v];
+  L.polyline(route,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round'}).addTo(_routeLayer);
+  function dot(ll,c,label,r){L.circleMarker(ll,{radius:r||7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:'top',className:'maptip',offset:[0,-3]});}
+  dot(START_NEAL,'#2f9e5e','Neal');
+  dot(START_SIDHYA,'#7c4dca','Sidhya');
+  dot(v,'#ffd166','💜 '+VENUE_LABEL[k],9);
+  _map.invalidateSize();
+  _map.fitBounds(L.latLngBounds(route),{padding:[28,28]});
+  var cap=document.getElementById('mapCap'); if(cap)cap.textContent='🚆 our route to '+VENUE_LABEL[k];
+}
+window.pickVenue=function(k){
+  if(!VENUE_LL[k])return;
+  if(pick.venue!==k){pick.during=null;pick.after=null;}
+  pick.venue=k; try{venueCards();}catch(e){}
+  var n=document.getElementById('next1');if(n)n.disabled=false;
+  var dm=document.querySelector('.datemap');if(dm)dm.style.display='';
+  setTimeout(function(){drawRoute(k);},40);
+};
 
 /* ---------- shareable image export ---------- */
 async function cardBlob(){
