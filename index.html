@@ -178,6 +178,7 @@
   .pb-btn{background:transparent;border:none;color:#e8e4f6;font-size:16px;cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.15s;line-height:1}
   .pb-btn:hover{background:rgba(167,139,250,.22)}
   .pb-btn:active{transform:scale(.92)}
+  .pb-btn.on{color:var(--sun);background:rgba(255,209,102,.2)}
   .pb-play{background:#fff;color:#34206b;width:42px;height:42px;font-size:16px}
   .pb-play:hover{background:#ece6fb;transform:scale(1.06)}
   @media (max-width:520px){
@@ -787,7 +788,8 @@ function addSong(){
 loadUserSongs();
 var MAXVOL=45, FADE_MS=2500, FADE_TICK=80;
 var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
-var trackIdx=0, fadeTimer=null, endWatch=null;
+var trackIdx=0, fadeTimer=null, endWatch=null, repeatOne=false;
+function toggleRepeat(){repeatOne=!repeatOne;var b=document.getElementById('pbLoop');if(b){b.classList.toggle('on',repeatOne);b.title=repeatOne?'Repeating this song':'Loop this song';}hint(repeatOne?'looping this song 🔂':'back to the full playlist 🔁');}
 
 function onYouTubeIframeAPIReady(){
   ytPlayer=new YT.Player('ythost',{
@@ -839,7 +841,7 @@ function prevTrack(){
   loadTrack(restart?trackIdx:trackIdx-1);
 }
 function onPlayerState(e){
-  if(e.data===YT.PlayerState.ENDED){nextTrack();}
+  if(e.data===YT.PlayerState.ENDED){if(repeatOne){loadTrack(trackIdx);}else{nextTrack();}}
   else if(e.data===YT.PlayerState.PLAYING){if(musicOn)fadeTo(MAXVOL);armEndWatch();updatePlayerBar();}  // fade the new track in
 }
 function startMusic(){
@@ -881,6 +883,7 @@ document.addEventListener('click',function once(){startMusic();document.removeEv
     <button class="pb-btn" id="pbPrev" onclick="prevTrack()" title="Previous" aria-label="Previous track">⏮</button>
     <button class="pb-btn pb-play" id="pbPlay" onclick="toggleMusic()" title="Play" aria-label="Play or pause">▶</button>
     <button class="pb-btn" id="pbNext" onclick="nextTrack()" title="Next" aria-label="Next track">⏭</button>
+    <button class="pb-btn" id="pbLoop" onclick="toggleRepeat()" title="Loop this song" aria-label="Repeat this song">🔁</button>
     <button class="pb-btn" id="pbAdd" onclick="addSong()" title="Add a song from a YouTube link" aria-label="Add a song">➕</button>
   </div>
 </div>
