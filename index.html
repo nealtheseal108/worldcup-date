@@ -18,7 +18,7 @@
   body{
     font-family:'Inter',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
     background:linear-gradient(160deg,#7c4dca 0%,#9b72e8 45%,#c4b5fd 100%);
-    color:var(--ink);min-height:100vh;padding:24px 16px 96px;overflow-x:hidden;
+    color:var(--ink);min-height:100vh;padding:24px 16px 96px;
   }
   h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;letter-spacing:-.02em}
   .fancy{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:1.2em;line-height:1;color:var(--accent2)}
@@ -66,8 +66,7 @@
   .dot.on{background:var(--sun)}
   .panel{background:var(--paper);border-radius:18px;padding:26px 22px 28px;box-shadow:0 18px 50px rgba(53,28,94,.32)}
   .step{display:none}
-  .step.active{display:block;animation:wave 1s cubic-bezier(.25,.8,.3,1)}
-  @keyframes wave{0%{opacity:0;transform:translateY(14px) skewX(0deg);filter:blur(2px)}30%{opacity:1;transform:translateX(-7px) skewX(2.2deg);filter:blur(0)}55%{transform:translateX(6px) skewX(-1.6deg)}78%{transform:translateX(-3px) skewX(.8deg)}100%{opacity:1;transform:none}}
+  .step.active{display:block}
   .eyebrow{font-family:'Courier Prime',ui-monospace,monospace;color:var(--lav);font-weight:500;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
   h2{font-size:24px;line-height:1.2;margin-bottom:6px}
   .sub{color:var(--muted);font-size:14.5px;margin-bottom:20px;line-height:1.5}
@@ -608,59 +607,8 @@ function foodCards(which){
     wrap.appendChild(c);
   });
 }
-var _uwCtx=null;
-function underwaterWhoosh(){
-  /* a REAL low-pass underwater wash, built in the Web Audio API (the YT music is a cross-origin
-     embed so it can't be filtered directly; this generates the submerged ambience + lays it on top).
-     filtered noise + a cutoff sweep + a slow LFO wobble = the watery "wave", faded in then out over 7.5s */
-  try{
-    var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
-    if(!_uwCtx)_uwCtx=new AC();
-    if(_uwCtx.state==='suspended')_uwCtx.resume();
-    var ctx=_uwCtx, t=ctx.currentTime, DUR=7.5;
-    var n=Math.floor(ctx.sampleRate*2), buf=ctx.createBuffer(1,n,ctx.sampleRate), ch=buf.getChannelData(0);
-    for(var i=0;i<n;i++)ch[i]=(Math.random()*2-1)*0.55;          // noise = the body of the water
-    var src=ctx.createBufferSource(); src.buffer=buf; src.loop=true;
-    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=7;   // lowpass = muffled / underwater
-    lp.frequency.setValueAtTime(720,t);
-    lp.frequency.linearRampToValueAtTime(340,t+DUR*0.45);              // sweep the cutoff down (deeper)
-    lp.frequency.linearRampToValueAtTime(640,t+DUR);                  // then back up (surfacing)
-    var lfo=ctx.createOscillator(); lfo.frequency.value=0.55;          // slow undulation = the wave
-    var lfoAmt=ctx.createGain(); lfoAmt.gain.value=210; lfo.connect(lfoAmt); lfoAmt.connect(lp.frequency);
-    var g=ctx.createGain();                                            // master envelope: fade in then out
-    g.gain.setValueAtTime(0.0001,t);
-    g.gain.linearRampToValueAtTime(0.15,t+2);
-    g.gain.linearRampToValueAtTime(0.0001,t+DUR);
-    src.connect(lp); lp.connect(g); g.connect(ctx.destination);
-    src.start(t); lfo.start(t); src.stop(t+DUR+0.05); lfo.stop(t+DUR+0.05);
-  }catch(e){}
-}
-function pageMusicFx(){
-  // page turn = go underwater: the wash fades in/out over 7.5s while the music dips + muffles
-  if(!musicOn)return;
-  underwaterWhoosh();
-  if(!ytPlayer||!ytPlayer.setVolume)return;
-  try{
-    var base=(typeof MAXVOL==='number'?MAXVOL:45), low=Math.max(1,Math.round(base*0.30));
-    var dur=2600, steps=26, i=0, iv=dur/steps;
-    if(window._fxTimer)clearInterval(window._fxTimer);
-    if(ytPlayer.setPlaybackRate){                                     // pitch-bend the music down, then resurface
-      var rates=ytPlayer.getAvailablePlaybackRates?ytPlayer.getAvailablePlaybackRates():[1];
-      var slow=rates.indexOf(0.75)>=0?0.75:(rates.indexOf(0.5)>=0?0.5:1);
-      if(slow!==1){ytPlayer.setPlaybackRate(slow);setTimeout(function(){try{if(musicOn)ytPlayer.setPlaybackRate(1);}catch(e){}},dur-200);}
-    }
-    window._fxTimer=setInterval(function(){
-      i++;
-      var dip=(1-Math.cos(2*Math.PI*(i/steps)))/2;   // 0 -> 1 -> 0, deepest mid-transition
-      var vol=base-(base-low)*dip;                    // muffle the music while it's submerged
-      try{ytPlayer.setVolume(Math.max(0,Math.min(100,Math.round(vol))));}catch(e){}
-      if(i>=steps){clearInterval(window._fxTimer);window._fxTimer=null;try{if(musicOn)ytPlayer.setVolume(base);}catch(e){}}
-    },iv);
-  }catch(e){}
-}
 function scrollToMap(){var m=document.getElementById('datemap');if(m)m.scrollIntoView({behavior:'smooth',block:'start'});}
 function go(n){
-  pageMusicFx();
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   for(let i=0;i<4;i++){document.getElementById('d'+i).classList.toggle('on', i<=Math.min(n,3));}
