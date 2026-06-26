@@ -41,6 +41,14 @@
   .wormline{stroke-dasharray:2 9;animation:worm 4s linear infinite}
   .maplink{display:inline-flex;align-items:center;gap:6px;margin:0 0 16px;padding:8px 15px;border:1px solid var(--line);border-radius:30px;background:#f1ecfc;color:#5a3fb0;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
   .maplink:hover{background:#e7ddf7}
+  .statlist{display:flex;flex-direction:column;gap:12px;max-height:48vh;overflow:auto;margin:8px 0 4px;padding-right:2px}
+  .stat-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:baseline}
+  .stat-name{font-size:13px;color:#3a2a63;font-weight:700;line-height:1.25}
+  .stat-name small{display:block;color:var(--muted);font-weight:500;font-size:11px;margin-top:1px}
+  .stat-n{font-family:'Courier Prime',ui-monospace,monospace;font-weight:700;color:#5a3fb0;font-size:12.5px;white-space:nowrap}
+  .stat-meter{grid-column:1/-1;height:7px;border-radius:6px;background:#efe9fb;overflow:hidden;margin-top:2px}
+  .stat-meter i{display:block;height:100%;background:linear-gradient(90deg,var(--lav),var(--lav2));border-radius:6px;transition:width .4s ease}
+  .stat-empty{color:var(--muted);font-size:13px;text-align:center;padding:14px 6px}
   .datemap .leaflet-tile-pane{filter:sepia(.5) saturate(1.5) hue-rotate(208deg) brightness(1.03)}
   .leaflet-container{font-family:'Courier Prime',ui-monospace,monospace}
   .maptip{background:#fff;border:none;border-radius:7px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:700;color:#3a2a63;box-shadow:0 2px 8px rgba(53,28,94,.3);padding:2px 7px;white-space:nowrap}
@@ -932,6 +940,11 @@ loadWeather();
 var MAXVOL=45, FADE_MS=2500, FADE_TICK=80;
 var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
 var trackIdx=0, fadeTimer=null, endWatch=null, repeatOne=false;
+var playCounts={}, _lastCountedIdx=-1;
+function loadPlayCounts(){try{playCounts=JSON.parse(localStorage.getItem('wc_play_counts')||'{}')||{};}catch(e){playCounts={};}}
+function savePlayCounts(){try{localStorage.setItem('wc_play_counts',JSON.stringify(playCounts));}catch(e){}}
+function countPlay(){var t=MUSIC[trackIdx];if(!t)return;if(_lastCountedIdx===trackIdx)return;_lastCountedIdx=trackIdx;playCounts[t.id]=(playCounts[t.id]||0)+1;savePlayCounts();renderStats();}
+loadPlayCounts();
 function toggleRepeat(){repeatOne=!repeatOne;var b=document.getElementById('pbLoop');if(b){b.classList.toggle('on',repeatOne);b.title=repeatOne?'Repeating this song':'Loop this song';}hint(repeatOne?'looping this song 🔂':'back to the full playlist 🔁');}
 
 function onYouTubeIframeAPIReady(){
@@ -969,6 +982,7 @@ function armEndWatch(){
 }
 function loadTrack(i){
   trackIdx=(i+MUSIC.length)%MUSIC.length;
+  _lastCountedIdx=-1;               // a fresh load = a new listen, counted when it starts playing
   musicWanted=true;musicOn=true;
   var t=MUSIC[trackIdx];
   try{ytPlayer.unMute();ytPlayer.setVolume(0);
@@ -985,7 +999,7 @@ function prevTrack(){
 }
 function onPlayerState(e){
   if(e.data===YT.PlayerState.ENDED){if(repeatOne){loadTrack(trackIdx);}else{nextTrack();}}
-  else if(e.data===YT.PlayerState.PLAYING){if(musicOn)fadeTo(MAXVOL);armEndWatch();updatePlayerBar();}  // fade the new track in
+  else if(e.data===YT.PlayerState.PLAYING){if(musicOn)fadeTo(MAXVOL);armEndWatch();countPlay();updatePlayerBar();}  // fade the new track in + tally the listen
 }
 function startMusic(){
   musicWanted=true;
@@ -1010,6 +1024,24 @@ function updatePlayerBar(){
   if(ar)ar.textContent=t.artist;
   if(pl){pl.textContent=musicOn?'⏸':'▶';pl.title=musicOn?'Pause':'Play';}
 }
+function _esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function renderStats(){
+  var box=document.getElementById('statsList'); if(!box)return;
+  var rows=MUSIC.map(function(m){return {t:m.title,a:m.artist,n:playCounts[m.id]||0};});
+  var total=rows.reduce(function(s,r){return s+r.n;},0);
+  var max=Math.max.apply(null,rows.map(function(r){return r.n;}).concat([1]));
+  rows.sort(function(a,b){return b.n-a.n;});
+  var tot=document.getElementById('statsTotal'); if(tot)tot.textContent=total?'· '+total+' play'+(total===1?'':'s')+' so far':'';
+  if(!total){box.innerHTML='<div class="stat-empty">no plays yet, hit ▶ and let it ride 💜</div>';return;}
+  box.innerHTML=rows.map(function(r,idx){
+    var pct=Math.round(r.n/max*100), crown=(idx===0&&r.n)?'👑 ':'';
+    return '<div class="stat-row"><div class="stat-name">'+crown+_esc(r.t)+'<small>'+_esc(r.a)+'</small></div>'+
+           '<div class="stat-n">'+r.n+' ▶</div>'+
+           '<div class="stat-meter"><i style="width:'+pct+'%"></i></div></div>';
+  }).join('');
+}
+function openStats(){renderStats();var m=document.getElementById('statsModal');if(m)m.style.display='flex';}
+function closeStats(){var m=document.getElementById('statsModal');if(m)m.style.display='none';}
 /* autoplay policies: kick off on the first interaction anywhere */
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
 </script>
@@ -1027,6 +1059,7 @@ document.addEventListener('click',function once(){startMusic();document.removeEv
     <button class="pb-btn pb-play" id="pbPlay" onclick="toggleMusic()" title="Play" aria-label="Play or pause">▶</button>
     <button class="pb-btn" id="pbNext" onclick="nextTrack()" title="Next" aria-label="Next track">⏭</button>
     <button class="pb-btn" id="pbLoop" onclick="toggleRepeat()" title="Loop this song" aria-label="Repeat this song">🔁</button>
+    <button class="pb-btn" id="pbStats" onclick="openStats()" title="Play counts" aria-label="Song play counts">📊</button>
     <button class="pb-btn" id="pbAdd" onclick="addSong()" title="Add a song from a YouTube link" aria-label="Add a song">➕</button>
   </div>
 </div>
@@ -1039,6 +1072,16 @@ document.addEventListener('click',function once(){startMusic();document.removeEv
     <div class="modal-row">
       <button class="btn ghost" onclick="closeAddSong()">cancel</button>
       <button class="btn primary" onclick="confirmAddSong()">add it 🎵</button>
+    </div>
+  </div>
+</div>
+<div id="statsModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeStats()">
+  <div class="modal-card">
+    <div class="modal-title">🎧 our playlist on repeat</div>
+    <div class="modal-sub">how many times each song's been played <span id="statsTotal"></span></div>
+    <div class="statlist" id="statsList"></div>
+    <div class="modal-row">
+      <button class="btn primary" onclick="closeStats()">nice 💜</button>
     </div>
   </div>
 </div>
