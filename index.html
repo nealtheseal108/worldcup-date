@@ -49,6 +49,7 @@
   .stat-meter{grid-column:1/-1;height:7px;border-radius:6px;background:#efe9fb;overflow:hidden;margin-top:2px}
   .stat-meter i{display:block;height:100%;background:linear-gradient(90deg,var(--lav),var(--lav2));border-radius:6px;transition:width .4s ease}
   .stat-empty{color:var(--muted);font-size:13px;text-align:center;padding:14px 6px}
+  .stat-fine{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.3px;color:var(--muted);margin:-4px 0 4px}
   .datemap .leaflet-tile-pane{filter:sepia(.5) saturate(1.5) hue-rotate(208deg) brightness(1.03)}
   .leaflet-container{font-family:'Courier Prime',ui-monospace,monospace}
   .maptip{background:#fff;border:none;border-radius:7px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:700;color:#3a2a63;box-shadow:0 2px 8px rgba(53,28,94,.3);padding:2px 7px;white-space:nowrap}
@@ -891,9 +892,25 @@ var MAXVOL=45, FADE_MS=2500, FADE_TICK=80;
 var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
 var trackIdx=0, fadeTimer=null, endWatch=null, repeatOne=false;
 var playCounts={}, _lastCountedIdx=-1;
+var PLAY_SEC=40, _watchSec=0, _watchPrevT=null, _watchTimer=null;   // a "play" only counts after 40s of the song is actually listened to
 function loadPlayCounts(){try{playCounts=JSON.parse(localStorage.getItem('wc_play_counts')||'{}')||{};}catch(e){playCounts={};}}
 function savePlayCounts(){try{localStorage.setItem('wc_play_counts',JSON.stringify(playCounts));}catch(e){}}
 function countPlay(){var t=MUSIC[trackIdx];if(!t)return;if(_lastCountedIdx===trackIdx)return;_lastCountedIdx=trackIdx;playCounts[t.id]=(playCounts[t.id]||0)+1;savePlayCounts();renderStats();}
+function clearWatch(){if(_watchTimer){clearInterval(_watchTimer);_watchTimer=null;}}
+function resetWatch(){clearWatch();_watchSec=0;_watchPrevT=null;}     // fresh track -> start the 40s clock over
+function startWatch(){
+  if(_lastCountedIdx===trackIdx)return;                              // already counted this play session
+  clearWatch();_watchPrevT=null;
+  _watchTimer=setInterval(function(){                                // accrue real listening time only while playing
+    try{
+      if(!musicOn||!ytPlayer||!ytPlayer.getPlayerState||ytPlayer.getPlayerState()!==YT.PlayerState.PLAYING){_watchPrevT=null;return;}
+      var now=Date.now();
+      if(_watchPrevT!=null){var d=(now-_watchPrevT)/1000;if(d>0&&d<3)_watchSec+=d;}  // ignore pauses + background-tab gaps
+      _watchPrevT=now;
+      if(_watchSec>=PLAY_SEC){countPlay();clearWatch();}             // 40s listened = one counted play
+    }catch(e){}
+  },1000);
+}
 loadPlayCounts();
 function toggleRepeat(){repeatOne=!repeatOne;var b=document.getElementById('pbLoop');if(b){b.classList.toggle('on',repeatOne);b.title=repeatOne?'Repeating this song':'Loop this song';}hint(repeatOne?'looping this song 🔂':'back to the full playlist 🔁');}
 
@@ -932,7 +949,7 @@ function armEndWatch(){
 }
 function loadTrack(i){
   trackIdx=(i+MUSIC.length)%MUSIC.length;
-  _lastCountedIdx=-1;               // a fresh load = a new listen, counted when it starts playing
+  _lastCountedIdx=-1; resetWatch();  // a fresh load resets the 40s listen clock for the new song
   musicWanted=true;musicOn=true;
   var t=MUSIC[trackIdx];
   try{ytPlayer.unMute();ytPlayer.setVolume(0);
@@ -949,7 +966,8 @@ function prevTrack(){
 }
 function onPlayerState(e){
   if(e.data===YT.PlayerState.ENDED){if(repeatOne){loadTrack(trackIdx);}else{nextTrack();}}
-  else if(e.data===YT.PlayerState.PLAYING){if(musicOn)fadeTo(MAXVOL);armEndWatch();countPlay();updatePlayerBar();}  // fade the new track in + tally the listen
+  else if(e.data===YT.PlayerState.PLAYING){if(musicOn)fadeTo(MAXVOL);armEndWatch();startWatch();updatePlayerBar();}  // fade in + start the 40s listen clock
+  else if(e.data===YT.PlayerState.PAUSED){clearWatch();}                                                            // pause accrual, keep the banked time
 }
 function startMusic(){
   musicWanted=true;
@@ -1029,6 +1047,7 @@ document.addEventListener('click',function once(){startMusic();document.removeEv
   <div class="modal-card">
     <div class="modal-title">🎧 our playlist on repeat</div>
     <div class="modal-sub">how many times each song's been played <span id="statsTotal"></span></div>
+    <div class="stat-fine">a play counts after 40s of listening 🎧</div>
     <div class="statlist" id="statsList"></div>
     <div class="modal-row">
       <button class="btn primary" onclick="closeStats()">nice 💜</button>
