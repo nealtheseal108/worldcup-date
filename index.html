@@ -652,12 +652,13 @@ async function saveGif(){
 }
 
 /* ---------- background music: looping playlist with fade transitions ----------
-   Shotput (slowed+reverb) -> Link Up -> Heat Waves -> Babydoll -> Flight's Booked -> loop  */
+   Shotput -> Link Up -> Passionfruit(@1:12) -> Heat Waves -> Babydoll -> Flight's Booked -> loop  */
 var MUSIC=[
   {id:'K4Fk9Clc12w', title:'Shotput (slowed + reverb)', artist:'Still Woozy'},
   {id:'1_w9ZtbHj_E', title:'Link Up', artist:'Don Toliver'},
+  {id:'nfJReXaXkTY', title:'Passionfruit (slowed + reverb)', artist:'Drake', start:72},
   {id:'c9jTdUBMys8', title:'Heat Waves', artist:'Glass Animals'},
-  {id:'nb8CnIo_-_A', title:'Babydoll', artist:'Dominic Fike'},
+  {id:'l8KS5HiMXn4', title:'Babydoll (slowed + reverb)', artist:'Dominic Fike'},
   {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake'}
 ];
 var MAXVOL=45, FADE_MS=2500, FADE_TICK=80;
@@ -700,7 +701,11 @@ function armEndWatch(){
 function loadTrack(i){
   trackIdx=(i+MUSIC.length)%MUSIC.length;
   musicWanted=true;musicOn=true;
-  try{ytPlayer.unMute();ytPlayer.setVolume(0);ytPlayer.loadVideoById(MUSIC[trackIdx].id);ytPlayer.playVideo();}catch(e){}
+  var t=MUSIC[trackIdx];
+  try{ytPlayer.unMute();ytPlayer.setVolume(0);
+    if(t.start)ytPlayer.loadVideoById({videoId:t.id,startSeconds:t.start});  // some tracks start partway in
+    else ytPlayer.loadVideoById(t.id);
+    ytPlayer.playVideo();}catch(e){}
   updatePlayerBar();
 }
 function nextTrack(){loadTrack(trackIdx+1);}
