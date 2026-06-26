@@ -23,7 +23,10 @@
   h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;letter-spacing:-.02em}
   .fancy{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:1.2em;line-height:1;color:var(--accent2)}
   .lovenote{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400}
-  .wrap{max-width:680px;margin:0 auto}
+  .wrap{max-width:680px;margin:0 auto;transition:max-width .35s ease}
+  body.mapview .wrap{max-width:1060px}
+  .layout{display:flex;gap:20px;align-items:flex-start;justify-content:center}
+  .layout>.panel{flex:0 1 680px;min-width:0}
   .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
   .topbar .ball{font-size:22px}
   .topbar h1{font-family:'Courier Prime',ui-monospace,monospace;font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
@@ -31,9 +34,18 @@
   .matchup .chip{display:inline-flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#3a2a63;background:rgba(255,255,255,.92);border-radius:30px;padding:6px 14px;box-shadow:0 3px 12px rgba(53,28,94,.22)}
   .matchup b{color:var(--lav);font-weight:700}
   .matchup .mu-note{color:#b06a00}
-  .datemap{background:var(--paper);border-radius:16px;padding:8px 12px 4px;margin-bottom:14px;box-shadow:0 10px 30px rgba(53,28,94,.22)}
+  .datemap{display:none;background:var(--paper);border-radius:16px;padding:8px 12px 4px;box-shadow:0 10px 30px rgba(53,28,94,.22);flex:0 0 340px;position:sticky;top:14px}
+  body.mapview .datemap{display:block}
   .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:2px}
-  #leafmap{height:210px;border-radius:13px;overflow:hidden;background:#efeaf7}
+  #leafmap{height:260px;border-radius:13px;overflow:hidden;background:#efeaf7}
+  @media(min-width:861px){body.mapview .datemap #leafmap{height:440px}}
+  @media(max-width:860px){
+    body.mapview .wrap{max-width:680px}
+    .layout{flex-direction:column}
+    .datemap{position:static;flex:none;width:auto;margin-top:18px}
+  }
+  @keyframes worm{to{stroke-dashoffset:-44}}
+  .wormline{stroke-dasharray:2 9;animation:worm 4s linear infinite}
   .datemap .leaflet-tile-pane{filter:sepia(.5) saturate(1.5) hue-rotate(208deg) brightness(1.03)}
   .leaflet-container{font-family:'Courier Prime',ui-monospace,monospace}
   .maptip{background:#fff;border:none;border-radius:7px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:700;color:#3a2a63;box-shadow:0 2px 8px rgba(53,28,94,.3);padding:2px 7px;white-space:nowrap}
@@ -260,11 +272,7 @@
     <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
   </div>
 
-  <div class="datemap" style="display:none">
-    <div class="cap" id="mapCap">🚆 our route there</div>
-    <div id="leafmap"></div>
-  </div>
-
+  <div class="layout">
   <div class="panel">
 
     <!-- STEP 0 -->
@@ -401,6 +409,11 @@
       </div>
     </section>
 
+  </div>
+  <div class="datemap" id="datemap">
+    <div class="cap" id="mapCap">🚆 our route there</div>
+    <div id="leafmap"></div>
+  </div>
   </div>
   <div class="foot">no car needed babu, every leg is train + bus on the 2 line.<br>it runs til midnight so there's never a rush home 💜</div>
   <div class="kquote">"few solid n*ggas, but it's not enough"<span>— Kendrick Lamar</span></div>
@@ -591,17 +604,24 @@ function foodCards(which){
   });
 }
 function pageMusicFx(){
-  /* vocoder-ish gated warble fade on page turn (true vocoder DSP isn't possible on the YT stream;
-     this stutters the volume with a dip-and-return envelope to fake that robotic warble) */
+  /* "dunk underwater" muffle on page turn: smoothly duck the volume to a low murmur and
+     bend the pitch down, then resurface. (true muffling/low-pass DSP isn't possible on the
+     cross-origin YT stream, so this fakes the drowned-out feel with volume + playback rate) */
   if(!musicOn||!ytPlayer||!ytPlayer.setVolume)return;
   try{
-    var base=(typeof MAXVOL==='number'?MAXVOL:45), steps=16, i=0, iv=156;
+    var base=(typeof MAXVOL==='number'?MAXVOL:45), low=Math.max(1,Math.round(base*0.18));
+    var dur=1700, steps=22, i=0, iv=dur/steps;
     if(window._fxTimer)clearInterval(window._fxTimer);
+    // pitch bend down for the underwater wobble, then snap back as it resurfaces
+    if(ytPlayer.setPlaybackRate){
+      var rates=ytPlayer.getAvailablePlaybackRates?ytPlayer.getAvailablePlaybackRates():[1];
+      var slow=rates.indexOf(0.75)>=0?0.75:(rates.indexOf(0.5)>=0?0.5:1);
+      if(slow!==1){ytPlayer.setPlaybackRate(slow);setTimeout(function(){try{if(musicOn)ytPlayer.setPlaybackRate(1);}catch(e){}},dur-180);}
+    }
     window._fxTimer=setInterval(function(){
       i++;
-      var hump=Math.sin(Math.PI*i/steps);   // 0 -> 1 -> 0 dip envelope over ~2.5s
-      var gate=(i%2)?0.3:1;                  // rapid on/off stutter = vocoder-ish warble
-      var vol=base*(1-0.7*hump)*gate;
+      var dip=(1-Math.cos(2*Math.PI*(i/steps)))/2;   // 0 -> 1 -> 0, deepest mid-transition
+      var vol=base-(base-low)*dip;                    // base -> murmur -> base
       try{ytPlayer.setVolume(Math.max(0,Math.min(100,Math.round(vol))));}catch(e){}
       if(i>=steps){clearInterval(window._fxTimer);window._fxTimer=null;try{if(musicOn)ytPlayer.setVolume(base);}catch(e){}}
     },iv);
@@ -612,9 +632,12 @@ function go(n){
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   for(let i=0;i<4;i++){document.getElementById('d'+i).classList.toggle('on', i<=Math.min(n,3));}
+  var showMap=(n===2||n===3)&&!!pick.venue;          // the map lives only on the snack + dinner screens
+  document.body.classList.toggle('mapview', showMap);
   if(n===1) venueCards();
   if(n===2){ foodCards('during'); document.getElementById('next2').disabled=!pick.during; }
   if(n===3){ foodCards('after'); document.getElementById('next3').disabled=!pick.after; }
+  if(showMap) setTimeout(function(){drawRoute(pick.venue);},70);   // (re)frame once the container has size
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function reveal(){
@@ -676,15 +699,15 @@ var REST_LL={
 var _map=null,_routeLayer=null;
 function ensureMap(){
   if(_map||typeof L==='undefined')return _map;
-  _map=L.map('leafmap',{zoomControl:false,attributionControl:true,scrollWheelZoom:false});
+  _map=L.map('leafmap',{zoomControl:true,attributionControl:true,scrollWheelZoom:true,dragging:true,doubleClickZoom:true,touchZoom:true,boxZoom:true,tap:true});
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; OpenStreetMap, &copy; CARTO'}).addTo(_map);
   _routeLayer=L.layerGroup().addTo(_map);
   return _map;
 }
-function drawRoute(k){
+function drawRoute(k,_n){
   if(!ensureMap())return;
   _map.invalidateSize();
-  if(_map.getSize().x===0){setTimeout(function(){drawRoute(k);},90);return;}  // wait for the container to have size
+  if(_map.getSize().x===0){if((_n||0)<15)setTimeout(function(){drawRoute(k,(_n||0)+1);},90);return;}  // wait (capped) for the container to size
   _routeLayer.clearLayers();
   var v=VENUE_LL[k];
   var s=pick.during&&REST_LL[pick.during.t];   // pre-game snack, sits near the venue
@@ -694,15 +717,17 @@ function drawRoute(k){
   if(s)route.push(s);
   route.push(v);
   if(a)route.push(a);
-  L.polyline(route,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round'}).addTo(_routeLayer);
-  function dot(ll,c,label,r){L.circleMarker(ll,{radius:r||7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:'top',className:'maptip',offset:[0,-3]});}
-  function foodDot(ll,c,label){L.circleMarker(ll,{radius:8,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:'bottom',className:'maptip',offset:[0,7]});}
-  dot(START_NEAL,'#2f9e5e','Neal');
-  dot(START_SIDHYA,'#7c4dca','Sidhya');
-  if(s)foodDot(s,'#e58a2b',(pick.during.e||'🥨')+' '+pick.during.t);   // snack, right on the line before the game
-  dot(v,'#ffd166','💜 '+VENUE_LABEL[k],9);
-  if(a)foodDot(a,'#c0398b',(pick.after.e||'🍽️')+' '+pick.after.t);     // dinner, on the way home
-  _map.fitBounds(L.latLngBounds(route),{padding:[30,30]});
+  L.polyline(route,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round',className:'wormline'}).addTo(_routeLayer);
+  function tipOff(dir){return dir==='top'?[0,-4]:dir==='bottom'?[0,6]:dir==='left'?[-5,0]:[5,0];}
+  function dot(ll,c,label,r,dir){dir=dir||'top';L.circleMarker(ll,{radius:r||7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:dir,className:'maptip',offset:tipOff(dir)});}
+  function foodDot(ll,c,label,dir){dir=dir||'bottom';L.circleMarker(ll,{radius:8,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:dir,className:'maptip',offset:tipOff(dir)});}
+  // staggered label directions so the tight downtown cluster fans out instead of stacking
+  dot(START_NEAL,'#2f9e5e','Neal',7,'top');
+  dot(START_SIDHYA,'#7c4dca','Sidhya',7,'bottom');
+  if(s)foodDot(s,'#e58a2b',(pick.during.e||'🥨')+' '+pick.during.t,'left');   // snack, on the line before the game
+  dot(v,'#ffd166','💜 '+VENUE_LABEL[k],9,'top');
+  if(a)foodDot(a,'#c0398b',(pick.after.e||'🍽️')+' '+pick.after.t,'right');     // dinner, on the way home
+  _map.fitBounds(L.latLngBounds(route),{padding:[58,42]});
   var cap=document.getElementById('mapCap');
   if(cap){
     var legs=['🚆 2 line in'];
@@ -717,8 +742,7 @@ window.pickVenue=function(k){
   if(pick.venue!==k){pick.during=null;pick.after=null;}
   pick.venue=k; try{venueCards();}catch(e){}
   var n=document.getElementById('next1');if(n)n.disabled=false;
-  var dm=document.querySelector('.datemap');if(dm)dm.style.display='';
-  setTimeout(function(){drawRoute(k);},40);
+  // the map shows up on the next screens (snack/dinner); nothing to draw here while it's hidden
 };
 
 /* ---------- shareable image export ---------- */
