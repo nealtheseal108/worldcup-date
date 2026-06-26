@@ -18,15 +18,13 @@
   body{
     font-family:'Inter',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
     background:linear-gradient(160deg,#7c4dca 0%,#9b72e8 45%,#c4b5fd 100%);
-    color:var(--ink);min-height:100vh;padding:24px 16px 96px;
+    color:var(--ink);min-height:100vh;padding:24px 16px 96px;overflow-x:hidden;
   }
   h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;letter-spacing:-.02em}
   .fancy{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:1.2em;line-height:1;color:var(--accent2)}
   .lovenote{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400}
-  .wrap{max-width:680px;margin:0 auto;transition:max-width .35s ease}
-  body.mapview .wrap{max-width:1060px}
-  .layout{display:flex;gap:20px;align-items:flex-start;justify-content:center}
-  .layout>.panel{flex:0 1 680px;min-width:0}
+  .wrap{max-width:680px;margin:0 auto}
+  .layout{display:block}
   .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
   .topbar .ball{font-size:22px}
   .topbar h1{font-family:'Courier Prime',ui-monospace,monospace;font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
@@ -34,18 +32,15 @@
   .matchup .chip{display:inline-flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#3a2a63;background:rgba(255,255,255,.92);border-radius:30px;padding:6px 14px;box-shadow:0 3px 12px rgba(53,28,94,.22)}
   .matchup b{color:var(--lav);font-weight:700}
   .matchup .mu-note{color:#b06a00}
-  .datemap{display:none;background:var(--paper);border-radius:16px;padding:8px 12px 4px;box-shadow:0 10px 30px rgba(53,28,94,.22);flex:0 0 340px;position:sticky;top:14px}
+  .datemap{display:none;background:var(--paper);border-radius:16px;padding:8px 12px 4px;box-shadow:0 10px 30px rgba(53,28,94,.22);margin-top:16px}
   body.mapview .datemap{display:block}
   .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:2px}
-  #leafmap{height:260px;border-radius:13px;overflow:hidden;background:#efeaf7}
-  @media(min-width:861px){body.mapview .datemap #leafmap{height:440px}}
-  @media(max-width:860px){
-    body.mapview .wrap{max-width:680px}
-    .layout{flex-direction:column}
-    .datemap{position:static;flex:none;width:auto;margin-top:18px}
-  }
+  #leafmap{height:340px;border-radius:13px;overflow:hidden;background:#efeaf7}
+  @media(max-width:600px){#leafmap{height:280px}}
   @keyframes worm{to{stroke-dashoffset:-44}}
   .wormline{stroke-dasharray:2 9;animation:worm 4s linear infinite}
+  .maplink{display:inline-flex;align-items:center;gap:6px;margin:0 0 16px;padding:8px 15px;border:1px solid var(--line);border-radius:30px;background:#f1ecfc;color:#5a3fb0;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .maplink:hover{background:#e7ddf7}
   .datemap .leaflet-tile-pane{filter:sepia(.5) saturate(1.5) hue-rotate(208deg) brightness(1.03)}
   .leaflet-container{font-family:'Courier Prime',ui-monospace,monospace}
   .maptip{background:#fff;border:none;border-radius:7px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:700;color:#3a2a63;box-shadow:0 2px 8px rgba(53,28,94,.3);padding:2px 7px;white-space:nowrap}
@@ -62,9 +57,9 @@
   .dot{width:34px;height:5px;border-radius:3px;background:rgba(255,255,255,.35)}
   .dot.on{background:var(--sun)}
   .panel{background:var(--paper);border-radius:18px;padding:26px 22px 28px;box-shadow:0 18px 50px rgba(53,28,94,.32)}
-  .step{display:none;animation:fade .35s ease}
-  .step.active{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .step{display:none}
+  .step.active{display:block;animation:wave 1s cubic-bezier(.25,.8,.3,1)}
+  @keyframes wave{0%{opacity:0;transform:translateY(14px) skewX(0deg);filter:blur(2px)}30%{opacity:1;transform:translateX(-7px) skewX(2.2deg);filter:blur(0)}55%{transform:translateX(6px) skewX(-1.6deg)}78%{transform:translateX(-3px) skewX(.8deg)}100%{opacity:1;transform:none}}
   .eyebrow{font-family:'Courier Prime',ui-monospace,monospace;color:var(--lav);font-weight:500;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
   h2{font-size:24px;line-height:1.2;margin-bottom:6px}
   .sub{color:var(--muted);font-size:14.5px;margin-bottom:20px;line-height:1.5}
@@ -304,6 +299,7 @@
       <div class="eyebrow">Step 2 of 3</div>
       <h2>pick our game-time snack babu!</h2>
       <p class="sub">something yummy AND healthy to fuel the match. easy on the wallet, grab it before kickoff ‼️</p>
+      <button class="maplink" type="button" onclick="scrollToMap()">🗺️ peek our route ↓</button>
       <div class="cards" id="duringCards"></div>
       <div class="nav">
         <button class="btn ghost" onclick="go(1)">← Back</button>
@@ -316,6 +312,7 @@
       <div class="eyebrow">Step 3 of 3</div>
       <h2>where we eating after?!</h2>
       <p class="sub">picked to dodge the post-match crowds. we're broke students 😭 so it's all <b>$</b> and <b>$$</b>, no splurges, and 🚆 marks spots right on our 2 line ride home. there's an indian pick in every list for our anniversary 💜</p>
+      <button class="maplink" type="button" onclick="scrollToMap()">🗺️ peek our route ↓</button>
       <div class="cards" id="afterCards"></div>
       <div class="nav">
         <button class="btn ghost" onclick="go(2)">← Back</button>
@@ -603,30 +600,57 @@ function foodCards(which){
     wrap.appendChild(c);
   });
 }
-function pageMusicFx(){
-  /* "dunk underwater" muffle on page turn: smoothly duck the volume to a low murmur and
-     bend the pitch down, then resurface. (true muffling/low-pass DSP isn't possible on the
-     cross-origin YT stream, so this fakes the drowned-out feel with volume + playback rate) */
-  if(!musicOn||!ytPlayer||!ytPlayer.setVolume)return;
+var _uwCtx=null;
+function underwaterWhoosh(){
+  /* a REAL low-pass underwater wash, built in the Web Audio API (the YT music is a cross-origin
+     embed so it can't be filtered directly; this generates the submerged ambience + lays it on top).
+     filtered noise + a cutoff sweep + a slow LFO wobble = the watery "wave", faded in then out over 7.5s */
   try{
-    var base=(typeof MAXVOL==='number'?MAXVOL:45), low=Math.max(1,Math.round(base*0.18));
-    var dur=1700, steps=22, i=0, iv=dur/steps;
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+    if(!_uwCtx)_uwCtx=new AC();
+    if(_uwCtx.state==='suspended')_uwCtx.resume();
+    var ctx=_uwCtx, t=ctx.currentTime, DUR=7.5;
+    var n=Math.floor(ctx.sampleRate*2), buf=ctx.createBuffer(1,n,ctx.sampleRate), ch=buf.getChannelData(0);
+    for(var i=0;i<n;i++)ch[i]=(Math.random()*2-1)*0.55;          // noise = the body of the water
+    var src=ctx.createBufferSource(); src.buffer=buf; src.loop=true;
+    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=7;   // lowpass = muffled / underwater
+    lp.frequency.setValueAtTime(720,t);
+    lp.frequency.linearRampToValueAtTime(340,t+DUR*0.45);              // sweep the cutoff down (deeper)
+    lp.frequency.linearRampToValueAtTime(640,t+DUR);                  // then back up (surfacing)
+    var lfo=ctx.createOscillator(); lfo.frequency.value=0.55;          // slow undulation = the wave
+    var lfoAmt=ctx.createGain(); lfoAmt.gain.value=210; lfo.connect(lfoAmt); lfoAmt.connect(lp.frequency);
+    var g=ctx.createGain();                                            // master envelope: fade in then out
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(0.15,t+2);
+    g.gain.linearRampToValueAtTime(0.0001,t+DUR);
+    src.connect(lp); lp.connect(g); g.connect(ctx.destination);
+    src.start(t); lfo.start(t); src.stop(t+DUR+0.05); lfo.stop(t+DUR+0.05);
+  }catch(e){}
+}
+function pageMusicFx(){
+  // page turn = go underwater: the wash fades in/out over 7.5s while the music dips + muffles
+  if(!musicOn)return;
+  underwaterWhoosh();
+  if(!ytPlayer||!ytPlayer.setVolume)return;
+  try{
+    var base=(typeof MAXVOL==='number'?MAXVOL:45), low=Math.max(1,Math.round(base*0.30));
+    var dur=2600, steps=26, i=0, iv=dur/steps;
     if(window._fxTimer)clearInterval(window._fxTimer);
-    // pitch bend down for the underwater wobble, then snap back as it resurfaces
-    if(ytPlayer.setPlaybackRate){
+    if(ytPlayer.setPlaybackRate){                                     // pitch-bend the music down, then resurface
       var rates=ytPlayer.getAvailablePlaybackRates?ytPlayer.getAvailablePlaybackRates():[1];
       var slow=rates.indexOf(0.75)>=0?0.75:(rates.indexOf(0.5)>=0?0.5:1);
-      if(slow!==1){ytPlayer.setPlaybackRate(slow);setTimeout(function(){try{if(musicOn)ytPlayer.setPlaybackRate(1);}catch(e){}},dur-180);}
+      if(slow!==1){ytPlayer.setPlaybackRate(slow);setTimeout(function(){try{if(musicOn)ytPlayer.setPlaybackRate(1);}catch(e){}},dur-200);}
     }
     window._fxTimer=setInterval(function(){
       i++;
       var dip=(1-Math.cos(2*Math.PI*(i/steps)))/2;   // 0 -> 1 -> 0, deepest mid-transition
-      var vol=base-(base-low)*dip;                    // base -> murmur -> base
+      var vol=base-(base-low)*dip;                    // muffle the music while it's submerged
       try{ytPlayer.setVolume(Math.max(0,Math.min(100,Math.round(vol))));}catch(e){}
       if(i>=steps){clearInterval(window._fxTimer);window._fxTimer=null;try{if(musicOn)ytPlayer.setVolume(base);}catch(e){}}
     },iv);
   }catch(e){}
 }
+function scrollToMap(){var m=document.getElementById('datemap');if(m)m.scrollIntoView({behavior:'smooth',block:'start'});}
 function go(n){
   pageMusicFx();
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
