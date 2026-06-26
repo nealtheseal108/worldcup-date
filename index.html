@@ -53,6 +53,8 @@
   h2{font-size:24px;line-height:1.2;margin-bottom:6px}
   .sub{color:var(--muted);font-size:14.5px;margin-bottom:20px;line-height:1.5}
   .cards{display:grid;gap:12px}
+  #duringCards,#afterCards{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .dishes{font-size:12px;color:#6a4fb0;font-weight:600;margin:4px 0 7px;line-height:1.4}
 
   /* venue cards (with art banner) */
   .vcard{border:2px solid var(--line);background:var(--card);border-radius:16px;overflow:hidden;cursor:pointer;transition:.15s;position:relative}
@@ -464,16 +466,18 @@ const VENUES = {
     transferLine:"Hop the <b>Monorail</b> at Westlake (2 min) straight into Seattle Center!",
     safety:"i've already got us sorted, and the open Seattle Center campus has lots of exits, so it is the easiest of the options to move through or step out of in a big crowd. The indoor Armory next door is our backup if it rains or the Mural packs out. Bags are screened at entry.",
     during:[
-      {e:"🌮",t:"Sal y Limón",d:"buzzy michoacán spot that literally plays the games on big screens, load up on veggie tacos, chips n guac before kickoff 🤩",p:"$$",r:4.7,rc:"1.1k"},
-      {e:"🍦",t:"Molly Moon's",d:"seattle's iconic scoop shop, real vegan flavors too. quick sweet stop on the way in 💜",p:"$",r:4.6,rc:"1.5k"},
-      {e:"🥐",t:"Macrina Bakery",d:"belltown institution since '93, almond croissants n veggie sandwiches to grab on the walk over.",p:"$",r:4.5,rc:"1.3k"}
+      {e:"🍕",t:"MOD Pizza (Armory)",d:"build-your-own pizza right inside the seattle center armory, unlimited veggie toppings + vegan cheese. fastest pre-match bite 🤩",p:"$",r:4.2,rc:"285",dishes:["build-your-own veggie","artichoke caspian","garden salad"]},
+      {e:"🌮",t:"Sal y Limón",d:"family-run michoacán spot 2 blocks from the center, hand-made tortillas, plays the games on big screens.",p:"$$",r:4.4,rc:"490",dishes:["tacos vegetarianos","veggie enchiladas","tamales de rajas"]},
+      {e:"🍜",t:"CÔBA Viet Kitchen",d:"modern vietnamese w/ a patio, veggie pho is tofu + mushroom and veg dishes are marked. 4 min walk.",p:"$$",r:4.4,rc:"530",dishes:["veggie pho","tofu fresh rolls","spicy eggplant"]},
+      {e:"🥗",t:"Bounty Kitchen",d:"cozy organic cafe famous for grain bowls n salads, light fuel before kickoff.",p:"$$",r:4.4,rc:"480",dishes:["marrakech bowl","chickpea of the sea","havana libre bowl"]},
+      {e:"🥐",t:"Macrina Bakery",d:"seattle's favorite bakery since '93, grab a pastry on the walk over.",p:"$$",r:4.4,rc:"310",dishes:["almond croissant","morning glory muffin","avocado toast"]}
     ],
     after:[
-      {e:"🧆",t:"Café Suliman",d:"Warm vegetarian Levantine comfort food near the festival. Easy, tasty, and kind to a student budget.",p:"$"},
-      {e:"🍕",t:"Via Tribunali",d:"Low-key Neapolitan pizza in Queen Anne, easy veg margherita and marinara. Relaxed and affordable.",p:"$$"},
-      {e:"🍛",t:"ROTI Cuisine of India",d:"Authentic Indian right in Lower Queen Anne. Tons of veg, perfect for our anniversary dinner. 💜",p:"$$"},
-      {e:"🍜",t:"CÔBA Viet Kitchen",d:"Modern Vietnamese a block from Seattle Center: veg pho, crispy spring rolls, mango-tofu salad. 💜",p:"$$"},
-      {e:"🍲",t:"Racha Thai",d:"Tofu curries and veggie stir-fries two blocks away, easy to keep fully veg and seriously filling.",p:"$$"}
+      {e:"🍕",t:"Via Tribunali",d:"some of the most authentic wood-fired neapolitan pizza outside naples, cozy n famous up the hill.",p:"$$",r:4.4,rc:"740",dishes:["margherita","funghi","marinara"]},
+      {e:"🍛",t:"ROTI Cuisine of India",d:"beloved lower queen anne indian, 75+ dishes n a deep veg bench. our anniversary pick 💜",p:"$$",r:4.0,rc:"1.3k",dishes:["paneer tikka masala","dal makhani","malai kofta"]},
+      {e:"🍣",t:"The Sushi Samurai",d:"washington's first all-plant-based sushi bar, robot server + mario tennis at the bar, every roll is veg-safe.",p:"$$",r:4.5,rc:"390",dishes:["queen anne roll","ring of fire roll","konjac shrimp tempura"]},
+      {e:"🍲",t:"Racha Thai",d:"longtime queen anne thai right by the center, huge menu w/ easy tofu swaps.",p:"$$",r:4.2,rc:"585",dishes:["green curry w/ tofu","pad thai","pad see ew"]},
+      {e:"🧇",t:"Citizen Collective",d:"iconic uptown cafe + beer garden in the space needle's shadow, big patio w/ fire pits, strong veg/vegan.",p:"$$",r:4.2,rc:"1.5k",dishes:["waffles","yogurt parfait","breakfast tacos"]}
     ]
   },
   pier:{
@@ -484,15 +488,19 @@ const VENUES = {
     transferLine:"Short walk downhill from Westlake to Pike Place and the Pier 62 waterfront!",
     safety:"The dockside party is free and first-come, so we get there early to claim a good spot by the rail. It is a confined pier with limited entry and exit, so we arrive 30 plus minutes early for screening. No backpacks, bags must stay under 14 by 6 by 14 inches. Blankets allowed.",
     during:[
-      {e:"🥟",t:"Piroshky Piroshky",d:"pike place legend, the line says it all. vegan potato-mushroom piroshki for the walk to the pier, like $7.",p:"$",r:4.5,rc:"5.8k"},
-      {e:"🧀",t:"Beecher's",d:"the 'world's best' mac n cheese (oprah-approved), totally meat-free, grab a hot cup to split before kickoff.",p:"$$",r:4.6,rc:"2.5k"},
-      {e:"🍩",t:"Daily Dozen Doughnut",d:"warm mini cinnamon-sugar donuts straight off the lil robot, a market rite of passage (cash only).",p:"$",r:4.3,rc:"1.2k"},
-      {e:"🥢",t:"Mee Sum Pastry",d:"pillowy veggie hum bao from a tiny market window since the 80s, portable n a few bucks.",p:"$",r:4.4,rc:"1.2k"},
-      {e:"🫓",t:"The Crumpet Shop",d:"seattle's og crumpets since '76, go jam or ricotta-honey, hold the butter to keep it veg.",p:"$",r:4.7,rc:"1.5k"}
+      {e:"🥟",t:"Piroshky Piroshky",d:"the iconic pike place hand-pie line, vegan savory piroshki are labeled, grab-and-go fuel.",p:"$",r:4.5,rc:"5.8k",dishes:["potato-mushroom piroshky (vegan)","veggie chipotle piroshky","apple cinnamon roll"]},
+      {e:"🧀",t:"Beecher's",d:"watch the cheese made through the window, then split the oprah-approved meatless mac. market landmark.",p:"$$",r:4.3,rc:"4k",dishes:["world's best mac & cheese","grilled cheese","tomato soup"]},
+      {e:"🍩",t:"Daily Dozen Doughnut",d:"hot mini doughnuts off the robot since '78, all veg n cheap, a warm bag to share on the walk.",p:"$",r:4.5,rc:"1.2k",dishes:["cinnamon-sugar minis","powdered minis","sprinkle minis"]},
+      {e:"🥬",t:"Mee Sum Pastry",d:"giant pillowy steamed buns, the veggie hum bao is the move, portable n a few bucks.",p:"$",r:4.4,rc:"1.3k",dishes:["vegetable hum bao","pineapple bun","green tea sesame ball"]},
+      {e:"🫓",t:"The Crumpet Shop",d:"bouncy house-made crumpets toasted to order w/ ~2 dozen toppings, beloved cheap veg bite.",p:"$",r:4.7,rc:"1.5k",dishes:["the walrus (walnut, honey, ricotta)","lemon curd & ricotta","pesto, cheese & tomato"]},
+      {e:"🧆",t:"Mr. D's Greek",d:"the market's go-to greek window for 40 years, hearty falafel + flaky spanakopita.",p:"$",r:4.4,rc:"330",dishes:["falafel yeero w/ hummus","spanakopita","greek salad"]}
     ],
     after:[
-      {e:"🍛",t:"Zaika",d:"Modern Indian on Pike St with big veg and vegan menus. Our anniversary pick, and not too pricey. 💜",p:"$$"},
-      {e:"🌮",t:"El Borracho",d:"100% plant-based Mexican in the Market: jackfruit and tofu tacos and giant burritos, all veg by default.",p:"$$"}
+      {e:"🍛",t:"Zaika",d:"downtown indian w/ a deep labeled veg section, great for a celebratory feast. (closed tuesdays) 💜",p:"$$",r:4.1,rc:"1.3k",dishes:["paneer tikka masala","malai kofta","veg dum biryani"]},
+      {e:"🌮",t:"El Borracho",d:"fully plant-based taqueria by the market, so the whole menu is fair game for us two.",p:"$",r:4.0,rc:"550",dishes:["impossible tex-mex tacos","bean & cheese burrito","nachos w/ queso"]},
+      {e:"🍜",t:"Bangrak Market",d:"buzzy bangkok night-market style belltown spot, tofu swaps + a fun lively post-match vibe.",p:"$$",r:4.3,rc:"1.9k",dishes:["som tum (papaya salad)","fried tofu","grilled veggie skewers"]},
+      {e:"🍕",t:"Serious Pie",d:"tom douglas's famous 3-day-dough pizzeria, several knockout veg pies, great for sharing.",p:"$$",r:4.5,rc:"4.8k",dishes:["oyster mushroom & truffle pizza","yukon potato & rosemary","ferndale mozzarella"]},
+      {e:"🥞",t:"Tilikum Place Cafe",d:"belltown institution famous for puffy dutch babies, a cozy charming wind-down. (thu to sun)",p:"$$",r:4.6,rc:"2.4k",dishes:["savory dutch baby","spinach & beecher's omelet","sweet dutch baby"]}
     ]
   },
   house:{
@@ -503,29 +511,32 @@ const VENUES = {
     transferLine:"We are basically there! Pacific Place is right across from Westlake station.",
     safety:"Fully indoor mall, climate-controlled with no weather risk, plus multiple floors and exits. Bags are screened at entry. The most low-key, comfy option if it is hot or busy.",
     during:[
-      {e:"🍩",t:"Top Pot Doughnuts",d:"obama-famous hand-forged donuts, maple bar + a raspberry glazed n we're set 🤩",p:"$",r:4.5,rc:"2.9k"},
-      {e:"🍕",t:"Serious Pie",d:"tom douglas's blistered wood-fired pies, the foraged mushroom + truffle one is veg n unreal, split it.",p:"$$",r:4.5,rc:"4.6k"},
-      {e:"🍜",t:"Noi Thai",d:"slick downtown thai, the whole veg section is actually vegan, tofu pad see ew before the game.",p:"$$",r:4.4,rc:"2.9k"}
+      {e:"🥟",t:"Din Tai Fung (Pacific Place)",d:"world-famous soup dumplings right inside pacific place, labeled vegan section, fast n reliable before kickoff.",p:"$$",r:4.4,rc:"2.8k",dishes:["vegan dumplings","veg & mushroom fried rice","garlic green beans"]},
+      {e:"🍕",t:"Serious Pie",d:"tom douglas icon, blistered wood-oven crust, the potato pizza is a cult veg fave. ~3 blocks from westlake.",p:"$$",r:4.4,rc:"4.9k",dishes:["yukon gold potato pizza","oyster mushroom & truffle","lacinato kale"]},
+      {e:"🧀",t:"Beecher's",d:"the oprah-anointed mac n cheese, all veg counter food you can grab fast n eat on the go.",p:"$",r:4.5,rc:"4k",dishes:["world's best mac & cheese","grilled cheese","tomato soup"]},
+      {e:"🌱",t:"Veggie Grill",d:"100% vegan menu one block off westlake, everything's fair game so ordering's effortless.",p:"$$",r:4.4,rc:"640",dishes:["buffalo chick'n wrap","truffle mac & cheese","sweetheart fries"]},
+      {e:"🍩",t:"Top Pot Doughnuts",d:"the hand-forged seattle doughnut institution, an easy sweet pre-kickoff stop near westlake 🤩",p:"$",r:4.4,rc:"2.1k",dishes:["original glazed","old-fashioned cake","feather boa"]}
     ],
     after:[
-      {e:"🥟",t:"Din Tai Fung (Pacific Place)",d:"in the same building, order the veggie dumplings n greens, no trek after the game, easy on the wallet.",p:"$$"},
-      {e:"🍛",t:"Zaika",d:"Modern Indian a few blocks away on Pike St, huge veg menu. Our anniversary pick. 💜",p:"$$"},
-      {e:"🍔",t:"Veggie Grill",d:"100% plant-based fast-casual, so the whole menu is fair game: vegan burgers, bowls, crispy tenders. Open late.",p:"$$"},
-      {e:"🍕",t:"MOD Pizza",d:"Build-your-own personal pizza, unlimited veggies and vegan cheese for one flat price. Open late.",p:"$"},
-      {e:"🌯",t:"Chipotle",d:"Sofritas (spiced tofu) burrito or veggie bowl with all the guac, fast and reliably veg. Open till 10.",p:"$"}
+      {e:"🍜",t:"Noi Thai",d:"polished downtown thai at harbor steps w/ a dedicated veg section, beautiful plating, casual price.",p:"$$",r:4.4,rc:"1.4k",dishes:["veg pad thai (tofu)","tofu green curry","veggie spring rolls"]},
+      {e:"🌮",t:"Tacos Chukis",d:"cult capitol hill taco shop w/ killer prices, the mushroom + grilled-veggie tacos are a real veg win.",p:"$",r:4.5,rc:"2.1k",dishes:["mushroom (hongo) tacos","grilled veggie tacos","veggie mulita"]},
+      {e:"🍥",t:"Kizuki Ramen",d:"pike-pine ramen-ya making its veggie broth from scratch, a warm casual bowl on the walk home.",p:"$$",r:4.4,rc:"1.7k",dishes:["veggie ramen (shiitake broth)","spinach goma-ae","edamame"]},
+      {e:"🍕",t:"Big Mario's Pizza",d:"capitol hill late-night NY-slice institution, loads of veggie/vegan toppings, open till 2am.",p:"$",r:4.6,rc:"710",dishes:["brooklyn veggie slice","cheese slice","margherita pie"]},
+      {e:"🏔️",t:"Annapurna Cafe",d:"cozy below-broadway himalayan fave famous for momos, the veg thali is a standout.",p:"$$",r:4.4,rc:"1.1k",dishes:["vegan spinach momo","aloo bodi tama","vegetable thali"]},
+      {e:"🍲",t:"Ba Bar",d:"buzzy vietnamese on 12th w/ a real spread of tofu + curry dishes built out for vegetarians.",p:"$$",r:4.4,rc:"1.7k",dishes:["lemongrass tofu","green curry w/ baked tofu","tamarind tofu noodles"]}
     ]
   }
 };
 
 /* Eastside dinner options on the 2 Line home (near stations), shown for every venue */
 const EASTSIDE = [
-  {e:"🌶️",t:"Araya's Place",d:"iconic all-vegan thai since '87, so you can order LITERALLY anything, old bellevue by east main station 💜",p:"$$",r:4.5,rc:"1.6k",east:true},
-  {e:"🥟",t:"Din Tai Fung (Bellevue)",d:"world-famous soup dumplings, 18 folds each, full veggie lineup (green dumplings, vegan buns). by bellevue downtown station.",p:"$$",r:4.4,rc:"5.4k",east:true},
-  {e:"🌮",t:"Cactus",d:"eastside fave voted best mexican for years, those butternut squash enchiladas go crazy. bellevue square.",p:"$$",r:4.4,rc:"3.4k",east:true},
-  {e:"🍣",t:"Maneki",d:"seattle's oldest japanese spot (since 1904!), james beard classic, veggie rolls + agedashi tofu, cozy tatami room by the CID stop.",p:"$$",r:4.6,rc:"3.6k",east:true},
-  {e:"🍜",t:"Pho Bac Súp Shop",d:"the pham family's james-beard pho dynasty, tofu n veggie pho, best broth in the city, just off the CID stop.",p:"$",r:4.3,rc:"2.3k",east:true},
-  {e:"🍰",t:"Hood Famous Cafe",d:"that purple ube cheesecake everyone posts 💜 dreamy filipino dessert + ube latte, right across from the CID station.",p:"$$",r:4.6,rc:"650",east:true},
-  {e:"🍕",t:"Mioposto",d:"wood-fired neapolitan pies in mercer island town center, big veg selection, easy hop off the train.",p:"$$",r:4.3,rc:"1k",east:true}
+  {e:"🌶️",t:"Araya's Place",d:"iconic all-vegan thai since '87, order LITERALLY anything. old bellevue by east main station 💜",p:"$$",r:4.5,rc:"1.6k",east:true,dishes:["panang curry","pad thai","tom kha soup"]},
+  {e:"🥟",t:"Din Tai Fung (Bellevue)",d:"world-famous soup dumplings at lincoln square, right at the bellevue downtown 2 line station.",p:"$$",r:4.4,rc:"5.4k",east:true,dishes:["vegetarian dumplings","veg & mushroom fried rice","vegetarian buns"]},
+  {e:"🌵",t:"Cactus",d:"beloved seattle staple since '90 w/ two standout meat-free signatures. bellevue square.",p:"$$",r:4.4,rc:"1.3k",east:true,dishes:["butternut squash enchiladas","portobello fajitas","build-your-own guac"]},
+  {e:"🏮",t:"Maneki",d:"seattle's oldest japanese spot, open since 1904, a true CID institution (book ahead).",p:"$$",r:4.6,rc:"850",east:true,dishes:["agedashi tofu","vegetable tempura","veggie roll"]},
+  {e:"🍜",t:"Pho Bac Súp Shop",d:"the hip little saigon flagship of seattle's founding pho family, solid veggie broth.",p:"$",r:4.3,rc:"2.3k",east:true,dishes:["pho chay (veggie pho)","tofu veggie pho"]},
+  {e:"🍰",t:"Hood Famous Cafe",d:"home of the OG ube cheesecake 💜 iconic treat stop, steps from the CID station.",p:"$",r:4.6,rc:"640",east:true,dishes:["ube cheesecake","ube latte","ube cookies"]},
+  {e:"🍕",t:"Mioposto",d:"cozy family-run open-flame pizzeria in mercer island town center, vegan cheese + GF crust.",p:"$$",r:4.3,rc:"700",east:true,dishes:["margherita pizza","eggplant parmesan","caprese salad"]}
 ];
 
 const pick = {venue:null, during:null, after:null};
@@ -557,6 +568,7 @@ function foodCards(which){
     c.innerHTML=`<div class="emoji">${item.e}</div><div>
       <div class="ttl">${item.t}</div>
       <div class="desc">${item.d}</div>
+      ${item.dishes&&item.dishes.length?`<div class="dishes">🍽️ ${item.dishes.join(' · ')}</div>`:''}
       ${item.r?`<span class="tag rate">⭐ ${item.r}${item.rc?' · '+item.rc:''}</span> `:''}${item.p?`<span class="tag price">${item.p}</span>`:''}${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
     c.onclick=()=>{
       pick[which]=item; foodCards(which);
