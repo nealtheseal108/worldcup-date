@@ -281,7 +281,7 @@
           <div class="tk-foot"><span id="tkDate">7.06.26 · 5:00PM</span><span>GOING 💜</span></div>
         </div>
         <div class="sharerow">
-          <button class="btn primary" onclick="shareGif()">🎞️ Share GIF</button>
+          <button class="btn primary" onclick="saveGif()">🎞️ Save GIF</button>
           <button class="btn lav2btn" onclick="shareCard()">📤 Share photo</button>
           <button class="btn lav2btn" onclick="savePhoto()">⬇️ Save photo</button>
           <button class="btn lav2btn" onclick="copyImage()">🖼️ Copy image</button>
@@ -619,19 +619,15 @@ async function cardGifBlob(onProgress){
     gif.render();
   });
 }
-async function shareGif(){
+async function saveGif(){
   hint('Making your GIF... 🎞️');
   try{
     const blob=await cardGifBlob(p=>hint('Making your GIF... '+Math.round(p*100)+'%'));
-    const file=new File([blob],'im-going-with-my-boyfriend.gif',{type:'image/gif'});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:"I'm going with my boyfriend!",text:"I'm going to the World Cup with my boyfriend! 💜"});
-      hint('Shared the GIF! 💜');
-    }else{
-      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='im-going-with-my-boyfriend.gif';
-      document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
-      hint('Saved the GIF! Attach it in WhatsApp or iMessage 💜');
-    }
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='sidhu-neal-world-cup-date.gif';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+    hint('Saved the GIF! 💜 Find it in your downloads, then drop it into WhatsApp or iMessage.');
   }catch(e){hint('GIF had trouble, try Save photo instead 💜');}
 }
 
