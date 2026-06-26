@@ -27,6 +27,10 @@
   .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
   .topbar .ball{font-size:22px}
   .topbar h1{font-family:'Courier Prime',ui-monospace,monospace;font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
+  .matchup{text-align:center;margin:0 0 16px}
+  .matchup .chip{display:inline-flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#3a2a63;background:rgba(255,255,255,.92);border-radius:30px;padding:6px 14px;box-shadow:0 3px 12px rgba(53,28,94,.22)}
+  .matchup b{color:var(--lav);font-weight:700}
+  .matchup .mu-note{color:#b06a00}
   .progress{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
   .dot{width:34px;height:5px;border-radius:3px;background:rgba(255,255,255,.35)}
   .dot.on{background:var(--sun)}
@@ -198,6 +202,7 @@
 <body>
 <div class="wrap">
   <div class="topbar"><span class="ball">⚽</span><h1>Sidhya & Neal · World Cup Date · July 6</h1></div>
+  <div class="matchup"><span class="chip">🏆 Round of 16 · <b id="muText">TBD 🆚 TBD</b> · <span class="mu-note" id="muNote">🇺🇸 could be us!</span></span></div>
   <div class="progress">
     <div class="dot on" id="d0"></div><div class="dot" id="d1"></div>
     <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
@@ -211,7 +216,7 @@
         <div class="big">⚽💜</div>
         <div class="pill">HAPPY 8 MONTHS · ROUND OF 16 · 5 PM!</div>
         <h2>hey sidhu, you get to pick our <span class="fancy">date!!</span></h2>
-        <p class="sub" style="margin-top:10px">happy 8 months babu!! 💜 i handled all the boring stuff (trains, timing, no car needed) so you just pick the fun: where we watch, what we snack on, where we eat after. you choose and i'll plan around it, type beat 🤩 all veg, promise. let's gooo ‼️⚽</p>
+        <p class="sub" style="margin-top:10px">happy 8 months babu!! 💜 i handled all the boring stuff (trains, timing, no car needed) so you just pick the fun: where we watch, what we snack on, where we eat after. you choose and i'll plan around it, type beat 🤩 let's gooo ‼️⚽</p>
         <input class="namein" id="nameField" value="Sidhya" maxlength="24">
       </div>
       <div class="nav"><span></span><button class="btn primary" onclick="go(1)">Let's go! →</button></div>
@@ -233,7 +238,7 @@
     <section class="step" id="step2">
       <div class="eyebrow">Step 2 of 3</div>
       <h2>pick our game-time snack babu!</h2>
-      <p class="sub">something yummy AND healthy to fuel the match. all veg, easy on the wallet, grab it before kickoff ‼️</p>
+      <p class="sub">something yummy AND healthy to fuel the match. easy on the wallet, grab it before kickoff ‼️</p>
       <div class="cards" id="duringCards"></div>
       <div class="nav">
         <button class="btn ghost" onclick="go(1)">← Back</button>
@@ -245,7 +250,7 @@
     <section class="step" id="step3">
       <div class="eyebrow">Step 3 of 3</div>
       <h2>where we eating after?!</h2>
-      <p class="sub">veg and picked to dodge the post-match crowds. we're broke students 😭 so it's all <b>$</b> and <b>$$</b>, no splurges, and 🚆 marks spots right on our 2 line ride home. there's an indian pick in every list for our anniversary 💜</p>
+      <p class="sub">picked to dodge the post-match crowds. we're broke students 😭 so it's all <b>$</b> and <b>$$</b>, no splurges, and 🚆 marks spots right on our 2 line ride home. there's an indian pick in every list for our anniversary 💜</p>
       <div class="cards" id="afterCards"></div>
       <div class="nav">
         <button class="btn ghost" onclick="go(2)">← Back</button>
@@ -295,7 +300,7 @@
         <h2 id="itiTitle">Our Big Date!</h2>
         <div class="venue" id="itiVenue"></div>
         <div class="lovenote">made this for you sidhu 💜 love you more than anyone</div>
-        <div class="sub" style="margin-top:6px">Monday, July 6, 2026 · Round of 16 · Kickoff 5:00 PM · Full time ~6:30 PM</div>
+        <div class="sub" style="margin-top:6px">Monday, July 6, 2026 · Round of 16 · Kickoff 5:00 PM · Full time ~6:55 PM</div>
       </div>
 
       <div class="sectlabel">Step 1 · two routes that cross 🚆</div>
@@ -494,7 +499,7 @@ function foodCards(which){
     c.innerHTML=`<div class="emoji">${item.e}</div><div>
       <div class="ttl">${item.t}</div>
       <div class="desc">${item.d}</div>
-      <span class="tag veg">🌱 vegetarian</span>${item.r?` <span class="tag rate">⭐ ${item.r}${item.rc?' · '+item.rc:''}</span>`:''}${item.p?` <span class="tag price">${item.p}</span>`:''}${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
+      ${item.r?`<span class="tag rate">⭐ ${item.r}${item.rc?' · '+item.rc:''}</span> `:''}${item.p?`<span class="tag price">${item.p}</span>`:''}${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
     c.onclick=()=>{
       pick[which]=item; foodCards(which);
       document.getElementById(which==='during'?'next2':'next3').disabled=false;
@@ -519,15 +524,15 @@ function reveal(){
   // shareable ticket
   document.getElementById('tkVenue').textContent = v.short;
   document.getElementById('tkComp').innerHTML =
-    `WATCH&nbsp;&nbsp;<b>${v.short}</b><br>SNACK&nbsp;&nbsp;<b>${pick.during.t}</b><br>DINNER&nbsp;<b>${pick.after.t}</b>`;
-  const tk = ` ${name.toUpperCase()} ♥ NEAL · 8 MONTHS · JULY 6 2026 · WORLD CUP R16 ·`;
+    `MATCH&nbsp;&nbsp;<b>${MATCHUP}</b><br>WATCH&nbsp;&nbsp;<b>${v.short}</b><br>SNACK&nbsp;&nbsp;<b>${pick.during.t}</b><br>DINNER&nbsp;<b>${pick.after.t}</b>`;
+  const tk = ` ${name.toUpperCase()} ♥ NEAL · 8 MONTHS · JULY 6 2026 · WORLD CUP R16 · ${MATCHUP} ·`;
   document.getElementById('tkTicker').textContent = tk.repeat(6);
 
   const rows=[
     ['~3:45 PM','<b>Arrive Westlake together.</b>', v.transferLine],
     ['4:00 PM',`<b>Snack: ${pick.during.t}!</b>`, pick.during.d+' Then clear security and find a great spot.'],
     ['5:00 PM','<b>Kickoff, Round of 16! ⚽</b>','Watch party at '+v.name+'. Jerseys on! 💜'],
-    ['~6:30 PM','<b>Full time!</b>','Game wraps up around 6:30. Soak up the atmosphere, grab a few photos, and let the first crowd wave clear out. (A little later if it goes to extra time and penalties!)'],
+    ['~6:55 PM','<b>full time!</b>','wraps up around 6:55. soak up the vibes, grab some pics, and let the first crowd wave clear out (a lil later if it goes to extra time + pens).'],
     ['7:30 PM',`<b>Dinner: ${pick.after.t}!</b>`, pick.after.d],
     ['~9:00 PM','<b>Free Salt &amp; Straw 🍦</b>','We hop off in Bellevue Downtown and cash in our free Salt &amp; Straw. Two spoons, one cup, zero regrets.'],
     ['~9:20 PM','<b>Bellevue Downtown Park 💜</b>','A slow lap around the park and the waterfall, then a little kiss under the lights. Best part of the night, just saying. 😚'],
@@ -547,6 +552,11 @@ venueCards();
 var CHEEKY_HIDE_UNTIL=1782457721986; /* Thu Jun 25 2026 ~00:08 PDT (1h from when this was set) */
 function applyCheekyGate(){var el=document.getElementById('cheekyLine');if(el)el.style.display=(Date.now()<CHEEKY_HIDE_UNTIL)?'none':'';}
 applyCheekyGate();
+/* World Cup matchup — Seattle R16 = Match 94 (W81 vs W82). update when the teams are set. */
+var MATCHUP = "TBD 🆚 TBD";
+var MATCHUP_NOTE = "🇺🇸 could be us!";
+function applyMatchup(){var t=document.getElementById('muText');if(t)t.textContent=MATCHUP;var n=document.getElementById('muNote');if(n)n.textContent=MATCHUP_NOTE;}
+applyMatchup();
 
 /* ---------- shareable image export ---------- */
 async function cardBlob(){
@@ -601,7 +611,7 @@ async function cardGifBlob(onProgress){
   const card=document.getElementById('shareCard');
   const ticker=card.querySelector('.tk-ticker');
   const track=card.querySelector('.tk-track');
-  const SCALE=1.5, FRAMES=18, DELAY=120;
+  const SCALE=1.25, FRAMES=44, DELAY=167;   // ~7.3s/loop to match the live ticker (-50% over 22s)
   // ticker window geometry, relative to the card, in capture pixels
   const cr=card.getBoundingClientRect(), tr=ticker.getBoundingClientRect();
   const tx=Math.round((tr.left-cr.left)*SCALE), ty=Math.round((tr.top-cr.top)*SCALE);
@@ -651,15 +661,17 @@ async function saveGif(){
 }
 
 /* ---------- background music: looping playlist with fade transitions ----------
-   Shotput -> Link Up -> Passionfruit(@1:12) -> Heat Waves -> Babydoll -> Flight's Booked -> Kiss Me More -> loop  */
+   Shotput -> Link Up -> Passionfruit(@1:12) -> Heat Waves(late) -> Babydoll -> Flight's Booked -> Kiss Me More -> Ay No Puedo -> No One Noticed -> loop  */
 var MUSIC=[
   {id:'K4Fk9Clc12w', title:'Shotput (slowed + reverb)', artist:'Still Woozy'},
   {id:'1_w9ZtbHj_E', title:'Link Up', artist:'Don Toliver'},
   {id:'nfJReXaXkTY', title:'Passionfruit (slowed + reverb)', artist:'Drake', start:72},
-  {id:'c9jTdUBMys8', title:'Heat Waves', artist:'Glass Animals'},
+  {id:'qit2Y6CyWx8', title:'Heat Waves (late night edit)', artist:'Glass Animals'},
   {id:'l8KS5HiMXn4', title:'Babydoll (slowed + reverb)', artist:'Dominic Fike'},
   {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake'},
-  {id:'ISsxv6i9f_k', title:'Kiss Me More (slowed + reverb)', artist:'Doja Cat & SZA'}
+  {id:'ISsxv6i9f_k', title:'Kiss Me More (slowed + reverb)', artist:'Doja Cat & SZA'},
+  {id:'y9NPx6NDA6M', title:'Ay No Puedo', artist:'The Marías'},
+  {id:'_9hkXCYiEjc', title:'No One Noticed', artist:'The Marías'}
 ];
 var MAXVOL=45, FADE_MS=2500, FADE_TICK=80;
 var ytPlayer=null, musicReady=false, musicOn=false, musicWanted=false;
