@@ -320,7 +320,7 @@
 
       <div class="safety" id="safetyBox"></div>
       <div class="note" id="reserveNote"></div>
-      <div class="cheeky">Sex is not included in this date unfortunately. 💔😅</div>
+      <div class="cheeky" id="cheekyLine">Sex is not included in this date unfortunately. 💔😅</div>
 
       <div class="printrow">
         <button class="btn primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
@@ -526,8 +526,13 @@ function reveal(){
   document.getElementById('reserveNote').innerHTML =
     '✅ <b>All booked, babu!</b> 💜 Neal has already sorted our 7:30 PM table at '+pick.after.t+'. Nothing to plan or pay for tonight, just show up and enjoy. His treat.';
   go(4);
+  applyCheekyGate();
 }
 venueCards();
+/* temporary: hide the cheeky closing line for ~1 hour, then it comes back on its own */
+var CHEEKY_HIDE_UNTIL=1782457721986; /* Thu Jun 25 2026 ~00:08 PDT (1h from when this was set) */
+function applyCheekyGate(){var el=document.getElementById('cheekyLine');if(el)el.style.display=(Date.now()<CHEEKY_HIDE_UNTIL)?'none':'';}
+applyCheekyGate();
 
 /* ---------- shareable image export ---------- */
 async function cardBlob(){
