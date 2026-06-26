@@ -19,6 +19,9 @@ Everything lives in the single `index.html`.
 - v1 needs no backend — a client-side clock that highlights the active itinerary row and shows
   "starts in X min" is enough; layer live data in later.
 
+## 📌 Before the date — to confirm
+- [ ] **Sidhya's dad confirms the flight booking** — the whole date hinges on this, so lock it in first.
+
 ## ✅ Already shipped
 - Looping music playlist (Shotput slowed+reverb → Link Up → Heat Waves → Babydoll → Flight's Booked)
   with a Spotify-style bottom player bar (prev / play-pause / next).
