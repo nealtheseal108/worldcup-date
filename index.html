@@ -686,18 +686,31 @@ function drawRoute(k){
   _map.invalidateSize();
   if(_map.getSize().x===0){setTimeout(function(){drawRoute(k);},90);return;}  // wait for the container to have size
   _routeLayer.clearLayers();
-  var v=VENUE_LL[k], route=[START_NEAL,START_SIDHYA,MERCER,WESTLAKE,v];
+  var v=VENUE_LL[k];
+  var s=pick.during&&REST_LL[pick.during.t];   // pre-game snack, sits near the venue
+  var a=pick.after&&REST_LL[pick.after.t];      // post-game dinner, often eastside on the way home
+  // one continuous journey: both homes -> 2 line -> westlake -> snack -> the game -> dinner
+  var route=[START_NEAL,START_SIDHYA,MERCER,WESTLAKE];
+  if(s)route.push(s);
+  route.push(v);
+  if(a)route.push(a);
   L.polyline(route,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round'}).addTo(_routeLayer);
   function dot(ll,c,label,r){L.circleMarker(ll,{radius:r||7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:'top',className:'maptip',offset:[0,-3]});}
+  function foodDot(ll,c,label){L.circleMarker(ll,{radius:8,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:'bottom',className:'maptip',offset:[0,7]});}
   dot(START_NEAL,'#2f9e5e','Neal');
   dot(START_SIDHYA,'#7c4dca','Sidhya');
+  if(s)foodDot(s,'#e58a2b',(pick.during.e||'🥨')+' '+pick.during.t);   // snack, right on the line before the game
   dot(v,'#ffd166','💜 '+VENUE_LABEL[k],9);
-  var fit=route.slice();
-  function foodDot(ll,c,label){L.circleMarker(ll,{radius:7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:'bottom',className:'maptip',offset:[0,6]});fit.push(ll);}
-  var s=pick.during&&REST_LL[pick.during.t]; if(s)foodDot(s,'#e58a2b','🥨 '+pick.during.t);
-  var a=pick.after&&REST_LL[pick.after.t]; if(a)foodDot(a,'#c0398b','🍽️ '+pick.after.t);
-  _map.fitBounds(L.latLngBounds(fit),{padding:[26,26]});
-  var cap=document.getElementById('mapCap'); if(cap)cap.textContent='🚆 our route to '+VENUE_LABEL[k];
+  if(a)foodDot(a,'#c0398b',(pick.after.e||'🍽️')+' '+pick.after.t);     // dinner, on the way home
+  _map.fitBounds(L.latLngBounds(route),{padding:[30,30]});
+  var cap=document.getElementById('mapCap');
+  if(cap){
+    var legs=['🚆 2 line in'];
+    if(pick.during)legs.push((pick.during.e||'🥨')+' '+pick.during.t);
+    legs.push('💜 '+VENUE_LABEL[k]);
+    if(pick.after)legs.push((pick.after.e||'🍽️')+' '+pick.after.t);
+    cap.textContent=legs.join(' → ');
+  }
 }
 window.pickVenue=function(k){
   if(!VENUE_LL[k])return;
