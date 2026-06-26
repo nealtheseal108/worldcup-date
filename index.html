@@ -59,6 +59,7 @@
   .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--lav);background:#efe7fb;border-radius:20px;padding:2px 9px;margin-top:8px}
   .veg{color:#1c7a4a;background:#e3f6ea}
   .price{color:#7a5a16;background:#fdf0c8;letter-spacing:1px}
+  .rate{color:#8a6a12;background:#fbf1cf}
 
   .nav{display:flex;justify-content:space-between;margin-top:22px;gap:10px;flex-wrap:wrap}
   button.btn{font:inherit;font-weight:700;border:none;border-radius:11px;padding:12px 22px;cursor:pointer;transition:.15s}
@@ -401,11 +402,9 @@ const VENUES = {
     transferLine:"Hop the <b>Monorail</b> at Westlake (2 min) straight into Seattle Center!",
     safety:"i've already got us sorted, and the open Seattle Center campus has lots of exits, so it is the easiest of the options to move through or step out of in a big crowd. The indoor Armory next door is our backup if it rains or the Mural packs out. Bags are screened at entry.",
     during:[
-      {e:"🥗",t:"Armory Food Court",d:"Dozens of stalls right by the Mural! Veg grain bowls, salads, falafel wraps. Fast and healthy."},
-      {e:"🧆",t:"Café Suliman",d:"Casual Levantine mezze, hummus, and fresh salads. Loads of vegetarian, light and comforting."},
-      {e:"🇬🇷",t:"Lola",d:"Bright Greek small plates a short walk away. Veg spreads, pita, and salads before kickoff."},
-      {e:"🧆",t:"Mint & Olives",d:"Loaded falafel wraps with hummus and pickled veg, a block from Seattle Center. Cheap, fast, all veg."},
-      {e:"🍦",t:"Molly Moon's",d:"Famous Seattle scoop shop with rotating vegan flavors, a short walk up the hill. Sweet pre-match treat."}
+      {e:"🌮",t:"Sal y Limón",d:"buzzy michoacán spot that literally plays the games on big screens — load up on veggie tacos, chips n guac before kickoff 🤩",p:"$$",r:4.7,rc:"1.1k"},
+      {e:"🍦",t:"Molly Moon's",d:"seattle's iconic scoop shop, real vegan flavors too. quick sweet stop on the way in 💜",p:"$",r:4.6,rc:"1.5k"},
+      {e:"🥐",t:"Macrina Bakery",d:"belltown institution since '93 — almond croissants n veggie sandwiches to grab on the walk over.",p:"$",r:4.5,rc:"1.3k"}
     ],
     after:[
       {e:"🧆",t:"Café Suliman",d:"Warm vegetarian Levantine comfort food near the festival. Easy, tasty, and kind to a student budget.",p:"$"},
@@ -423,12 +422,11 @@ const VENUES = {
     transferLine:"Short walk downhill from Westlake to Pike Place and the Pier 62 waterfront!",
     safety:"The dockside party is free and first-come, so we get there early to claim a good spot by the rail. It is a confined pier with limited entry and exit, so we arrive 30 plus minutes early for screening. No backpacks, bags must stay under 14 by 6 by 14 inches. Blankets allowed.",
     during:[
-      {e:"🥗",t:"Michou",d:"Power Greens and quinoa-kale salads, fresh from local ingredients. The veg standout of the market."},
-      {e:"🧆",t:"Falafel King",d:"Fresh falafel wraps, plates, and salads. Quick vegetarian Middle-Eastern grab-and-go!"},
-      {e:"🥪",t:"Sisters European Café",d:"Veg salads and toasted focaccia sandwiches. Hearty and easy to carry to the pier."},
-      {e:"🥟",t:"Piroshky Piroshky",d:"Grab the vegan potato-mushroom piroshky, a warm portable hand-pie for the walk down to the pier!"},
-      {e:"🥢",t:"Mee Sum Pastry",d:"The giant veggie hum bao is the ultimate handheld snack, filling and easy on a student budget."},
-      {e:"🫓",t:"The Crumpet Shop",d:"Fresh-griddled crumpets (vegan as-is) with jam or peanut butter, a cheap Pike Place classic."}
+      {e:"🥟",t:"Piroshky Piroshky",d:"pike place legend, the line says it all. vegan potato-mushroom piroshki for the walk to the pier, like $7.",p:"$",r:4.5,rc:"5.8k"},
+      {e:"🧀",t:"Beecher's",d:"the 'world's best' mac n cheese (oprah-approved), totally meat-free — grab a hot cup to split before kickoff.",p:"$$",r:4.6,rc:"2.5k"},
+      {e:"🍩",t:"Daily Dozen Doughnut",d:"warm mini cinnamon-sugar donuts straight off the lil robot — a market rite of passage (cash only).",p:"$",r:4.3,rc:"1.2k"},
+      {e:"🥢",t:"Mee Sum Pastry",d:"pillowy veggie hum bao from a tiny market window since the 80s — portable n a few bucks.",p:"$",r:4.4,rc:"1.2k"},
+      {e:"🫓",t:"The Crumpet Shop",d:"seattle's og crumpets since '76 — go jam or ricotta-honey, hold the butter to keep it veg.",p:"$",r:4.7,rc:"1.5k"}
     ],
     after:[
       {e:"🍛",t:"Zaika",d:"Modern Indian on Pike St with big veg and vegan menus. Our anniversary pick, and not too pricey. 💜",p:"$$"},
@@ -443,14 +441,12 @@ const VENUES = {
     transferLine:"We are basically there! Pacific Place is right across from Westlake station.",
     safety:"Fully indoor mall, climate-controlled with no weather risk, plus multiple floors and exits. Bags are screened at entry. The most low-key, comfy option if it is hot or busy.",
     during:[
-      {e:"🥣",t:"Café Yumm!",d:"Healthy veg rice and bean bowls and salads in the downtown core. Quick, light, filling!"},
-      {e:"🍜",t:"Thai Ginger",d:"Right inside Pacific Place. Fresh Thai with tofu and lots of veg options before kickoff."},
-      {e:"🧆",t:"Falafel King",d:"Grab a veg falafel wrap over at nearby Pike Place and bring it in. Easy protein for the match!"},
-      {e:"🥪",t:"Mendocino Farms",d:"Chef-y sandwiches and big salads with clearly marked veggie picks, a few blocks from Pacific Place."},
-      {e:"🍚",t:"Just Poké",d:"Build a bowl with air-fried tofu, edamame, and sesame sauce, a hearty veg poke near Westlake."}
+      {e:"🍩",t:"Top Pot Doughnuts",d:"obama-famous hand-forged donuts — maple bar + a raspberry glazed n we're set 🤩",p:"$",r:4.5,rc:"2.9k"},
+      {e:"🍕",t:"Serious Pie",d:"tom douglas's blistered wood-fired pies — the foraged mushroom + truffle one is veg n unreal, split it.",p:"$$",r:4.5,rc:"4.6k"},
+      {e:"🍜",t:"Noi Thai",d:"slick downtown thai, the whole veg section is actually vegan — tofu pad see ew before the game.",p:"$$",r:4.4,rc:"2.9k"}
     ],
     after:[
-      {e:"🥟",t:"Din Tai Fung",d:"In the same building, order the veggie dumplings and greens. No trek after the game, and easy on the wallet.",p:"$$"},
+      {e:"🥟",t:"Din Tai Fung (Pacific Place)",d:"in the same building — order the veggie dumplings n greens, no trek after the game, easy on the wallet.",p:"$$"},
       {e:"🍛",t:"Zaika",d:"Modern Indian a few blocks away on Pike St, huge veg menu. Our anniversary pick. 💜",p:"$$"},
       {e:"🍔",t:"Veggie Grill",d:"100% plant-based fast-casual, so the whole menu is fair game: vegan burgers, bowls, crispy tenders. Open late.",p:"$$"},
       {e:"🍕",t:"MOD Pizza",d:"Build-your-own personal pizza, unlimited veggies and vegan cheese for one flat price. Open late.",p:"$"},
@@ -461,10 +457,13 @@ const VENUES = {
 
 /* Eastside dinner options on the 2 Line home (near stations) — shown for every venue */
 const EASTSIDE = [
-  {e:"🍜",t:"Kati Vegan Thai",d:"All-vegan Thai in Old Bellevue, a short stroll from Bellevue Downtown station on our 2 Line ride home. Panang, pad thai, the works. 💜",p:"$$",east:true},
-  {e:"🧆",t:"Mediterranean Kitchen",d:"Big Middle-Eastern spread by Bellevue Downtown Park, near the Bellevue station. Falafel, fattoush, hummus, a cheap and cheerful veg feast.",p:"$",east:true},
-  {e:"🍛",t:"Mayuri",d:"Eastside Indian institution with a huge veg menu out by Overlake, a sweet anniversary stop right by the 2 Line. 💜",p:"$$",east:true},
-  {e:"🍤",t:"Pon Proem Thai",d:"Cozy family Thai in Mercer Island town center by the station, most dishes go tofu or veg. Easy, filling, and budget-friendly.",p:"$",east:true}
+  {e:"🌶️",t:"Araya's Place",d:"iconic all-vegan thai since '87, so you can order LITERALLY anything — old bellevue by east main station 💜",p:"$$",r:4.5,rc:"1.6k",east:true},
+  {e:"🥟",t:"Din Tai Fung (Bellevue)",d:"world-famous soup dumplings, 18 folds each — full veggie lineup (green dumplings, vegan buns). by bellevue downtown station.",p:"$$",r:4.4,rc:"5.4k",east:true},
+  {e:"🌮",t:"Cactus",d:"eastside fave voted best mexican for years — those butternut squash enchiladas go crazy. bellevue square.",p:"$$",r:4.4,rc:"3.4k",east:true},
+  {e:"🍣",t:"Maneki",d:"seattle's oldest japanese spot (since 1904!), james beard classic — veggie rolls + agedashi tofu, cozy tatami room by the CID stop.",p:"$$",r:4.6,rc:"3.6k",east:true},
+  {e:"🍜",t:"Pho Bac Súp Shop",d:"the pham family's james-beard pho dynasty — tofu n veggie pho, best broth in the city, just off the CID stop.",p:"$",r:4.3,rc:"2.3k",east:true},
+  {e:"🍰",t:"Hood Famous Cafe",d:"that purple ube cheesecake everyone posts 💜 dreamy filipino dessert + ube latte, right across from the CID station.",p:"$$",r:4.6,rc:"650",east:true},
+  {e:"🍕",t:"Mioposto",d:"wood-fired neapolitan pies in mercer island town center, big veg selection — easy hop off the train.",p:"$$",r:4.3,rc:"1k",east:true}
 ];
 
 const pick = {venue:null, during:null, after:null};
@@ -495,7 +494,7 @@ function foodCards(which){
     c.innerHTML=`<div class="emoji">${item.e}</div><div>
       <div class="ttl">${item.t}</div>
       <div class="desc">${item.d}</div>
-      <span class="tag veg">🌱 vegetarian</span>${item.p?` <span class="tag price">${item.p}</span>`:''}${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
+      <span class="tag veg">🌱 vegetarian</span>${item.r?` <span class="tag rate">⭐ ${item.r}${item.rc?' · '+item.rc:''}</span>`:''}${item.p?` <span class="tag price">${item.p}</span>`:''}${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
     c.onclick=()=>{
       pick[which]=item; foodCards(which);
       document.getElementById(which==='during'?'next2':'next3').disabled=false;
