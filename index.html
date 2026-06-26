@@ -55,6 +55,7 @@
   .cards{display:grid;gap:12px}
   #duringCards,#afterCards{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
   .dishes{font-size:12px;color:#6a4fb0;font-weight:600;margin:4px 0 7px;line-height:1.4}
+  .love{color:#a4307a;background:#fbe0f1}
 
   /* venue cards (with art banner) */
   .vcard{border:2px solid var(--line);background:var(--card);border-radius:16px;overflow:hidden;cursor:pointer;transition:.15s;position:relative}
@@ -547,6 +548,9 @@ const EASTSIDE = [
   {e:"🍕",t:"Mioposto",d:"cozy family-run open-flame pizzeria in mercer island town center, vegan cheese + GF crust.",p:"$$",r:4.3,rc:"700",east:true,dishes:["margherita pizza","eggplant parmesan","caprese salad"]}
 ];
 
+/* something i'm making for her, shown first in the pre-game list */
+const HOMEMADE = {e:"🥛",t:"Elaichi Lassi",d:"i'm making you fresh elaichi lassi to bring along, cardamom + a lil love. our pre-game sip before anything else 💜",homemade:true};
+
 const pick = {venue:null, during:null, after:null};
 
 function venueCards(){
@@ -567,7 +571,7 @@ function venueCards(){
   });
 }
 function foodCards(which){
-  const list = which==='after' ? VENUES[pick.venue].after.concat(EASTSIDE) : VENUES[pick.venue][which];
+  const list = which==='after' ? VENUES[pick.venue].after.concat(EASTSIDE) : [HOMEMADE].concat(VENUES[pick.venue].during);
   const wrap=document.getElementById(which==='during'?'duringCards':'afterCards');
   wrap.innerHTML='';
   list.forEach(item=>{
@@ -577,7 +581,7 @@ function foodCards(which){
       <div class="ttl">${item.t}</div>
       <div class="desc">${item.d}</div>
       ${item.dishes&&item.dishes.length?`<div class="dishes">🍽️ ${item.dishes.join(' · ')}</div>`:''}
-      ${item.r?`<span class="tag rate">⭐ ${item.r}${item.rc?' · '+item.rc:''}</span> `:''}${item.p?`<span class="tag price">${item.p}</span>`:''}${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
+      ${item.homemade?'<span class="tag love">💜 homemade by neal</span> ':''}${item.r?`<span class="tag rate">⭐ ${item.r}${item.rc?' · '+item.rc:''}</span> `:''}${item.p?`<span class="tag price">${item.p}</span>`:''}${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
     c.onclick=()=>{
       pick[which]=item; foodCards(which);
       document.getElementById(which==='during'?'next2':'next3').disabled=false;
