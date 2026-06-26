@@ -281,8 +281,9 @@
           <div class="tk-foot"><span id="tkDate">7.06.26 · 5:00PM</span><span>GOING 💜</span></div>
         </div>
         <div class="sharerow">
-          <button class="btn primary" onclick="savePhoto()">⬇️ Save photo</button>
-          <button class="btn lav2btn" onclick="shareCard()">📤 Share</button>
+          <button class="btn primary" onclick="shareGif()">🎞️ Share GIF</button>
+          <button class="btn lav2btn" onclick="shareCard()">📤 Share photo</button>
+          <button class="btn lav2btn" onclick="savePhoto()">⬇️ Save photo</button>
           <button class="btn lav2btn" onclick="copyImage()">🖼️ Copy image</button>
         </div>
         <div class="sharehint" id="shareHint">Save it, then drop it into WhatsApp or iMessage 💜</div>
@@ -544,6 +545,62 @@ async function copyImage(){
     await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
     hint('Copied! Paste it into WhatsApp or iMessage 💜');
   }catch(e){hint('Copy not supported here, use Save photo instead 💜');}
+}
+
+/* ---------- animated GIF export (the scrolling ticker, seamless loop) ---------- */
+let _gifLib=null;
+function loadGifLib(){
+  if(_gifLib)return _gifLib;
+  _gifLib=new Promise((res,rej)=>{
+    if(window.GIF)return res();
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js';
+    s.onload=()=>res(); s.onerror=()=>rej(new Error('gif lib failed to load'));
+    document.head.appendChild(s);
+  });
+  return _gifLib;
+}
+async function cardGifBlob(onProgress){
+  await loadGifLib();
+  // gif.js needs a SAME-ORIGIN worker, so wrap the CDN worker in a blob URL
+  const wResp=await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
+  const wUrl=URL.createObjectURL(await wResp.blob());
+  const card=document.getElementById('shareCard');
+  const track=card.querySelector('.tk-track');
+  const FRAMES=12, SCALE=1.5, DELAY=90;
+  const prevAnim=track.style.animation;
+  track.style.animation='none';                          // freeze CSS animation, drive it by hand
+  const frames=[]; let w=0,h=0;
+  for(let i=0;i<FRAMES;i++){
+    track.style.transform='translateX(-'+(50*i/FRAMES).toFixed(3)+'%)';   // 0 -> -50% = one seamless loop
+    const c=await html2canvas(card,{scale:SCALE,backgroundColor:'#0e1116',useCORS:true});
+    w=c.width; h=c.height; frames.push(c);
+    if(onProgress)onProgress((i+1)/FRAMES*0.65);
+  }
+  track.style.transform=''; track.style.animation=prevAnim;
+  const gif=new GIF({workers:2,quality:10,width:w,height:h,workerScript:wUrl,background:'#0e1116',repeat:0});
+  frames.forEach(c=>gif.addFrame(c,{delay:DELAY,copy:true}));
+  return await new Promise((res,rej)=>{
+    gif.on('progress',p=>{if(onProgress)onProgress(0.65+p*0.35);});
+    gif.on('finished',b=>{URL.revokeObjectURL(wUrl);res(b);});
+    gif.on('abort',()=>{URL.revokeObjectURL(wUrl);rej(new Error('gif aborted'));});
+    gif.render();
+  });
+}
+async function shareGif(){
+  hint('Making your GIF... 🎞️');
+  try{
+    const blob=await cardGifBlob(p=>hint('Making your GIF... '+Math.round(p*100)+'%'));
+    const file=new File([blob],'im-going-with-my-boyfriend.gif',{type:'image/gif'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:"I'm going with my boyfriend!",text:"I'm going to the World Cup with my boyfriend! 💜"});
+      hint('Shared the GIF! 💜');
+    }else{
+      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='im-going-with-my-boyfriend.gif';
+      document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+      hint('Saved the GIF! Attach it in WhatsApp or iMessage 💜');
+    }
+  }catch(e){hint('GIF had trouble, try Save photo instead 💜');}
 }
 
 /* ---------- background music: looping playlist with fade transitions ----------
