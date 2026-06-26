@@ -31,6 +31,17 @@
   .matchup .chip{display:inline-flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#3a2a63;background:rgba(255,255,255,.92);border-radius:30px;padding:6px 14px;box-shadow:0 3px 12px rgba(53,28,94,.22)}
   .matchup b{color:var(--lav);font-weight:700}
   .matchup .mu-note{color:#b06a00}
+  .datemap{background:var(--paper);border-radius:16px;padding:8px 12px 4px;margin-bottom:14px;box-shadow:0 10px 30px rgba(53,28,94,.22)}
+  .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:2px}
+  .datemap svg{width:100%;height:auto;display:block}
+  .pin{cursor:pointer}
+  .pin .dot{fill:var(--lav2);transition:.15s}
+  .pin:hover .dot{fill:var(--lav)}
+  .pin.sel .dot{fill:var(--sun)}
+  .pin .ring{opacity:0;fill:none;stroke:var(--sun);stroke-width:2;transition:.15s}
+  .pin.sel .ring{opacity:1}
+  .pin .lbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:9px;fill:#3a2a63;text-anchor:middle;font-weight:700;pointer-events:none}
+  .map-lbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:8px;fill:#6b5d82;text-anchor:middle}
   .progress{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
   .dot{width:34px;height:5px;border-radius:3px;background:rgba(255,255,255,.35)}
   .dot.on{background:var(--sun)}
@@ -206,6 +217,32 @@
   <div class="progress">
     <div class="dot on" id="d0"></div><div class="dot" id="d1"></div>
     <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+  </div>
+
+  <div class="datemap">
+    <div class="cap">tap a spot — i'll worm us there 💜</div>
+    <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Route map from the Eastside to Seattle">
+      <defs><linearGradient id="wormgrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9b72e8"/><stop offset="1" stop-color="#7c4dca"/></linearGradient></defs>
+      <rect width="640" height="200" rx="12" fill="#f1ebfc"/>
+      <path d="M214 0 C246 60 232 140 256 200 L452 200 C436 130 460 70 442 0 Z" fill="#bca9ee" opacity=".5"/>
+      <g stroke="#d6c8f3" stroke-width="2" fill="none" opacity=".8"><path d="M286 64 q18 7 36 0"/><path d="M312 120 q18 7 36 0"/><path d="M372 92 q18 7 36 0"/><path d="M300 158 q18 7 36 0"/></g>
+      <text x="346" y="192" class="map-lbl" fill="#ffffff" opacity=".75">LAKE WASHINGTON</text>
+      <text x="74" y="14" class="map-lbl">SEATTLE</text>
+      <text x="566" y="14" class="map-lbl">EASTSIDE</text>
+      <g fill="none" stroke="#cdbcf0" stroke-width="3" stroke-linecap="round" stroke-dasharray="1.5 7" opacity=".85">
+        <path d="M600 150 L548 150 C520 150 506 138 470 116 C360 132 300 104 196 118 C168 122 150 120 132 112 C120 100 108 78 96 60"/>
+        <path d="M132 112 C140 110 150 108 156 106"/>
+        <path d="M132 112 C116 122 92 142 76 160"/>
+      </g>
+      <path id="dmWorm" fill="none" stroke="url(#wormgrad)" stroke-width="4.5" stroke-linecap="round"/>
+      <circle id="dmWormHead" r="5" fill="#ffffff" stroke="#7c4dca" stroke-width="2.5" opacity="0"/>
+      <circle cx="132" cy="112" r="3.5" fill="#3a2a63"/>
+      <circle cx="600" cy="150" r="5" fill="#2f9e5e"/><text x="600" y="166" class="map-lbl">NEAL</text>
+      <circle cx="548" cy="150" r="5" fill="#7c4dca"/><text x="548" y="166" class="map-lbl">SIDHYA</text>
+      <g id="pinMural" class="pin"><circle class="ring" cx="96" cy="60" r="11"/><circle class="dot" cx="96" cy="60" r="7"/><text class="lbl" x="96" y="45">SEATTLE CTR</text></g>
+      <g id="pinHouse" class="pin"><circle class="ring" cx="156" cy="106" r="11"/><circle class="dot" cx="156" cy="106" r="7"/><text class="lbl" x="156" y="125">PACIFIC PL</text></g>
+      <g id="pinPier" class="pin"><circle class="ring" cx="76" cy="160" r="11"/><circle class="dot" cx="76" cy="160" r="7"/><text class="lbl" x="76" y="180">PIKE PLACE</text></g>
+    </svg>
   </div>
 
   <div class="panel">
@@ -482,6 +519,7 @@ function venueCards(){
       ${ART[key]}
       <div class="vbody"><div class="ttl">${v.name}</div><div class="desc">${v.desc}</div></div>`;
     c.onclick=()=>{
+      if(window.pickVenue){pickVenue(key);return;}
       if(pick.venue!==key){pick.during=null;pick.after=null;}
       pick.venue=key; venueCards();
       document.getElementById('next1').disabled=false;
@@ -557,6 +595,38 @@ var MATCHUP = "TBD 🆚 TBD";
 var MATCHUP_NOTE = "🇺🇸 could be us!";
 function applyMatchup(){var t=document.getElementById('muText');if(t)t.textContent=MATCHUP;var n=document.getElementById('muNote');if(n)n.textContent=MATCHUP_NOTE;}
 applyMatchup();
+
+/* ---------- date route map: worm from our two starts to the picked venue and back ---------- */
+(function(){
+  var T='M600 150 L548 150 C520 150 506 138 470 116 C360 132 300 104 196 118 C168 122 150 120 132 112';
+  var R={ mural:T+' C120 100 108 78 96 60', house:T+' C140 110 150 108 156 106', pier:T+' C116 122 92 142 76 160' };
+  var PIN={mural:'pinMural',house:'pinHouse',pier:'pinPier'};
+  var worm=document.getElementById('dmWorm'), head=document.getElementById('dmWormHead');
+  if(!worm||!head) return;
+  var len=0, t0=null;
+  function ease(x){return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;}
+  function selPins(){for(var j in PIN){var e=document.getElementById(PIN[j]);if(e)e.classList.toggle('sel',pick.venue===j);}}
+  function setRoute(k){worm.setAttribute('d',R[k]);len=worm.getTotalLength();worm.style.strokeDasharray=len+' '+len;worm.style.strokeDashoffset=len;t0=null;}
+  function frame(now){
+    if(t0===null)t0=now;
+    var e=(now-t0)%4400;                                  // out -> hold -> back -> gap
+    var p=e<1800?ease(e/1800):e<2500?1:e<4100?1-ease((e-2500)/1600):0;
+    worm.style.strokeDashoffset=len*(1-p);
+    if(p>0){head.style.opacity=1;var q=worm.getPointAtLength(len*p);head.setAttribute('cx',q.x);head.setAttribute('cy',q.y);}
+    else head.style.opacity=0;
+    requestAnimationFrame(frame);
+  }
+  window.pickVenue=function(k){
+    if(!R[k])return;
+    if(pick.venue!==k){pick.during=null;pick.after=null;}
+    pick.venue=k; try{venueCards();}catch(e){}
+    var n=document.getElementById('next1');if(n)n.disabled=false;
+    setRoute(k); selPins();
+  };
+  for(var k in PIN)(function(k){var e=document.getElementById(PIN[k]);if(e)e.onclick=function(){pickVenue(k);};})(k);
+  setRoute(pick.venue||'mural'); selPins();
+  requestAnimationFrame(frame);
+})();
 
 /* ---------- shareable image export ---------- */
 async function cardBlob(){
