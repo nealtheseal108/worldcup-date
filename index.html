@@ -50,10 +50,22 @@
   .stat-meter i{display:block;height:100%;background:linear-gradient(90deg,var(--lav),var(--lav2));border-radius:6px;transition:width .4s ease}
   .stat-empty{color:var(--muted);font-size:13px;text-align:center;padding:14px 6px}
   .stat-fine{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.3px;color:var(--muted);margin:-4px 0 4px}
+  .diaryintro{background:#f6f1ff;border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#4a3578;line-height:1.45}
+  .diarybtn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 12px;border:1px solid var(--line);border-radius:20px;background:#f1ecfc;color:#5a3fb0;font-weight:700;font-size:11.5px;cursor:pointer;font-family:inherit}
+  .diarybtn:hover{background:#e7ddf7}
+  .diarybtn.on{background:#ddf3e4;color:#1f7a44;border-color:#bce6c9}
+  .diary-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px}
+  .clipwrap{position:relative;width:132px;max-width:46%}
+  .diary-clip{width:100%;border-radius:10px;background:#000;box-shadow:0 4px 14px rgba(53,28,94,.3);display:block}
+  .clipdel{position:absolute;top:5px;right:5px;width:22px;height:22px;border:none;border-radius:50%;background:rgba(18,12,34,.72);color:#fff;font-size:12px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+  .cliploc{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;color:var(--muted);margin-top:3px}
+  .rec-preview{width:100%;max-height:48vh;border-radius:12px;background:#000;transform:scaleX(-1);margin:4px 0 2px}
   .datemap .leaflet-tile-pane{filter:sepia(.5) saturate(1.5) hue-rotate(208deg) brightness(1.03)}
   .leaflet-container{font-family:'Courier Prime',ui-monospace,monospace}
   .maptip{background:#fff;border:none;border-radius:7px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:700;color:#3a2a63;box-shadow:0 2px 8px rgba(53,28,94,.3);padding:2px 7px;white-space:nowrap}
   .maptip:before{display:none}
+  .stationtip{background:rgba(255,255,255,.96);border:none;border-radius:5px;font-family:'Courier Prime',ui-monospace,monospace;font-size:9px;font-weight:700;color:#5a3fb0;padding:1px 5px;box-shadow:0 2px 6px rgba(53,28,94,.25);white-space:nowrap}
+  .stationtip:before{display:none}
   .pin{cursor:pointer}
   .pin .dot{fill:var(--lav2);transition:.15s}
   .pin:hover .dot{fill:var(--lav)}
@@ -242,7 +254,7 @@
     *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     body{background:#0e1116;padding:0;margin:0}
     .wrap{max-width:none;margin:0;padding:0}
-    .topbar,.matchup,.progress,.datemap,#playerbar,.nav,.printrow,.foot,.sharehint,.sharerow,.iti-head,.sectlabel,.twoplan,.merge,#timeline,.note,.safety,.perks,.cheeky{display:none!important}
+    .topbar,.matchup,.progress,.datemap,#playerbar,.nav,.printrow,.foot,.sharehint,.sharerow,.iti-head,.sectlabel,.twoplan,.merge,#timeline,.note,.safety,.perks,.cheeky,.diaryintro{display:none!important}
     .step:not(.active){display:none!important}
     .panel{box-shadow:none;padding:0;background:transparent;border-radius:0}
     .sharewrap{margin:0}
@@ -388,6 +400,7 @@
       <div class="merge">💜 Our paths cross: we meet on the 2 Line around 3:00 PM and ride into Seattle together!</div>
 
       <div class="sectlabel">Step 2 · the rest of the day, together</div>
+      <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button></div>
       <div id="timeline"></div>
 
       <div class="perks">
@@ -643,8 +656,12 @@ function reveal(){
     ['~9:20 PM','<b>Bellevue Downtown Park 💜</b>','A slow lap around the park and the waterfall, then a little kiss under the lights. Best part of the night, just saying. 😚'],
     ['~9:45 PM','<b>Easy ride home.</b>','Back on the 2 Line, which runs until midnight, so there is never a rush home.']
   ];
-  document.getElementById('timeline').innerHTML = rows.map(r=>
-    `<div class="time"><div class="clk">${r[0]}</div><div class="body">${r[1]}<small>${r[2]}</small></div></div>`).join('');
+  window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
+  document.getElementById('timeline').innerHTML = rows.map((r,i)=>
+    `<div class="time"><div class="clk">${r[0]}</div><div class="body">${r[1]}<small>${r[2]}</small>`+
+    `<button class="diarybtn" type="button" onclick="openRecord(${i})">📹 record this moment</button>`+
+    `<div class="diary-row" id="diary-s${i}"></div></div></div>`).join('');
+  if(window.renderAllDiary)renderAllDiary();
   document.getElementById('safetyBox').innerHTML='🛟 <b>Good to know:</b> '+v.safety+
     ' If the US is playing, expect the biggest crowds of the tournament, so we get there early and post up near an exit!';
   document.getElementById('reserveNote').innerHTML =
@@ -685,6 +702,18 @@ var LINK_2LINE=[
 var NEAL_LINK=[START_NEAL,[47.5470,-122.0530],[47.5660,-122.1420],[47.58590,-122.19187]];
 var SIDHYA_LINK=[START_SIDHYA,[47.61572,-122.19251]];
 function nearestLinkIdx(ll){var b=0,bd=1e9;for(var i=0;i<LINK_2LINE.length;i++){var dx=LINK_2LINE[i][0]-ll[0],dy=LINK_2LINE[i][1]-ll[1],d=dx*dx+dy*dy;if(d<bd){bd=d;b=i;}}return b;}
+// the actual 2 Line stations we pass through (tiny ticks on the map; hover/tap for the name)
+var LINK_STATIONS=[
+  {n:'Bellevue Downtown',ll:[47.61572,-122.19251]},
+  {n:'East Main',ll:[47.60983,-122.18757]},
+  {n:'South Bellevue',ll:[47.58590,-122.19187]},
+  {n:'Mercer Island',ll:[47.58388,-122.23215]},
+  {n:'Judkins Park',ll:[47.59060,-122.29670]},
+  {n:'Chinatown–ID',ll:[47.59840,-122.32770]},
+  {n:'Pioneer Square',ll:[47.60240,-122.33180]},
+  {n:'Symphony',ll:[47.60730,-122.33520]},
+  {n:'Westlake',ll:[47.61150,-122.33700]}
+];
 /* approx lat/lng for each pickable restaurant, keyed by its exact title (homemade lassi has no spot) */
 var REST_LL={
   "MOD Pizza (Armory)":[47.62155,-122.35086],"Sal y Limón":[47.62472,-122.35633],"CÔBA Viet Kitchen":[47.62413,-122.35527],"Bounty Kitchen":[47.63820,-122.35653],"Macrina Bakery":[47.61447,-122.34798],
@@ -727,6 +756,8 @@ function drawRoute(k,_n){
   // how Neal + Sidhya get to the line (lighter connector lines: bus/drive to the station)
   L.polyline(NEAL_LINK,{color:'#9b72e8',weight:3,opacity:.5,dashArray:'1 7',lineCap:'round'}).addTo(_routeLayer);
   L.polyline(SIDHYA_LINK,{color:'#9b72e8',weight:3,opacity:.5,dashArray:'1 7',lineCap:'round'}).addTo(_routeLayer);
+  // tiny ticks for each 2 Line station we ride through (name on hover/tap)
+  LINK_STATIONS.forEach(function(st){L.circleMarker(st.ll,{radius:2.6,color:'#fff',weight:1.4,fillColor:'#6a4fe0',fillOpacity:1}).addTo(_routeLayer).bindTooltip(st.n+' Station',{direction:'top',className:'stationtip',offset:[0,-2]});});
   function tipOff(dir){return dir==='top'?[0,-4]:dir==='bottom'?[0,6]:dir==='left'?[-5,0]:[5,0];}
   function dot(ll,c,label,r,dir){dir=dir||'top';L.circleMarker(ll,{radius:r||7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:dir,className:'maptip',offset:tipOff(dir)});}
   function foodDot(ll,c,label,dir){dir=dir||'bottom';L.circleMarker(ll,{radius:8,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:dir,className:'maptip',offset:tipOff(dir)});}
@@ -1037,6 +1068,55 @@ function renderStats(){
 }
 function openStats(){renderStats();var m=document.getElementById('statsModal');if(m)m.style.display='flex';}
 function closeStats(){var m=document.getElementById('statsModal');if(m)m.style.display='none';}
+/* ---------- date diary: a video clip + your location for each moment, saved on-device (IndexedDB) ---------- */
+var DIARY_DB=null, diaryGeo=null, diaryStream=null, diaryRec=null, diaryChunks=[], diaryCurSec=null;
+function diaryOpen(){return new Promise(function(res,rej){if(DIARY_DB)return res(DIARY_DB);if(!window.indexedDB)return rej('no-idb');var r=indexedDB.open('wc_diary',1);r.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains('clips'))db.createObjectStore('clips',{keyPath:'id',autoIncrement:true});};r.onsuccess=function(e){DIARY_DB=e.target.result;res(DIARY_DB);};r.onerror=function(){rej(r.error);};});}
+function diaryAdd(rec){return diaryOpen().then(function(db){return new Promise(function(res,rej){var tx=db.transaction('clips','readwrite');tx.objectStore('clips').add(rec);tx.oncomplete=function(){res();};tx.onerror=function(){rej(tx.error);};});});}
+function diaryBySection(sec){return diaryOpen().then(function(db){return new Promise(function(res){var out=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){if(c.value.sec===sec)out.push(c.value);c.continue();}else res(out);};cur.onerror=function(){res(out);};});});}
+function diaryDelete(id,sec){return diaryOpen().then(function(db){var tx=db.transaction('clips','readwrite');tx.objectStore('clips').delete(id);tx.oncomplete=function(){renderDiary(sec);};});}
+function connectLocation(){
+  if(!navigator.geolocation){hint('location not available on this device');return;}
+  hint('asking for location…');
+  navigator.geolocation.getCurrentPosition(function(p){diaryGeo={lat:p.coords.latitude,lng:p.coords.longitude};var b=document.getElementById('geoBtn');if(b){b.textContent='📍 location on';b.classList.add('on');}hint('location connected 📍 clips get tagged where we are');},function(){hint("couldn't get location, that's ok 💜");});
+}
+function renderDiary(sec){
+  diaryBySection(sec).then(function(list){
+    var box=document.getElementById('diary-'+sec); if(!box)return;
+    box.innerHTML=list.map(function(c){
+      var url=URL.createObjectURL(c.blob);
+      var loc=(c.lat!=null&&c.lng!=null)?('📍 '+c.lat.toFixed(3)+', '+c.lng.toFixed(3)):'';
+      return `<div class="clipwrap"><video class="diary-clip" src="${url}" controls playsinline></video>`+
+             `<button class="clipdel" title="delete clip" onclick="diaryDelete(${c.id},'${sec}')">✕</button>`+
+             (loc?`<div class="cliploc">${loc}</div>`:'')+`</div>`;
+    }).join('');
+  });
+}
+function renderAllDiary(){document.querySelectorAll('[id^="diary-s"]').forEach(function(b){renderDiary(b.id.replace('diary-',''));});}
+function openRecord(i){
+  diaryCurSec='s'+i;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){hint('recording needs a phone/browser with camera support 💜');return;}
+  document.getElementById('recLabel').textContent=(window.diaryLabels&&window.diaryLabels[i])||'this moment';
+  var sb=document.getElementById('recStart'); sb.style.display=''; sb.disabled=true; document.getElementById('recStop').style.display='none';
+  document.getElementById('recModal').style.display='flex';
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true}).then(function(stream){diaryStream=stream;var v=document.getElementById('recPreview');v.srcObject=stream;v.muted=true;v.play();sb.disabled=false;}).catch(function(){hint('camera + mic permission needed to record 💜');closeRecord();});
+}
+function startRec(){
+  if(!diaryStream)return; diaryChunks=[];
+  var mime=(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported('video/webm'))?'video/webm':'';
+  try{diaryRec=new MediaRecorder(diaryStream,mime?{mimeType:mime}:undefined);}catch(e){try{diaryRec=new MediaRecorder(diaryStream);}catch(e2){hint('recording not supported here 💜');return;}}
+  diaryRec.ondataavailable=function(e){if(e.data&&e.data.size)diaryChunks.push(e.data);};
+  diaryRec.onstop=saveRec;
+  diaryRec.start();
+  document.getElementById('recStart').style.display='none'; document.getElementById('recStop').style.display='';
+}
+function stopRec(){if(diaryRec&&diaryRec.state!=='inactive')diaryRec.stop();}
+function saveRec(){
+  var blob=new Blob(diaryChunks,{type:(diaryRec&&diaryRec.mimeType)||'video/webm'}), sec=diaryCurSec;
+  var rec={sec:sec,blob:blob,t:Date.now(),lat:diaryGeo&&diaryGeo.lat,lng:diaryGeo&&diaryGeo.lng};
+  function finish(){diaryAdd(rec).then(function(){hint('saved to your date diary 🎥💜');renderDiary(sec);closeRecord();}).catch(function(){hint('could not save the clip 😭');closeRecord();});}
+  if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){rec.lat=p.coords.latitude;rec.lng=p.coords.longitude;diaryGeo={lat:rec.lat,lng:rec.lng};finish();},finish,{timeout:2500,maximumAge:60000});}else finish();
+}
+function closeRecord(){var m=document.getElementById('recModal');if(m)m.style.display='none';if(diaryStream){diaryStream.getTracks().forEach(function(t){t.stop();});diaryStream=null;}diaryRec=null;diaryChunks=[];var v=document.getElementById('recPreview');if(v){try{v.pause();}catch(e){}v.srcObject=null;}}
 /* autoplay policies: kick off on the first interaction anywhere */
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
 </script>
@@ -1078,6 +1158,18 @@ document.addEventListener('click',function once(){startMusic();document.removeEv
     <div class="statlist" id="statsList"></div>
     <div class="modal-row">
       <button class="btn primary" onclick="closeStats()">nice 💜</button>
+    </div>
+  </div>
+</div>
+<div id="recModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeRecord()">
+  <div class="modal-card">
+    <div class="modal-title">🎥 record <span id="recLabel">this moment</span></div>
+    <div class="modal-sub">a lil clip for our date diary, saved just on your phone 💜</div>
+    <video id="recPreview" class="rec-preview" playsinline muted autoplay></video>
+    <div class="modal-row">
+      <button class="btn ghost" onclick="closeRecord()">close</button>
+      <button class="btn primary" id="recStart" onclick="startRec()" disabled>● record</button>
+      <button class="btn primary" id="recStop" onclick="stopRec()" style="display:none">■ stop &amp; save</button>
     </div>
   </div>
 </div>
