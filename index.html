@@ -1190,6 +1190,19 @@ function connectLocation(){
   navigator.geolocation.getCurrentPosition(function(p){diaryGeo={lat:p.coords.latitude,lng:p.coords.longitude};var b=document.getElementById('geoBtn');if(b){b.textContent='📍 location on';b.classList.add('on');}hint('location connected 📍 clips get tagged where we are');},function(){hint("couldn't get location, that's ok 💜");});
 }
 function renderDiary(sec){
+  if(cloudOn()){
+    cloudList().then(function(list){
+      var box=document.getElementById('diary-'+sec); if(!box)return;
+      box.innerHTML=list.filter(function(c){return c.sec===sec;}).map(function(c){
+        var url=cloudClipUrl(c.id);
+        var loc=(c.lat!=null&&c.lng!=null)?('📍 '+(+c.lat).toFixed(3)+', '+(+c.lng).toFixed(3)):'';
+        return `<div class="clipwrap"><video class="diary-clip" src="${url}" controls playsinline></video>`+
+               `<button class="clipdel" title="delete clip" onclick="cloudDelete('${c.id}','${sec}')">✕</button>`+
+               (loc?`<div class="cliploc">${loc}</div>`:'')+`</div>`;
+      }).join('');
+    });
+    return;
+  }
   diaryBySection(sec).then(function(list){
     var box=document.getElementById('diary-'+sec); if(!box)return;
     box.innerHTML=list.map(function(c){
@@ -1238,16 +1251,40 @@ function saveRec(){
   if(!recFreeWindow())recAddUsed(durSec);              // spend it from this window's minute
   var blob=new Blob(diaryChunks,{type:(diaryRec&&diaryRec.mimeType)||'video/webm'}), sec=diaryCurSec;
   var rec={sec:sec,blob:blob,t:Date.now(),lat:diaryGeo&&diaryGeo.lat,lng:diaryGeo&&diaryGeo.lng};
-  function finish(){diaryAdd(rec).then(function(){hint('saved to your date diary 🎥💜');renderDiary(sec);closeRecord();}).catch(function(){hint('could not save the clip 😭');closeRecord();});}
+  function finish(){
+    var done=function(msg){hint(msg);renderDiary(sec);closeRecord();};
+    if(cloudOn()){
+      diaryAdd(rec).catch(function(){});   // keep a local backup too, best-effort
+      cloudUpload(rec).then(function(r){done(r?'saved to your shared diary 🎥💜':'saved on your phone (cloud hiccup) 💜');}).catch(function(){done('saved on your phone (cloud hiccup) 💜');});
+    } else {
+      diaryAdd(rec).then(function(){done('saved to your date diary 🎥💜');}).catch(function(){done('could not save the clip 😭');});
+    }
+  }
   if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){rec.lat=p.coords.latitude;rec.lng=p.coords.longitude;diaryGeo={lat:rec.lat,lng:rec.lng};finish();},finish,{timeout:2500,maximumAge:60000});}else finish();
 }
 function closeRecord(){if(recStopTimer){clearTimeout(recStopTimer);recStopTimer=null;}if(recTickTimer){clearInterval(recTickTimer);recTickTimer=null;}var m=document.getElementById('recModal');if(m)m.style.display='none';if(diaryStream){diaryStream.getTracks().forEach(function(t){t.stop();});diaryStream=null;}diaryRec=null;diaryChunks=[];var tEl=document.getElementById('recTimer');if(tEl){tEl.style.display='none';tEl.textContent='';}var v=document.getElementById('recPreview');if(v){try{v.pause();}catch(e){}v.srcObject=null;}}
+/* ---------- cloud diary sync: a shared backend so both phones see the same clips ---------- */
+var CLOUD={url:'', key:'wcd_d1ary_Kq7Fz9mR2pX8sV4nL6tB3'};   // url is filled in once the Render backend is live
+function cloudOn(){return !!(CLOUD.url&&CLOUD.url.indexOf('http')===0);}
+function cloudHeaders(){return {'X-Diary-Key':CLOUD.key};}
+function cloudClipUrl(id){return CLOUD.url+'/api/clip/'+id+'?key='+encodeURIComponent(CLOUD.key);}
+function cloudList(){return fetch(CLOUD.url+'/api/clips',{headers:cloudHeaders()}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];});}
+function cloudUpload(rec){var fd=new FormData();fd.append('video',rec.blob,'clip.webm');fd.append('sec',rec.sec);fd.append('t',String(rec.t));if(rec.lat!=null)fd.append('lat',String(rec.lat));if(rec.lng!=null)fd.append('lng',String(rec.lng));return fetch(CLOUD.url+'/api/clip',{method:'POST',headers:cloudHeaders(),body:fd}).then(function(r){return r.ok?r.json():null;});}
+function cloudDelete(id,sec){return fetch(CLOUD.url+'/api/clip/'+id,{method:'DELETE',headers:cloudHeaders()}).then(function(){renderDiary(sec);}).catch(function(){hint('could not delete from the cloud 💜');});}
 /* ---------- compile the clips into "our date movie": in-app montage + best-effort file export ---------- */
 var movieClips=[], movieTimer=null, movieAbort=false, _movieResumeMusic=false;
 function movieName(){var f=document.getElementById('nameField');return ((f&&f.value)||'').trim()||'Sidhya';}
 function movieLabelFor(c){var i=parseInt((c.sec||'s0').slice(1));return (window.diaryLabels&&window.diaryLabels[i])||'a moment';}
 function movieLoc(c){return (c.lat!=null&&c.lng!=null)?('📍 '+c.lat.toFixed(3)+', '+c.lng.toFixed(3)):'';}
-function gatherClips(){return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){all.push(c.value);c.continue();}else{all.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});res(all);}};cur.onerror=function(){res(all);};});});}
+function gatherClips(){
+  if(cloudOn()){
+    return cloudList().then(function(list){
+      list.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});
+      return Promise.all(list.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {sec:c.sec,lat:c.lat,lng:c.lng,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){return arr.filter(Boolean);});
+    }).catch(function(){return [];});
+  }
+  return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){all.push(c.value);c.continue();}else{all.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});res(all);}};cur.onerror=function(){res(all);};});});
+}
 function compileMovie(){gatherClips().then(function(all){if(!all.length){hint("record a few moments first, then i'll cut our movie 🎬💜");return;}movieClips=all;openMovie();});}
 function openMovie(){document.getElementById('movieModal').style.display='flex';try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
