@@ -667,6 +667,24 @@ applyMatchup();
 var VENUE_LL={mural:[47.6253,-122.3536],pier:[47.6075,-122.3425],house:[47.6118,-122.3360]};
 var VENUE_LABEL={mural:'Seattle Center',pier:'Pike Place / Pier 62',house:'Pacific Place'};
 var START_NEAL=[47.6163,-122.0356], START_SIDHYA=[47.6101,-122.1265], MERCER=[47.5707,-122.2221], WESTLAKE=[47.6115,-122.3370];
+// the 2 Line (Link light rail) alignment, Bellevue downtown -> Westlake, tracing the real tracks incl. the I-90 floating bridge
+var LINK_2LINE=[
+  [47.61572,-122.19251], // Bellevue Downtown
+  [47.60983,-122.18757], // East Main
+  [47.58590,-122.19187], // South Bellevue
+  [47.58388,-122.23215], // Mercer Island
+  [47.58980,-122.24950], // I-90 floating bridge (Mercer Island side)
+  [47.59030,-122.28800], // I-90 floating bridge (Seattle side)
+  [47.59060,-122.29670], // Judkins Park
+  [47.59840,-122.32770], // Chinatown-International District
+  [47.60240,-122.33180], // Pioneer Square
+  [47.60730,-122.33520], // Symphony / University St
+  [47.61150,-122.33700]  // Westlake
+];
+// how each of us reaches the line: Neal skirts south of Lake Sammamish on I-90; Sidhya hops to Bellevue Downtown
+var NEAL_LINK=[START_NEAL,[47.5470,-122.0530],[47.5660,-122.1420],[47.58590,-122.19187]];
+var SIDHYA_LINK=[START_SIDHYA,[47.61572,-122.19251]];
+function nearestLinkIdx(ll){var b=0,bd=1e9;for(var i=0;i<LINK_2LINE.length;i++){var dx=LINK_2LINE[i][0]-ll[0],dy=LINK_2LINE[i][1]-ll[1],d=dx*dx+dy*dy;if(d<bd){bd=d;b=i;}}return b;}
 /* approx lat/lng for each pickable restaurant, keyed by its exact title (homemade lassi has no spot) */
 var REST_LL={
   "MOD Pizza (Armory)":[47.62155,-122.35086],"Sal y Limón":[47.62472,-122.35633],"CÔBA Viet Kitchen":[47.62413,-122.35527],"Bounty Kitchen":[47.63820,-122.35653],"Macrina Bakery":[47.61447,-122.34798],
@@ -695,12 +713,20 @@ function drawRoute(k,_n){
   var v=VENUE_LL[k];
   var s=pick.during&&REST_LL[pick.during.t];   // pre-game snack, sits near the venue
   var a=pick.after&&REST_LL[pick.after.t];      // post-game dinner, often eastside on the way home
-  // one continuous journey: both homes -> 2 line -> westlake -> snack -> the game -> dinner
-  var route=[START_NEAL,START_SIDHYA,MERCER,WESTLAKE];
-  if(s)route.push(s);
-  route.push(v);
-  if(a)route.push(a);
-  L.polyline(route,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round',className:'wormline'}).addTo(_routeLayer);
+  var aEast=a&&a[1]>-122.25;                     // dinner is across Lake WA (eastside) -> ride the 2 line back
+  // the shared 2 Line journey, then the walk to the snack + the game
+  var worm=LINK_2LINE.slice();
+  if(s)worm.push(s);
+  worm.push(v);
+  if(a&&!aEast)worm.push(a);                     // a downtown dinner is a short walk from the venue
+  L.polyline(worm,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round',className:'wormline'}).addTo(_routeLayer);
+  if(a&&aEast){                                  // eastside dinner: follow the 2 line back across the I-90 bridge
+    var ret=[v].concat(LINK_2LINE.slice(nearestLinkIdx(a)).reverse()).concat([a]);
+    L.polyline(ret,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round',className:'wormline'}).addTo(_routeLayer);
+  }
+  // how Neal + Sidhya get to the line (lighter connector lines: bus/drive to the station)
+  L.polyline(NEAL_LINK,{color:'#9b72e8',weight:3,opacity:.5,dashArray:'1 7',lineCap:'round'}).addTo(_routeLayer);
+  L.polyline(SIDHYA_LINK,{color:'#9b72e8',weight:3,opacity:.5,dashArray:'1 7',lineCap:'round'}).addTo(_routeLayer);
   function tipOff(dir){return dir==='top'?[0,-4]:dir==='bottom'?[0,6]:dir==='left'?[-5,0]:[5,0];}
   function dot(ll,c,label,r,dir){dir=dir||'top';L.circleMarker(ll,{radius:r||7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:dir,className:'maptip',offset:tipOff(dir)});}
   function foodDot(ll,c,label,dir){dir=dir||'bottom';L.circleMarker(ll,{radius:8,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:dir,className:'maptip',offset:tipOff(dir)});}
@@ -710,7 +736,8 @@ function drawRoute(k,_n){
   if(s)foodDot(s,'#e58a2b',(pick.during.e||'🥨')+' '+pick.during.t,'left');   // snack, on the line before the game
   dot(v,'#ffd166','💜 '+VENUE_LABEL[k],9,'top');
   if(a)foodDot(a,'#c0398b',(pick.after.e||'🍽️')+' '+pick.after.t,'right');     // dinner, on the way home
-  _map.fitBounds(L.latLngBounds(route),{padding:[58,42]});
+  var fit=worm.concat(NEAL_LINK).concat(SIDHYA_LINK); if(a)fit.push(a);
+  _map.fitBounds(L.latLngBounds(fit),{padding:[58,42]});
   var cap=document.getElementById('mapCap');
   if(cap){
     var legs=['🚆 2 line in'];
