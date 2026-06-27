@@ -60,6 +60,7 @@
   .clipdel{position:absolute;top:5px;right:5px;width:22px;height:22px;border:none;border-radius:50%;background:rgba(18,12,34,.72);color:#fff;font-size:12px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
   .cliploc{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;color:var(--muted);margin-top:3px}
   .rec-preview{width:100%;max-height:48vh;border-radius:12px;background:#000;transform:scaleX(-1);margin:4px 0 2px}
+  .rec-timer{font-family:'Courier Prime',ui-monospace,monospace;font-weight:700;font-size:14px;color:#c0398b;text-align:center;margin:6px 0 2px;letter-spacing:.5px}
   .datemap .leaflet-tile-pane{filter:sepia(.5) saturate(1.5) hue-rotate(208deg) brightness(1.03)}
   .leaflet-container{font-family:'Courier Prime',ui-monospace,monospace}
   .maptip{background:#fff;border:none;border-radius:7px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:700;color:#3a2a63;box-shadow:0 2px 8px rgba(53,28,94,.3);padding:2px 7px;white-space:nowrap}
@@ -400,7 +401,7 @@
       <div class="merge">💜 Our paths cross: we meet on the 2 Line around 3:00 PM and ride into Seattle together!</div>
 
       <div class="sectlabel">Step 2 · the rest of the day, together</div>
-      <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button></div>
+      <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild when the game ends (6:00-7:30). it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button></div>
       <div id="timeline"></div>
 
       <div class="perks">
@@ -1070,6 +1071,15 @@ function openStats(){renderStats();var m=document.getElementById('statsModal');i
 function closeStats(){var m=document.getElementById('statsModal');if(m)m.style.display='none';}
 /* ---------- date diary: a video clip + your location for each moment, saved on-device (IndexedDB) ---------- */
 var DIARY_DB=null, diaryGeo=null, diaryStream=null, diaryRec=null, diaryChunks=[], diaryCurSec=null;
+// recording allowance: 1 minute of footage per 20-minute window, lifted 6:00-7:30 PM (end of the game)
+var REC_WIN_MS=20*60*1000, REC_CAP=60, recStopTimer=null, recTickTimer=null, recStartT=0;
+function recFreeWindow(d){d=d||new Date();var t=d.getHours()*60+d.getMinutes();return t>=1080&&t<1170;}  // 18:00 (1080) -> 19:30 (1170)
+function recWinKey(){return Math.floor(Date.now()/REC_WIN_MS);}
+function recUsed(){try{var o=JSON.parse(localStorage.getItem('wc_rec_budget')||'{}');return o.w===recWinKey()?(o.s||0):0;}catch(e){return 0;}}
+function recAddUsed(sec){try{var k=recWinKey(),o=JSON.parse(localStorage.getItem('wc_rec_budget')||'{}'),u=(o.w===k?(o.s||0):0)+sec;localStorage.setItem('wc_rec_budget',JSON.stringify({w:k,s:u}));}catch(e){}}
+function recRemaining(){return recFreeWindow()?1e9:Math.max(0,REC_CAP-recUsed());}
+function recFmtClock(d){var h=d.getHours(),m=d.getMinutes(),ap=h>=12?'PM':'AM',hh=h%12||12;return hh+':'+(m<10?'0':'')+m+' '+ap;}
+function recFmtMMSS(s){s=Math.max(0,Math.floor(s));return Math.floor(s/60)+':'+((s%60)<10?'0':'')+(s%60);}
 function diaryOpen(){return new Promise(function(res,rej){if(DIARY_DB)return res(DIARY_DB);if(!window.indexedDB)return rej('no-idb');var r=indexedDB.open('wc_diary',1);r.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains('clips'))db.createObjectStore('clips',{keyPath:'id',autoIncrement:true});};r.onsuccess=function(e){DIARY_DB=e.target.result;res(DIARY_DB);};r.onerror=function(){rej(r.error);};});}
 function diaryAdd(rec){return diaryOpen().then(function(db){return new Promise(function(res,rej){var tx=db.transaction('clips','readwrite');tx.objectStore('clips').add(rec);tx.oncomplete=function(){res();};tx.onerror=function(){rej(tx.error);};});});}
 function diaryBySection(sec){return diaryOpen().then(function(db){return new Promise(function(res){var out=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){if(c.value.sec===sec)out.push(c.value);c.continue();}else res(out);};cur.onerror=function(){res(out);};});});}
@@ -1095,8 +1105,16 @@ function renderAllDiary(){document.querySelectorAll('[id^="diary-s"]').forEach(f
 function openRecord(i){
   diaryCurSec='s'+i;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){hint('recording needs a phone/browser with camera support 💜');return;}
+  if(!recFreeWindow() && recRemaining()<=0){            // out of footage for this 20-min window
+    var nextWin=new Date((recWinKey()+1)*REC_WIN_MS);
+    hint("that's your minute of footage for this 20 min 💜 next clip unlocks ~"+recFmtClock(nextWin));
+    return;
+  }
   document.getElementById('recLabel').textContent=(window.diaryLabels&&window.diaryLabels[i])||'this moment';
+  var note=document.getElementById('recNote');
+  if(note)note.textContent=recFreeWindow()?"🎉 end of the game, record as much as you want!":("⏱️ "+recFmtMMSS(recRemaining())+" of footage left this 20 min · saved on your phone 💜");
   var sb=document.getElementById('recStart'); sb.style.display=''; sb.disabled=true; document.getElementById('recStop').style.display='none';
+  var tEl=document.getElementById('recTimer'); if(tEl){tEl.style.display='none';tEl.textContent='';}
   document.getElementById('recModal').style.display='flex';
   navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true}).then(function(stream){diaryStream=stream;var v=document.getElementById('recPreview');v.srcObject=stream;v.muted=true;v.play();sb.disabled=false;}).catch(function(){hint('camera + mic permission needed to record 💜');closeRecord();});
 }
@@ -1107,16 +1125,23 @@ function startRec(){
   diaryRec.ondataavailable=function(e){if(e.data&&e.data.size)diaryChunks.push(e.data);};
   diaryRec.onstop=saveRec;
   diaryRec.start();
+  recStartT=Date.now();
+  var cap=recFreeWindow()?0:recRemaining();           // 0 = no auto-stop (free window)
+  if(cap>0)recStopTimer=setTimeout(function(){hint("that's your minute for now 💜 saved it");stopRec();},cap*1000);
+  var tEl=document.getElementById('recTimer'); if(tEl)tEl.style.display='';
+  recTickTimer=setInterval(function(){var el=document.getElementById('recTimer');if(!el)return;var e=(Date.now()-recStartT)/1000;el.textContent='● '+recFmtMMSS(e)+(cap>0?(' / '+recFmtMMSS(cap)):'');},250);
   document.getElementById('recStart').style.display='none'; document.getElementById('recStop').style.display='';
 }
-function stopRec(){if(diaryRec&&diaryRec.state!=='inactive')diaryRec.stop();}
+function stopRec(){if(recStopTimer){clearTimeout(recStopTimer);recStopTimer=null;}if(recTickTimer){clearInterval(recTickTimer);recTickTimer=null;}if(diaryRec&&diaryRec.state!=='inactive')diaryRec.stop();}
 function saveRec(){
+  var durSec=recStartT?((Date.now()-recStartT)/1000):0;
+  if(!recFreeWindow())recAddUsed(durSec);              // spend it from this window's minute
   var blob=new Blob(diaryChunks,{type:(diaryRec&&diaryRec.mimeType)||'video/webm'}), sec=diaryCurSec;
   var rec={sec:sec,blob:blob,t:Date.now(),lat:diaryGeo&&diaryGeo.lat,lng:diaryGeo&&diaryGeo.lng};
   function finish(){diaryAdd(rec).then(function(){hint('saved to your date diary 🎥💜');renderDiary(sec);closeRecord();}).catch(function(){hint('could not save the clip 😭');closeRecord();});}
   if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){rec.lat=p.coords.latitude;rec.lng=p.coords.longitude;diaryGeo={lat:rec.lat,lng:rec.lng};finish();},finish,{timeout:2500,maximumAge:60000});}else finish();
 }
-function closeRecord(){var m=document.getElementById('recModal');if(m)m.style.display='none';if(diaryStream){diaryStream.getTracks().forEach(function(t){t.stop();});diaryStream=null;}diaryRec=null;diaryChunks=[];var v=document.getElementById('recPreview');if(v){try{v.pause();}catch(e){}v.srcObject=null;}}
+function closeRecord(){if(recStopTimer){clearTimeout(recStopTimer);recStopTimer=null;}if(recTickTimer){clearInterval(recTickTimer);recTickTimer=null;}var m=document.getElementById('recModal');if(m)m.style.display='none';if(diaryStream){diaryStream.getTracks().forEach(function(t){t.stop();});diaryStream=null;}diaryRec=null;diaryChunks=[];var tEl=document.getElementById('recTimer');if(tEl){tEl.style.display='none';tEl.textContent='';}var v=document.getElementById('recPreview');if(v){try{v.pause();}catch(e){}v.srcObject=null;}}
 /* autoplay policies: kick off on the first interaction anywhere */
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
 </script>
@@ -1164,8 +1189,9 @@ document.addEventListener('click',function once(){startMusic();document.removeEv
 <div id="recModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeRecord()">
   <div class="modal-card">
     <div class="modal-title">🎥 record <span id="recLabel">this moment</span></div>
-    <div class="modal-sub">a lil clip for our date diary, saved just on your phone 💜</div>
+    <div class="modal-sub" id="recNote">a lil clip for our date diary, saved just on your phone 💜</div>
     <video id="recPreview" class="rec-preview" playsinline muted autoplay></video>
+    <div class="rec-timer" id="recTimer" style="display:none">0:00</div>
     <div class="modal-row">
       <button class="btn ghost" onclick="closeRecord()">close</button>
       <button class="btn primary" id="recStart" onclick="startRec()" disabled>● record</button>
