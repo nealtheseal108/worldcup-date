@@ -61,6 +61,18 @@
   .cliploc{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;color:var(--muted);margin-top:3px}
   .rec-preview{width:100%;max-height:48vh;border-radius:12px;background:#000;transform:scaleX(-1);margin:4px 0 2px}
   .rec-timer{font-family:'Courier Prime',ui-monospace,monospace;font-weight:700;font-size:14px;color:#c0398b;text-align:center;margin:6px 0 2px;letter-spacing:.5px}
+  .movie-bg{position:fixed;inset:0;z-index:200;background:rgba(18,12,34,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px}
+  .movie-stage{position:relative;width:min(90vw,400px);aspect-ratio:9/16;background:#000;border-radius:16px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.65)}
+  .movie-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none}
+  .movie-card{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;background:linear-gradient(160deg,#3a2566,#1f1438);padding:24px;gap:7px;animation:fadein .5s ease}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .movie-card .mc-big{font-size:60px}
+  .movie-card .mc-title{font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:28px;letter-spacing:-.02em}
+  .movie-card .mc-sub{font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;color:#c4b5fd;text-transform:uppercase;letter-spacing:.5px}
+  .movie-card .mc-sub2{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:21px;color:#ecdfff;margin-top:6px}
+  .movie-cap{position:absolute;left:0;right:0;bottom:0;display:none;padding:34px 18px 16px;background:linear-gradient(transparent,rgba(18,12,34,.92));color:#fff;font-family:'Inter',system-ui,sans-serif;font-size:13.5px;line-height:1.3}
+  .movie-cap b{font-weight:800;font-size:15px}
+  .movie-ctrls{display:flex;gap:10px}
   .datemap .leaflet-tile-pane{filter:sepia(.5) saturate(1.5) hue-rotate(208deg) brightness(1.03)}
   .leaflet-container{font-family:'Courier Prime',ui-monospace,monospace}
   .maptip{background:#fff;border:none;border-radius:7px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:700;color:#3a2a63;box-shadow:0 2px 8px rgba(53,28,94,.3);padding:2px 7px;white-space:nowrap}
@@ -401,7 +413,7 @@
       <div class="merge">💜 Our paths cross: we meet on the 2 Line around 3:00 PM and ride into Seattle together!</div>
 
       <div class="sectlabel">Step 2 · the rest of the day, together</div>
-      <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild when the game ends (6:00-7:30). it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button></div>
+      <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild when the game ends (6:00-7:30). it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <button class="diarybtn" type="button" onclick="compileMovie()">🎬 compile our movie</button></div>
       <div id="timeline"></div>
 
       <div class="perks">
@@ -1230,6 +1242,58 @@ function saveRec(){
   if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){rec.lat=p.coords.latitude;rec.lng=p.coords.longitude;diaryGeo={lat:rec.lat,lng:rec.lng};finish();},finish,{timeout:2500,maximumAge:60000});}else finish();
 }
 function closeRecord(){if(recStopTimer){clearTimeout(recStopTimer);recStopTimer=null;}if(recTickTimer){clearInterval(recTickTimer);recTickTimer=null;}var m=document.getElementById('recModal');if(m)m.style.display='none';if(diaryStream){diaryStream.getTracks().forEach(function(t){t.stop();});diaryStream=null;}diaryRec=null;diaryChunks=[];var tEl=document.getElementById('recTimer');if(tEl){tEl.style.display='none';tEl.textContent='';}var v=document.getElementById('recPreview');if(v){try{v.pause();}catch(e){}v.srcObject=null;}}
+/* ---------- compile the clips into "our date movie": in-app montage + best-effort file export ---------- */
+var movieClips=[], movieTimer=null, movieAbort=false, _movieResumeMusic=false;
+function movieName(){var f=document.getElementById('nameField');return ((f&&f.value)||'').trim()||'Sidhya';}
+function movieLabelFor(c){var i=parseInt((c.sec||'s0').slice(1));return (window.diaryLabels&&window.diaryLabels[i])||'a moment';}
+function movieLoc(c){return (c.lat!=null&&c.lng!=null)?('📍 '+c.lat.toFixed(3)+', '+c.lng.toFixed(3)):'';}
+function gatherClips(){return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){all.push(c.value);c.continue();}else{all.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});res(all);}};cur.onerror=function(){res(all);};});});}
+function compileMovie(){gatherClips().then(function(all){if(!all.length){hint("record a few moments first, then i'll cut our movie 🎬💜");return;}movieClips=all;openMovie();});}
+function openMovie(){document.getElementById('movieModal').style.display='flex';try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
+function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
+function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
+function moviePlayClip(i){
+  if(movieAbort)return;
+  if(i>=movieClips.length){moviePlayOutro();return;}
+  var c=movieClips[i],vid=document.getElementById('movieVideo');
+  document.getElementById('movieCard').style.display='none';
+  vid.style.display='';vid.src=URL.createObjectURL(c.blob);vid.muted=false;
+  var cap=document.getElementById('movieCap');cap.style.display='';var loc=movieLoc(c);
+  cap.innerHTML='<b>'+_esc(movieLabelFor(c))+'</b>'+(loc?' · '+loc:'');
+  vid.onended=function(){if(!movieAbort)moviePlayClip(i+1);};
+  var p=vid.play();if(p&&p.catch)p.catch(function(){if(!movieAbort)moviePlayClip(i+1);});
+}
+function moviePlayOutro(){movieShowCard('<div class="mc-big">💜</div><div class="mc-title">the end</div><div class="mc-sub">'+_esc(MATCHUP)+'</div><div class="mc-sub2">made with love, by neal 💜</div>');}
+function closeMovie(){movieAbort=true;if(movieTimer)clearTimeout(movieTimer);var vid=document.getElementById('movieVideo');if(vid){try{vid.pause();}catch(e){}vid.removeAttribute('src');try{vid.load();}catch(e){}}document.getElementById('movieModal').style.display='none';if(_movieResumeMusic){try{startMusic();}catch(e){}_movieResumeMusic=false;}}
+function exportMovie(){
+  if(!movieClips.length){hint('nothing to export yet 💜');return;}
+  var testc=document.createElement('canvas');
+  if(!window.MediaRecorder||!testc.captureStream){hint("this browser can't export a file, but you can screen-record the movie 💜");return;}
+  movieAbort=true; if(movieTimer)clearTimeout(movieTimer);
+  var dl=document.getElementById('movieDownload'); dl.disabled=true; dl.textContent='rendering…';
+  movieShowCard('<div class="mc-big">🎬</div><div class="mc-title">rendering our movie…</div><div class="mc-sub2">hang tight 💜</div>');
+  var W=720,H=1280,canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;var ctx=canvas.getContext('2d');
+  var off=document.createElement('video');off.playsInline=true;off.muted=false;
+  var AC=window.AudioContext||window.webkitAudioContext,actx=null,dest=null;
+  try{actx=new AC();var sn=actx.createMediaElementSource(off);dest=actx.createMediaStreamDestination();sn.connect(dest);}catch(e){actx=null;}
+  var stream=canvas.captureStream(30);
+  if(dest)dest.stream.getAudioTracks().forEach(function(t){stream.addTrack(t);});
+  var mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')?'video/webm;codecs=vp9,opus':(MediaRecorder.isTypeSupported('video/webm')?'video/webm':'');
+  var rec;try{rec=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);}catch(e){hint('export could not start 😭');dl.disabled=false;dl.textContent='⬇ save the movie';return;}
+  var chunks=[];rec.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
+  rec.onstop=function(){var blob=new Blob(chunks,{type:'video/webm'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='sidhya-neal-date-movie.webm';document.body.appendChild(a);a.click();a.remove();dl.disabled=false;dl.textContent='⬇ save the movie';hint('movie saved to your downloads 🎬💜');movieShowCard('<div class="mc-big">🎬💜</div><div class="mc-title">saved!</div><div class="mc-sub2">check your downloads</div>');};
+  function card(lines,emoji){ctx.fillStyle='#2e1f47';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='140px sans-serif';ctx.fillText(emoji,W/2,H/2-130);lines.forEach(function(l,i){ctx.fillStyle=i===0?'#fff':'#c4b5fd';ctx.font=(i===0?'bold 62px':'38px')+' sans-serif';ctx.fillText(l,W/2,H/2+i*72);});}
+  function frame(c){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);var vw=off.videoWidth||W,vh=off.videoHeight||H,s=Math.min(W/vw,H/vh),dw=vw*s,dh=vh*s;try{ctx.drawImage(off,(W-dw)/2,(H-dh)/2,dw,dh);}catch(e){}var g=ctx.createLinearGradient(0,H-240,0,H);g.addColorStop(0,'rgba(18,12,34,0)');g.addColorStop(1,'rgba(18,12,34,.88)');ctx.fillStyle=g;ctx.fillRect(0,H-240,W,240);ctx.textAlign='left';ctx.fillStyle='#fff';ctx.font='bold 46px sans-serif';ctx.fillText(movieLabelFor(c),50,H-128,W-100);var loc=movieLoc(c);if(loc){ctx.fillStyle='#c4b5fd';ctx.font='30px sans-serif';ctx.fillText(loc,50,H-78);}}
+  var phase=0,ci=0,t0=performance.now(),raf;
+  function tick(){
+    if(movieAbort&&phase!==0){/* keep rendering the export even though in-app player is aborted */}
+    if(phase===0){card([movieName()+' & Neal','July 6 2026','our date 🎬'],'⚽💜');if(performance.now()-t0>2600){phase=1;startClip(0);}raf=requestAnimationFrame(tick);return;}
+    if(phase===1){if(movieClips[ci])frame(movieClips[ci]);raf=requestAnimationFrame(tick);return;}
+    if(phase===2){card(['the end',MATCHUP,'made with love 💜'],'💜');if(performance.now()-t0>2600){cancelAnimationFrame(raf);try{rec.stop();}catch(e){}try{off.pause();}catch(e){}return;}raf=requestAnimationFrame(tick);return;}
+  }
+  function startClip(i){ci=i;off.src=URL.createObjectURL(movieClips[i].blob);off.onended=function(){if(i+1<movieClips.length)startClip(i+1);else{phase=2;t0=performance.now();}};var p=off.play();if(p&&p.then)p.then(function(){if(actx&&actx.state==='suspended')actx.resume();}).catch(function(){if(i+1<movieClips.length)startClip(i+1);else{phase=2;t0=performance.now();}});}
+  rec.start();t0=performance.now();tick();
+}
 /* autoplay policies: kick off on the first interaction anywhere */
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
 </script>
@@ -1285,6 +1349,17 @@ document.addEventListener('click',function once(){startMusic();document.removeEv
       <button class="btn primary" id="recStart" onclick="startRec()" disabled>● record</button>
       <button class="btn primary" id="recStop" onclick="stopRec()" style="display:none">■ stop &amp; save</button>
     </div>
+  </div>
+</div>
+<div id="movieModal" class="movie-bg" style="display:none">
+  <div class="movie-stage">
+    <video id="movieVideo" class="movie-video" playsinline></video>
+    <div class="movie-card" id="movieCard"></div>
+    <div class="movie-cap" id="movieCap"></div>
+  </div>
+  <div class="movie-ctrls">
+    <button class="btn ghost" onclick="closeMovie()">close</button>
+    <button class="btn primary" id="movieDownload" onclick="exportMovie()">⬇ save the movie</button>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
