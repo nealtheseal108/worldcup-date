@@ -414,7 +414,7 @@
       <div class="merge">💜 Our paths cross: we meet on the 2 Line around 3:00 PM and ride into Seattle together!</div>
 
       <div class="sectlabel">Step 2 · the rest of the day, together</div>
-      <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild from 6:00-7:15 around full time. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <button class="diarybtn" type="button" onclick="compileMovie()">🎬 compile our movie</button></div>
+      <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild from 6:00-7:30 around full time, record as much as you want. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <button class="diarybtn" type="button" onclick="compileMovie()">🎬 compile our movie</button></div>
       <div id="timeline"></div>
 
       <div class="perks">
@@ -1174,7 +1174,7 @@ function closeStats(){var m=document.getElementById('statsModal');if(m)m.style.d
 var DIARY_DB=null, diaryGeo=null, diaryStream=null, diaryRec=null, diaryChunks=[], diaryCurSec=null;
 // recording allowance: 1 minute of footage per 20-minute window, lifted 6:00-7:30 PM (end of the game)
 var REC_WIN_MS=20*60*1000, REC_CAP=60, recStopTimer=null, recTickTimer=null, recStartT=0;
-function recFreeWindow(d){d=d||new Date();var t=d.getHours()*60+d.getMinutes();return t>=1080&&t<=1155;}  // 6:00 PM (1080) -> 7:15 PM (1155): record all you want
+function recFreeWindow(d){d=d||new Date();var t=d.getHours()*60+d.getMinutes();return t>=1080&&t<=1170;}  // 6:00 PM (1080) -> 7:30 PM (1170): unlimited clips, unlimited length
 function recWinKey(){return Math.floor(Date.now()/REC_WIN_MS);}
 function recUsed(){try{var o=JSON.parse(localStorage.getItem('wc_rec_budget')||'{}');return o.w===recWinKey()?(o.s||0):0;}catch(e){return 0;}}
 function recAddUsed(sec){try{var k=recWinKey(),o=JSON.parse(localStorage.getItem('wc_rec_budget')||'{}'),u=(o.w===k?(o.s||0):0)+sec;localStorage.setItem('wc_rec_budget',JSON.stringify({w:k,s:u}));}catch(e){}}
