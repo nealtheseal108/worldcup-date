@@ -74,6 +74,12 @@
   .movie-cap b{font-weight:800;font-size:15px}
   .movie-place{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;color:#c4b5fd;margin-top:3px}
   .movie-ctrls{display:flex;gap:10px}
+  .endcard{background:linear-gradient(150deg,#3a2566,#1f1438);color:#fff;border-radius:16px;padding:20px 18px;margin:0 0 16px;text-align:center;box-shadow:0 14px 40px rgba(53,28,94,.4)}
+  .endcard .ec-big{font-size:40px;line-height:1}
+  .endcard .ec-title{font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:21px;margin-top:5px}
+  .endcard .ec-sub{font-size:13.5px;color:#d8c8f5;margin:5px auto 14px;line-height:1.45;max-width:340px}
+  .ec-btn{background:#fff;color:#3a2566;border:none;border-radius:30px;padding:12px 26px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;animation:ecpulse 1.9s ease-in-out infinite}
+  @keyframes ecpulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.45)}50%{transform:scale(1.04);box-shadow:0 0 0 12px rgba(255,255,255,0)}}
   .datemap .leaflet-tile-pane{filter:sepia(.5) saturate(1.5) hue-rotate(208deg) brightness(1.03)}
   .leaflet-container{font-family:'Courier Prime',ui-monospace,monospace}
   .maptip{background:#fff;border:none;border-radius:7px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:700;color:#3a2a63;box-shadow:0 2px 8px rgba(53,28,94,.3);padding:2px 7px;white-space:nowrap}
@@ -268,7 +274,7 @@
     *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     body{background:#0e1116;padding:0;margin:0}
     .wrap{max-width:none;margin:0;padding:0}
-    .topbar,.matchup,.progress,.datemap,#playerbar,.nav,.printrow,.foot,.sharehint,.sharerow,.iti-head,.sectlabel,.twoplan,.merge,#timeline,.note,.safety,.perks,.cheeky,.diaryintro{display:none!important}
+    .topbar,.matchup,.progress,.datemap,#playerbar,.nav,.printrow,.foot,.sharehint,.sharerow,.iti-head,.sectlabel,.twoplan,.merge,#timeline,.note,.safety,.perks,.cheeky,.diaryintro,.endcard{display:none!important}
     .step:not(.active){display:none!important}
     .panel{box-shadow:none;padding:0;background:transparent;border-radius:0}
     .sharewrap{margin:0}
@@ -400,6 +406,12 @@
         <div class="wxcard" id="wxcard">☁️ checking the forecast...</div>
       </div>
 
+      <div class="endcard" id="endCard" style="display:none">
+        <div class="ec-big">🎬💜</div>
+        <div class="ec-title">our date's wrapping up...</div>
+        <div class="ec-sub">wanna relive the whole thing? i cut all our clips together into our little movie 💜</div>
+        <button class="ec-btn" type="button" onclick="compileMovie()">▶ watch our date movie</button>
+      </div>
       <div class="sectlabel">Step 1 · two routes that cross 🚆</div>
       <div class="twoplan">
         <div class="plan">
@@ -765,6 +777,7 @@ function reveal(){
     '✅ <b>all booked babu!</b> 💜 i already sorted our 7:30 table at '+pick.after.t+'. nothing to plan or pay for tonight, just show up and enjoy. i got you.';
   go(4);
   applyCheekyGate();
+  checkDateEnding();
 }
 venueCards();
 /* temporary: hide the cheeky closing line for ~1 hour, then it comes back on its own */
@@ -1359,6 +1372,12 @@ function exportMovie(){
 }
 /* autoplay policies: kick off on the first interaction anywhere */
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
+/* end-of-date: at 9:30 PM the reveal screen surfaces a 'watch our movie' card */
+function dateEnding(){if(window.__forceEnd)return true;var n=new Date();return (n.getHours()*60+n.getMinutes())>=1290;}  /* >= 9:30 PM */
+function checkDateEnding(){var el=document.getElementById('endCard');if(el)el.style.display=dateEnding()?'':'none';}
+setInterval(checkDateEnding,30000);   /* so it pops up live if she's already on the reveal at 9:30 */
+/* TEST: open the site with ?end=1 to force the 9:30 state on a sample reveal */
+if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
 </script>
 <div id="ythost"></div>
 <div id="playerbar" role="region" aria-label="Music player">
