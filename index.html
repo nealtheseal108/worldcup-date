@@ -1265,7 +1265,7 @@ function saveRec(){
 }
 function closeRecord(){if(recStopTimer){clearTimeout(recStopTimer);recStopTimer=null;}if(recTickTimer){clearInterval(recTickTimer);recTickTimer=null;}var m=document.getElementById('recModal');if(m)m.style.display='none';if(diaryStream){diaryStream.getTracks().forEach(function(t){t.stop();});diaryStream=null;}diaryRec=null;diaryChunks=[];var tEl=document.getElementById('recTimer');if(tEl){tEl.style.display='none';tEl.textContent='';}var v=document.getElementById('recPreview');if(v){try{v.pause();}catch(e){}v.srcObject=null;}}
 /* ---------- cloud diary sync: a shared backend so both phones see the same clips ---------- */
-var CLOUD={url:'', key:'wcd_d1ary_Kq7Fz9mR2pX8sV4nL6tB3'};   // url is filled in once the Render backend is live
+var CLOUD={url:'https://worldcup-diary.onrender.com', key:'wcd_d1ary_Kq7Fz9mR2pX8sV4nL6tB3'};   // Render cloud-diary backend
 function cloudOn(){return !!(CLOUD.url&&CLOUD.url.indexOf('http')===0);}
 function cloudHeaders(){return {'X-Diary-Key':CLOUD.key};}
 function cloudClipUrl(id){return CLOUD.url+'/api/clip/'+id+'?key='+encodeURIComponent(CLOUD.key);}
