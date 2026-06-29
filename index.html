@@ -183,7 +183,7 @@
   .time .body small{color:var(--muted);display:block;margin-top:2px}
   /* boarding-pass itinerary cards that sticky-stack + overlap as you scroll */
   #timeline{padding-bottom:40vh}
-  .bpass{position:-webkit-sticky;position:sticky;background:#fff;border:1px solid var(--line);border-radius:16px;margin-bottom:22px;box-shadow:0 -3px 12px rgba(53,28,94,.10),0 16px 34px rgba(53,28,94,.22)}
+  .bpass{position:-webkit-sticky;position:sticky;top:72px;transform-origin:center top;will-change:transform;background:#fff;border:1px solid var(--line);border-radius:16px;margin-bottom:26px;box-shadow:0 -3px 12px rgba(53,28,94,.10),0 16px 34px rgba(53,28,94,.22)}
   .bp-top{display:flex;justify-content:space-between;align-items:center;gap:8px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;padding:8px 16px;border-radius:15px 15px 0 0;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;font-weight:700;letter-spacing:.6px}
   .bp-air{display:flex;align-items:center;gap:5px}
   .bp-grid{display:flex;gap:14px;padding:14px 16px 4px}
@@ -888,7 +888,7 @@ function reveal(){
   window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
-    return `<div class="bpass" style="top:${50+i*7}px;z-index:${i+2}">`+
+    return `<div class="bpass">`+
       `<div class="bp-top"><span class="bp-air">✈ DATE AIR</span><span class="bp-no">${no} · JUL 6</span></div>`+
       `<div class="bp-grid">`+
         `<div class="bp-clk"><span class="bp-clk-lbl">BOARDING</span>${r[0]}</div>`+
@@ -902,6 +902,7 @@ function reveal(){
     `</div>`;
   }).join('');
   if(window.renderAllDiary)renderAllDiary();
+  if(window.stackPasses){stackPasses();setTimeout(stackPasses,60);}
   document.getElementById('safetyBox').innerHTML='🛟 <b>Good to know:</b> '+v.safety+
     ' If the US is playing, expect the biggest crowds of the tournament, so we get there early and post up near an exit!';
   document.getElementById('reserveNote').innerHTML =
@@ -1510,6 +1511,23 @@ function checkDateEnding(){var el=document.getElementById('endCard');if(el)el.st
 setInterval(checkDateEnding,30000);   /* so it pops up live if she's already on the reveal at 9:30 */
 /* TEST: open the site with ?end=1 to force the 9:30 state on a sample reveal */
 if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
+/* boarding passes recede into a stack as the next one slides over them */
+var _stackRaf=null, STACK_TOP=72;
+function stackPasses(){
+  var cards=document.querySelectorAll('#timeline .bpass'); if(!cards.length)return;
+  var tops=[]; for(var k=0;k<cards.length;k++)tops.push(cards[k].getBoundingClientRect().top);
+  for(var i=0;i<cards.length;i++){
+    var depth=0;                                   // how many later cards have stacked over this one (continuous)
+    for(var j=i+1;j<cards.length;j++)depth+=Math.min(1,Math.max(0,(STACK_TOP+72-tops[j])/72));
+    var scale=Math.max(0.82,1-0.045*depth), ty=-8*depth;
+    cards[i].style.transform='translateY('+ty.toFixed(1)+'px) scale('+scale.toFixed(3)+')';
+    cards[i].style.zIndex=String(i+2);             // later cards sit on top, earlier ones tuck behind
+    cards[i].style.filter=depth>0?('brightness('+Math.max(0.86,1-0.05*depth).toFixed(3)+')'):'';
+  }
+}
+function _onStackScroll(){ if(_stackRaf)return; _stackRaf=requestAnimationFrame(function(){_stackRaf=null;stackPasses();}); }
+window.addEventListener('scroll',_onStackScroll,{passive:true});
+window.addEventListener('resize',_onStackScroll);
 </script>
 <div id="ythost"></div>
 <div id="playerbar" role="region" aria-label="Music player">
