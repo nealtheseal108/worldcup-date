@@ -32,9 +32,9 @@
   .matchup .chip{display:inline-flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#3a2a63;background:rgba(255,255,255,.92);border-radius:30px;padding:6px 14px;box-shadow:0 3px 12px rgba(53,28,94,.22)}
   .matchup b{color:var(--lav);font-weight:700}
   .matchup .mu-note{color:#b06a00}
-  .datemap{display:none;background:var(--paper);border-radius:16px;padding:8px 12px 4px;box-shadow:0 10px 30px rgba(53,28,94,.22);margin-top:16px}
+  .datemap{display:none;background:var(--paper);border-radius:16px;padding:14px 14px 14px;box-shadow:0 10px 30px rgba(53,28,94,.22);margin:16px 0 40px}
   body.mapview .datemap{display:block}
-  .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:2px}
+  .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin:2px 0 12px}
   #leafmap{height:340px;border-radius:13px;overflow:hidden;background:#efeaf7}
   @media(max-width:600px){#leafmap{height:280px}}
   @keyframes worm{to{stroke-dashoffset:-44}}
@@ -122,9 +122,9 @@
   .vcard:hover{border-color:var(--lav2);transform:translateY(-2px);box-shadow:0 10px 26px rgba(124,77,202,.2)}
   .vcard.sel{border-color:var(--lav);box-shadow:0 0 0 3px rgba(124,77,202,.22)}
   .vcard .art{width:100%;display:block;height:118px}
-  .vcard .vbody{padding:14px 15px 16px}
-  .vcard .ttl{font-weight:800;font-size:16.5px;margin-bottom:4px}
-  .vcard .desc{font-size:13.5px;color:var(--muted);line-height:1.45}
+  .vcard .vbody{padding:17px 18px 19px}
+  .vcard .ttl{font-weight:800;font-size:16.5px;margin-bottom:7px}
+  .vcard .desc{font-size:13.5px;color:var(--muted);line-height:1.55}
   .crown{position:absolute;top:10px;right:10px;background:var(--sun);color:#7a5a00;font-size:10.5px;font-weight:800;letter-spacing:.5px;padding:4px 11px;border-radius:20px;text-transform:uppercase;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 
   /* food cards (emoji row) */
@@ -927,8 +927,14 @@ applyMatchup();
 var VENUE_LL={mural:[47.6253,-122.3536],pier:[47.6075,-122.3425],occidental:[47.60051,-122.33322],hinghay:[47.59856,-122.32536],rooftop:[47.60873,-122.33606]};
 var VENUE_LABEL={mural:'Seattle Center',pier:'Pike Place / Pier 62',occidental:'Pioneer Square',hinghay:'Hing Hay Park',rooftop:'Next Level Rooftop'};
 var START_NEAL=[47.6163,-122.0356], START_SIDHYA=[47.6101,-122.1265], MERCER=[47.5707,-122.2221], WESTLAKE=[47.6115,-122.3370];
-// the 2 Line (Link light rail) alignment, Bellevue downtown -> Westlake, tracing the real tracks incl. the I-90 floating bridge
+var REDMOND_TECH=[47.6446,-122.1390], MARYMOOR=[47.6627,-122.1170]; // where we meet + where Neal boards
+// the 2 Line (Link light rail) alignment, Redmond Technology -> Westlake, tracing the real tracks incl. the I-90 floating bridge
 var LINK_2LINE=[
+  REDMOND_TECH,          // Redmond Technology (Overlake) — we MEET here
+  [47.6360,-122.1366],   // Overlake Village
+  [47.6276,-122.1561],   // BelRed / 130th
+  [47.6234,-122.1726],   // Spring District / 120th
+  [47.6190,-122.1859],   // Wilburton
   [47.61572,-122.19251], // Bellevue Downtown
   [47.60983,-122.18757], // East Main
   [47.58590,-122.19187], // South Bellevue
@@ -941,12 +947,19 @@ var LINK_2LINE=[
   [47.60730,-122.33520], // Symphony / University St
   [47.61150,-122.33700]  // Westlake
 ];
-// how each of us reaches the line: Neal skirts south of Lake Sammamish on I-90; Sidhya hops to Bellevue Downtown
-var NEAL_LINK=[START_NEAL,[47.5470,-122.0530],[47.5660,-122.1420],[47.58590,-122.19187]];
-var SIDHYA_LINK=[START_SIDHYA,[47.61572,-122.19251]];
+// how each of us reaches the line: Neal rides from his Sammamish place around the lake's north end, boards at
+// Marymoor Village, and rolls one stop to Redmond Tech; Sidhya comes up from Crossroads to meet him there.
+var NEAL_LINK=[START_NEAL,[47.6680,-122.0950],MARYMOOR,REDMOND_TECH];
+var SIDHYA_LINK=[START_SIDHYA,REDMOND_TECH];
 function nearestLinkIdx(ll){var b=0,bd=1e9;for(var i=0;i<LINK_2LINE.length;i++){var dx=LINK_2LINE[i][0]-ll[0],dy=LINK_2LINE[i][1]-ll[1],d=dx*dx+dy*dy;if(d<bd){bd=d;b=i;}}return b;}
 // the actual 2 Line stations we pass through (tiny ticks on the map; hover/tap for the name)
 var LINK_STATIONS=[
+  {n:'Marymoor Village',ll:MARYMOOR},
+  {n:'Redmond Technology',ll:REDMOND_TECH},
+  {n:'Overlake Village',ll:[47.6360,-122.1366]},
+  {n:'BelRed',ll:[47.6276,-122.1561]},
+  {n:'Spring District',ll:[47.6234,-122.1726]},
+  {n:'Wilburton',ll:[47.6190,-122.1859]},
   {n:'Bellevue Downtown',ll:[47.61572,-122.19251]},
   {n:'East Main',ll:[47.60983,-122.18757]},
   {n:'South Bellevue',ll:[47.58590,-122.19187]},
