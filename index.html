@@ -181,6 +181,27 @@
   .time .body{font-size:14px;line-height:1.5}
   .time .body b{font-size:14.5px}
   .time .body small{color:var(--muted);display:block;margin-top:2px}
+  /* boarding-pass itinerary cards that sticky-stack + overlap as you scroll */
+  #timeline{padding-bottom:40vh}
+  .bpass{position:-webkit-sticky;position:sticky;background:#fff;border:1px solid var(--line);border-radius:16px;margin-bottom:22px;box-shadow:0 -3px 12px rgba(53,28,94,.10),0 16px 34px rgba(53,28,94,.22)}
+  .bp-top{display:flex;justify-content:space-between;align-items:center;gap:8px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;padding:8px 16px;border-radius:15px 15px 0 0;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;font-weight:700;letter-spacing:.6px}
+  .bp-air{display:flex;align-items:center;gap:5px}
+  .bp-grid{display:flex;gap:14px;padding:14px 16px 4px}
+  .bp-clk{min-width:80px;color:var(--lav);font-weight:800;font-size:17px;line-height:1.05}
+  .bp-clk-lbl{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;color:var(--muted);letter-spacing:.7px;font-weight:700;margin-bottom:3px}
+  .bp-info{flex:1;min-width:0}
+  .bp-ttl{font-size:14.5px;font-weight:700;line-height:1.3}
+  .bp-ttl b{font-weight:800}
+  .bp-desc{color:var(--muted);display:block;font-size:13px;line-height:1.45;margin-top:3px}
+  .bp-perf{position:relative;border-top:2px dashed #d8ccef;margin:12px 16px 0}
+  .bp-perf::before,.bp-perf::after{content:"";position:absolute;top:-10px;width:18px;height:18px;border-radius:50%;background:var(--paper);border:1px solid var(--line)}
+  .bp-perf::before{left:-25px}
+  .bp-perf::after{right:-25px}
+  .bp-stub{display:flex;align-items:center;gap:16px;padding:12px 16px 13px}
+  .bp-seat{font-family:'Courier Prime',ui-monospace,monospace;line-height:1.15}
+  .bp-seat span{display:block;font-size:8.5px;color:var(--muted);letter-spacing:.7px}
+  .bp-seat b{font-size:14px;color:#3a2a63}
+  .bp-bars{flex:1;height:34px;border-radius:3px;opacity:.82;background:repeating-linear-gradient(90deg,#2e1f47 0,#2e1f47 2px,transparent 2px,transparent 4px,#2e1f47 4px,#2e1f47 6.5px,transparent 6.5px,transparent 9px)}
   .note{background:#fff6e0;border:1px solid #f3e2a8;border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5;margin-top:14px;color:#6b5a16}
   .safety{background:#f1ecfc;border:1px solid #ddd0f5;border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5;margin-top:12px;color:#4a3578}
   .perks{display:grid;gap:8px;margin-top:14px}
@@ -436,7 +457,7 @@
       </div>
       <div class="merge">💜 Our paths cross: we meet on the 2 Line around 3:00 PM and ride into Seattle together!</div>
 
-      <div class="sectlabel">Step 2 · the rest of the day, together</div>
+      <div class="sectlabel">🛫 your boarding passes · the whole day, leg by leg</div>
       <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild from 6:00-7:30 around full time, record as much as you want. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <button class="diarybtn" type="button" onclick="compileMovie()">🎬 compile our movie</button></div>
       <div id="timeline"></div>
 
@@ -865,10 +886,21 @@ function reveal(){
     ['~9:45 PM','<b>Easy ride home.</b>','Back on the 2 Line, which runs until midnight, so there is never a rush home.']
   ];
   window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
-  document.getElementById('timeline').innerHTML = rows.map((r,i)=>
-    `<div class="time"><div class="clk">${r[0]}</div><div class="body">${r[1]}<small>${r[2]}</small>`+
-    `<button class="diarybtn" type="button" onclick="openRecord(${i})">📹 record this moment</button>`+
-    `<div class="diary-row" id="diary-s${i}"></div></div></div>`).join('');
+  document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
+    var no='WC'+String(i+1).padStart(2,'0');
+    return `<div class="bpass" style="top:${50+i*7}px;z-index:${i+2}">`+
+      `<div class="bp-top"><span class="bp-air">✈ DATE AIR</span><span class="bp-no">${no} · JUL 6</span></div>`+
+      `<div class="bp-grid">`+
+        `<div class="bp-clk"><span class="bp-clk-lbl">BOARDING</span>${r[0]}</div>`+
+        `<div class="bp-info"><div class="bp-ttl">${r[1]}</div><small class="bp-desc">${r[2]}</small>`+
+          `<button class="diarybtn" type="button" onclick="openRecord(${i})">📹 record this moment</button>`+
+          `<div class="diary-row" id="diary-s${i}"></div>`+
+        `</div>`+
+      `</div>`+
+      `<div class="bp-perf"></div>`+
+      `<div class="bp-stub"><div class="bp-seat"><span>SEAT</span><b>2 💜</b></div><div class="bp-seat"><span>GATE</span><b>R16</b></div><div class="bp-bars" aria-hidden="true"></div></div>`+
+    `</div>`;
+  }).join('');
   if(window.renderAllDiary)renderAllDiary();
   document.getElementById('safetyBox').innerHTML='🛟 <b>Good to know:</b> '+v.safety+
     ' If the US is playing, expect the biggest crowds of the tournament, so we get there early and post up near an exit!';
