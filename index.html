@@ -163,7 +163,9 @@
   /* LDR arrival boarding pass on the welcome screen */
   .arrivalpass{max-width:340px;margin:14px auto 2px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 8px 22px rgba(53,28,94,.16);font-family:'Courier Prime',ui-monospace,monospace;text-align:left}
   .ap-head{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff}
-  .ap-air{font-weight:700;font-size:11px;letter-spacing:1px}
+  .ap-air{display:flex;align-items:center;gap:7px;font-weight:800;font-size:11px;letter-spacing:1.2px}
+  .ap-air .ap-mark{width:18px;height:18px;display:block;flex:none}
+  .ap-air .ap-mark svg{width:100%;height:100%;display:block}
   .ap-status{font-size:10.5px;font-weight:700;background:rgba(255,255,255,.22);padding:3px 9px;border-radius:20px}
   .ap-route{display:flex;align-items:center;gap:8px;padding:13px 18px 4px}
   .ap-port{text-align:center;min-width:56px}
@@ -177,7 +179,8 @@
   .ap-meta div{flex:1}
   .ap-meta span{display:block;font-size:8px;color:var(--muted);letter-spacing:.7px}
   .ap-meta b{font-size:12px;color:#3a2a63}
-  .ap-bars{height:22px;margin:0 14px 12px;border-radius:3px;opacity:.78;background:repeating-linear-gradient(90deg,#2e1f47 0,#2e1f47 2px,transparent 2px,transparent 4px,#2e1f47 4px,#2e1f47 6.5px,transparent 6.5px,transparent 9px)}
+  .ap-bars{display:flex;align-items:flex-end;justify-content:flex-start;gap:0;height:24px;margin:2px 16px 12px}
+  .ap-bars .bc-row{height:24px}
 
   .iti-head{text-align:center;margin-bottom:14px}
   .iti-head .big{font-size:38px}
@@ -216,11 +219,18 @@
   .bp-perf::before,.bp-perf::after{content:"";position:absolute;top:-10px;width:18px;height:18px;border-radius:50%;background:var(--paper);border:1px solid var(--line)}
   .bp-perf::before{left:-25px}
   .bp-perf::after{right:-25px}
-  .bp-stub{display:flex;align-items:center;gap:16px;padding:12px 16px 13px}
-  .bp-seat{font-family:'Courier Prime',ui-monospace,monospace;line-height:1.15}
-  .bp-seat span{display:block;font-size:8.5px;color:var(--muted);letter-spacing:.7px}
-  .bp-seat b{font-size:14px;color:#3a2a63}
-  .bp-bars{flex:1;height:26px;border-radius:3px;opacity:.8;background:repeating-linear-gradient(90deg,#2e1f47 0,#2e1f47 2px,transparent 2px,transparent 4px,#2e1f47 4px,#2e1f47 6.5px,transparent 6.5px,transparent 9px)}
+  .bp-stub{display:flex;align-items:center;gap:12px;padding:11px 16px 13px}
+  .bp-air{display:flex;align-items:center;gap:8px;flex:none}
+  .bp-mark{width:26px;height:26px;display:block;flex:none}
+  .bp-mark svg{width:100%;height:100%;display:block}
+  .bp-wm{font-family:'Inter',system-ui,sans-serif;line-height:.95}
+  .bp-wm b{display:block;font-size:11px;font-weight:800;letter-spacing:.6px;color:#2e1f47}
+  .bp-wm i{display:block;font-style:normal;font-size:8px;font-weight:800;letter-spacing:2.4px;color:var(--lav)}
+  .bp-code{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px;overflow:hidden}
+  .bp-codeno{font-family:'Courier Prime',ui-monospace,monospace;font-size:8px;letter-spacing:1.4px;color:var(--muted);white-space:nowrap}
+  /* shared barcode primitives (stub, arrival pass, share card) */
+  .bc-row{display:flex;align-items:flex-end;gap:0;line-height:0}
+  .bc-row i{display:inline-block;flex:none}
   /* in the deck, only the focused card shows its body; the rest collapse to a peeking header strip */
   #timeline.bp-ready .bpass .bp-body,#timeline.bp-ready .bpass .bp-perf,#timeline.bp-ready .bpass .bp-stub{transition:opacity .18s ease}
   #timeline.bp-ready .bpass.is-collapsed .bp-body,#timeline.bp-ready .bpass.is-collapsed .bp-perf,#timeline.bp-ready .bpass.is-collapsed .bp-stub{opacity:0;pointer-events:none}
@@ -251,29 +261,43 @@
   .kquote{position:fixed;right:14px;bottom:74px;z-index:40;max-width:260px;text-align:right;font-family:'Instrument Serif',Georgia,serif;font-style:italic;color:rgba(255,255,255,.62);font-size:13px;line-height:1.25;margin:0;pointer-events:none;text-shadow:0 1px 5px rgba(40,20,70,.45)}
   .kquote span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-style:normal;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:.85;margin-top:3px}
 
-  /* Kalshi-style ticket card */
-  .ticket{background:#0e1116;border:1px solid #2a2f3a;border-radius:18px;padding:18px 18px 15px;color:#e8e6f0;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.45)}
-  .tk-top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;letter-spacing:1px}
-  .tk-cat{color:#cfc7e8;display:flex;gap:8px;align-items:center}
-  .tk-bars{color:#a78bfa;font-size:11px;letter-spacing:-2px}
-  .tk-brand{color:#b9a5f0;font-size:16px;font-weight:800}
-  .tk-divider{border-top:1px dashed #333a47;margin:12px 0 14px}
-  .tk-title{font-size:25px;font-weight:800;line-height:1.13;margin-bottom:16px}
-  .tk-pick{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+  /* Linkway Air departure-board share card */
+  .ticket{background:#0e1116;border:1px solid #2a2f3a;border-radius:18px;padding:16px 18px 15px;color:#e8e6f0;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.45)}
+  .tk-board{margin:0 0 2px}
+  .tk-top{display:flex;justify-content:space-between;align-items:center}
+  .tk-cat{display:flex;align-items:center;gap:8px;font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:13px;letter-spacing:1.4px;color:#f0ead8}
+  .tk-mark{width:20px;height:20px;display:block;flex:none}
+  .tk-mark svg{width:100%;height:100%;display:block}
+  .tk-status{font-family:'Courier Prime','Courier New',monospace;font-weight:700;font-size:11px;letter-spacing:1.5px;color:#0e1116;background:#ffd166;padding:4px 11px;border-radius:5px}
+  .tk-route{display:flex;align-items:center;gap:10px;margin:14px 0 6px}
+  .tk-rcol{min-width:64px}
+  .tk-rcol b{display:block;font-family:'Inter',system-ui,sans-serif;font-size:24px;font-weight:800;letter-spacing:1px;line-height:1;color:#fff}
+  .tk-rcol span{display:block;font-family:'Courier Prime','Courier New',monospace;font-size:8px;letter-spacing:1.6px;color:#8a82a6;margin-top:4px}
+  .tk-rcol-r{text-align:right}
+  .tk-rmid{flex:1;position:relative;height:18px;display:flex;align-items:center;justify-content:center}
+  .tk-rline{position:absolute;left:0;right:0;top:50%;height:0;border-top:2px dashed #3a2d63}
+  .tk-rplane{position:relative;background:#0e1116;padding:0 8px;color:#a78bfa;font-size:14px}
+  .tk-divider{border-top:1px dashed #333a47;margin:12px 0 13px}
+  .tk-title{font-family:'Inter',system-ui,sans-serif;font-size:25px;font-weight:800;letter-spacing:-.02em;line-height:1.13;margin-bottom:15px}
+  .tk-pick{display:flex;gap:12px;align-items:center;margin-bottom:15px}
   .tk-thumb{width:52px;height:52px;border-radius:10px;overflow:hidden;flex:none}
   .tk-thumb svg{width:100%;height:100%;display:block}
-  .tk-pickname{font-size:21px;font-weight:800;line-height:1.1}
-  .tk-picksub{font-size:13px;color:#9b93b5;margin-top:3px}
-  .tk-ticker{position:relative;height:34px;margin:0 -18px 16px;background:linear-gradient(90deg,#1a1330,#241a44,#1a1330);border-top:1px solid #3a2d63;border-bottom:1px solid #3a2d63;overflow:hidden;display:flex;align-items:center}
-  .tk-track{white-space:nowrap;font-family:'Courier Prime','Courier New',monospace;font-weight:500;font-size:13px;color:#a78bfa;letter-spacing:1px;animation:tick 22s linear infinite;will-change:transform}
+  .tk-pickname{font-family:'Inter',system-ui,sans-serif;font-size:21px;font-weight:800;line-height:1.1}
+  .tk-picksub{font-family:'Courier Prime','Courier New',monospace;font-size:11px;letter-spacing:.6px;color:#9b93b5;margin-top:4px}
+  .tk-h{width:13px;height:13px;display:inline-block;vertical-align:-2px}
+  .tk-flapwrap{margin:0 -18px 15px;padding:0;background:linear-gradient(180deg,#15161c,#0b0c10);border-top:1px solid #2a2f3a;border-bottom:1px solid #2a2f3a}
+  .tk-ticker{position:relative;height:38px;margin:0;background:linear-gradient(90deg,#121319,#1c1d26,#121319);overflow:hidden;display:flex;align-items:center}
+  .tk-track{white-space:nowrap;font-family:'Courier Prime','Courier New',monospace;font-weight:700;font-size:13px;color:#ffd166;letter-spacing:3px;text-shadow:0 1px 0 #000;animation:tick 22s linear infinite;will-change:transform}
   @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-  .tk-stats{display:flex;gap:18px;margin-bottom:12px}
-  .tk-stats>div{flex:1}
-  .tk-lbl{font-size:12px;letter-spacing:1.5px;color:#8a82a6;font-weight:700;margin-bottom:2px}
-  .tk-val{font-size:25px;font-weight:800;color:#fff}
-  .tk-comp{font-family:'Courier Prime','Courier New',monospace;font-size:12.5px;color:#9b93b5;line-height:1.8;border-top:1px dashed #333a47;padding-top:10px;margin-bottom:11px}
+  .tk-stats{display:flex;gap:10px;margin-bottom:12px}
+  .tk-stats>div{flex:1;background:#15161c;border:1px solid #262a36;border-radius:8px;padding:8px 10px}
+  .tk-lbl{font-family:'Courier Prime','Courier New',monospace;font-size:9px;letter-spacing:2px;color:#8a82a6;font-weight:700;margin-bottom:3px}
+  .tk-val{font-family:'Inter',system-ui,sans-serif;font-size:23px;font-weight:800;color:#fff;line-height:1}
+  .tk-val span{font-size:11px;font-weight:800;color:#a78bfa;margin-left:3px}
+  .tk-comp{font-family:'Courier Prime','Courier New',monospace;font-size:12px;color:#9b93b5;line-height:1.8;border-top:1px dashed #333a47;padding-top:10px;margin-bottom:11px}
   .tk-comp b{color:#d7d2ea}
-  .tk-foot{display:flex;justify-content:space-between;font-family:'Courier New',monospace;font-size:12px;color:#7c7595;letter-spacing:1px}
+  .tk-foot{display:flex;justify-content:space-between;align-items:center;font-family:'Courier New',monospace;font-size:11px;color:#7c7595;letter-spacing:1px}
+  .tk-go{color:#0e1116;background:#cdbdf7;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:1px}
   .capturing .tk-track{animation:none!important;transform:none!important}
   .sharerow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
   .sharerow .btn{flex:1;min-width:104px}
@@ -334,16 +358,23 @@
     /* the ticket card becomes a full-page wall poster */
     .ticket{min-height:100vh;border:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:8vh 9vw!important}
     .ticket .tk-top{font-size:20px}
-    .ticket .tk-brand{font-size:34px}
+    .ticket .tk-cat{font-size:18px}
+    .ticket .tk-status{font-size:15px}
+    .ticket .tk-route{margin:18px 0}
+    .ticket .tk-rcol b{font-size:40px}
+    .ticket .tk-rcol span{font-size:13px}
     .ticket .tk-title{font-size:46px;line-height:1.12;margin:14px 0 26px}
     .ticket .tk-pick{margin-bottom:26px}
     .ticket .tk-thumb{width:88px;height:88px}
     .ticket .tk-pickname{font-size:32px}
     .ticket .tk-picksub{font-size:17px}
-    .ticket .tk-ticker{height:46px;margin:6px 0 22px}
+    .ticket .tk-flapwrap{margin:6px 0 22px}
+    .ticket .tk-ticker{height:46px}
     .ticket .tk-track{font-size:19px}
+    .ticket .tk-stats>div{padding:14px 16px}
     .ticket .tk-lbl{font-size:15px}
     .ticket .tk-val{font-size:40px}
+    .ticket .tk-go{font-size:15px}
     .ticket .tk-comp{font-size:18px;line-height:2.1}
     .ticket .tk-foot{font-size:16px;margin-top:10px}
   }
@@ -369,7 +400,7 @@
         <div class="big">⚽💜</div>
         <div class="pill">HAPPY 8 MONTHS · ROUND OF 16 · 5 PM!</div>
         <div class="arrivalpass" id="arrivalPass">
-          <div class="ap-head"><span class="ap-air">✈ BOARDING PASS</span><span class="ap-status">LANDED 💜</span></div>
+          <div class="ap-head"><span class="ap-air"><span class="ap-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 22 L17 4 C20 0.5 27 1 25.5 6 L14 22 Z" fill="#fff" opacity=".95"/><circle cx="10.5" cy="15.5" r="4.1" fill="none" stroke="#9b72e8" stroke-width="2"/><circle cx="15.5" cy="15.5" r="4.1" fill="none" stroke="#9b72e8" stroke-width="2"/></svg></span>LINKWAY AIR</span><span class="ap-status">LANDED 💜</span></div>
           <div class="ap-route">
             <div class="ap-port"><b class="ap-edit" id="apFrom" onclick="editArrivalFrom()" title="tap to set where you flew in from">HOME</b><span>you ✈ in</span></div>
             <div class="ap-plane"><i>✈</i></div>
@@ -377,7 +408,7 @@
           </div>
           <div class="ap-meta">
             <div><span>PASSENGER</span><b>SIDHYA 💜</b></div>
-            <div><span>FLIGHT</span><b>WC 0706</b></div>
+            <div><span>FLIGHT</span><b>LW 0706</b></div>
             <div><span>GATE</span><b>R16</b></div>
           </div>
           <div class="ap-bars" aria-hidden="true"></div>
@@ -437,26 +468,34 @@
       <div class="sharewrap">
         <div class="sectlabel">📸 Your shareable card</div>
         <div class="ticket" id="shareCard">
-          <div class="tk-top">
-            <div class="tk-cat"><span class="tk-bars">▮▮▮</span> WORLD CUP</div>
-            <div class="tk-brand">Sidhu&nbsp;💜&nbsp;Neal</div>
+          <div class="tk-board">
+            <div class="tk-top">
+              <div class="tk-cat"><span class="tk-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 22 L17 4 C20 0.5 27 1 25.5 6 L14 22 Z" fill="#ffd166" opacity=".95"/><circle cx="10.5" cy="15.5" r="4.1" fill="none" stroke="#0e1116" stroke-width="2"/><circle cx="15.5" cy="15.5" r="4.1" fill="none" stroke="#0e1116" stroke-width="2"/></svg></span>LINKWAY AIR</div>
+              <div class="tk-status">● BOARDING</div>
+            </div>
+            <div class="tk-route">
+              <div class="tk-rcol"><b>HOME</b><span>ORIGIN</span></div>
+              <div class="tk-rmid"><span class="tk-rline"></span><span class="tk-rplane">✈</span></div>
+              <div class="tk-rcol tk-rcol-r"><b>SEA</b><span>LUMEN FIELD</span></div>
+            </div>
+            <div class="tk-divider"></div>
           </div>
-          <div class="tk-divider"></div>
           <div class="tk-title">I'm going with my <span class="fancy" style="color:#cdbdf7">boyfriend</span>!</div>
           <div class="tk-pick">
             <div class="tk-thumb">
               <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="#2a1f4d"/><path d="M26 40 C8 28 12 14 22 18 C25 19 26 22 26 22 C26 22 27 19 30 18 C40 14 44 28 26 40 Z" fill="#b9a5f0"/></svg>
             </div>
             <div><div class="tk-pickname" id="tkVenue">Seattle Center</div>
-            <div class="tk-picksub">Round of 16 · Yes, we're going 💜</div></div>
+            <div class="tk-picksub">World Cup R16 · Sidhu <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#c9b6f5"/></svg> Neal</div></div>
           </div>
-          <div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div>
+          <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
           <div class="tk-stats">
-            <div><div class="tk-lbl">KICKOFF</div><div class="tk-val">5:00 PM</div></div>
-            <div><div class="tk-lbl">TOGETHER</div><div class="tk-val">8 MONTHS 💜</div></div>
+            <div><div class="tk-lbl">KICKOFF</div><div class="tk-val">5:00<span>PM</span></div></div>
+            <div><div class="tk-lbl">GATE</div><div class="tk-val">R16</div></div>
+            <div><div class="tk-lbl">SEAT</div><div class="tk-val">2<svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true" style="width:15px;height:15px;margin-left:3px"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#a78bfa"/></svg></div></div>
           </div>
           <div class="tk-comp" id="tkComp"></div>
-          <div class="tk-foot"><span id="tkDate">7.06.26 · 5:00PM</span><span>GOING 💜</span></div>
+          <div class="tk-foot"><span id="tkDate">7.06.26 · 5:00PM</span><span class="tk-go">STATUS: GOING</span></div>
         </div>
         <div class="sharerow">
           <button class="btn primary" onclick="saveGif()">🎞️ Save GIF</button>
@@ -889,6 +928,36 @@ function foodCards(which){
   });
 }
 function scrollToMap(){var m=document.getElementById('datemap');if(m)m.scrollIntoView({behavior:'smooth',block:'start'});}
+/* ---------- Linkway Air: realistic, deterministic Code128-style barcode (window.bpBarcode) ---------- */
+(function(){
+  function lcg(seed){var s=(seed>>>0)||1;if(s===0)s=1;return function(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};}
+  window.bpBarcode=function(seed,opts){
+    opts=opts||{};
+    var h=opts.h||26, color=opts.color||'#241733', target=opts.target||168;
+    var rnd=lcg((typeof seed==='number')?seed:706);
+    var widths=[1,2,3,2,1,4,3,1,2], gaps=[1,2,1,3,1,2,1];
+    var bars='', used=0, i=0;
+    bars+='<i style="width:1px;height:'+h+'px;background:'+color+'"></i>';
+    bars+='<i style="width:1px;height:'+h+'px;background:transparent"></i>';
+    bars+='<i style="width:3px;height:'+h+'px;background:'+color+'"></i>';
+    used+=5;
+    while(used<target-7&&i<240){
+      var bw=widths[(rnd()*widths.length)|0], gw=gaps[(rnd()*gaps.length)|0];
+      bars+='<i style="width:'+bw+'px;height:'+h+'px;background:'+color+'"></i>';
+      bars+='<i style="width:'+gw+'px;height:'+h+'px;background:transparent"></i>';
+      used+=bw+gw; i++;
+    }
+    bars+='<i style="width:3px;height:'+h+'px;background:'+color+'"></i>';
+    bars+='<i style="width:1px;height:'+h+'px;background:transparent"></i>';
+    bars+='<i style="width:2px;height:'+h+'px;background:'+color+'"></i>';
+    return '<span class="bc-row" style="height:'+h+'px">'+bars+'</span>';
+  };
+  window.bpBarcodeNo=function(seed){
+    var rnd=lcg(((typeof seed==='number')?seed:706)^0x5bd1e995), s='';
+    for(var k=0;k<13;k++){if(k===4||k===9)s+=' ';s+=((rnd()*10)|0);}
+    return s;
+  };
+})();
 function go(n){
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
@@ -940,7 +1009,16 @@ function reveal(){
         `<div class="diary-row" id="diary-s${i}"></div>`+
       `</div>`+
       `<div class="bp-perf"></div>`+
-      `<div class="bp-stub"><div class="bp-seat"><span>SEAT</span><b>2 💜</b></div><div class="bp-seat"><span>GATE</span><b>R16</b></div><div class="bp-bars" aria-hidden="true"></div></div>`+
+      ('<div class="bp-stub">'+
+        '<div class="bp-air">'+
+          '<span class="bp-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 22 L17 4 C20 0.5 27 1 25.5 6 L14 22 Z" fill="#7c4dca" opacity=".92"></path><circle cx="10.5" cy="15.5" r="4.1" fill="none" stroke="#fff" stroke-width="2"></circle><circle cx="15.5" cy="15.5" r="4.1" fill="none" stroke="#fff" stroke-width="2"></circle></svg></span>'+
+          '<span class="bp-wm"><b>LINKWAY</b><i>AIR</i></span>'+
+        '</div>'+
+        '<div class="bp-code" aria-hidden="true">'+
+          window.bpBarcode(706+i,{h:28,color:"#241733",target:150})+
+          '<span class="bp-codeno">LW 0706 '+window.bpBarcodeNo(706+i)+'</span>'+
+        '</div>'+
+      '</div>')+
     `</div>`;
   }).join('');
   if(window.renderAllDiary)renderAllDiary();
@@ -955,7 +1033,7 @@ function reveal(){
 }
 venueCards();
 /* LDR arrival boarding pass on the welcome screen: editable origin, saved on her phone */
-function loadArrival(){var el=document.getElementById('apFrom');if(!el)return;var v=localStorage.getItem('wc_arrival_from');if(v)el.textContent=v;}
+function loadArrival(){var el=document.getElementById('apFrom');if(el){var v=localStorage.getItem('wc_arrival_from');if(v)el.textContent=v;}var b=document.querySelector('#arrivalPass .ap-bars');if(b&&window.bpBarcode&&!b.querySelector('.bc-row'))b.innerHTML=window.bpBarcode(706,{h:24,color:'#241733',target:300});}
 function editArrivalFrom(){var cur=localStorage.getItem('wc_arrival_from')||'';var v=prompt('where did you fly into seattle from, babu? ✈\n(city or airport code)',cur);if(v===null)return;v=v.trim().toUpperCase().slice(0,9)||'HOME';localStorage.setItem('wc_arrival_from',v);var el=document.getElementById('apFrom');if(el)el.textContent=v;}
 loadArrival();
 /* temporary: hide the cheeky closing line for ~1 hour, then it comes back on its own */
