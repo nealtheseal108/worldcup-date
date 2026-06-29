@@ -160,6 +160,24 @@
   .hero .big{font-size:46px;margin-bottom:8px}
   .hero h2{font-size:27px}
   .pill{font-family:'Courier Prime',ui-monospace,monospace;display:inline-flex;gap:7px;align-items:center;background:#efe7fb;color:var(--lav);font-weight:500;font-size:11.5px;letter-spacing:.3px;padding:6px 13px;border-radius:30px;margin-bottom:14px}
+  /* LDR arrival boarding pass on the welcome screen */
+  .arrivalpass{max-width:340px;margin:14px auto 2px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 8px 22px rgba(53,28,94,.16);font-family:'Courier Prime',ui-monospace,monospace;text-align:left}
+  .ap-head{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff}
+  .ap-air{font-weight:700;font-size:11px;letter-spacing:1px}
+  .ap-status{font-size:10.5px;font-weight:700;background:rgba(255,255,255,.22);padding:3px 9px;border-radius:20px}
+  .ap-route{display:flex;align-items:center;gap:8px;padding:13px 18px 4px}
+  .ap-port{text-align:center;min-width:56px}
+  .ap-port b{display:block;font-size:21px;font-weight:800;color:var(--ink);letter-spacing:1px}
+  .ap-port span{display:block;font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+  .ap-edit{cursor:pointer;border-bottom:2px dotted var(--lav2);padding-bottom:1px}
+  .ap-plane{flex:1;height:22px;position:relative;display:flex;align-items:center;justify-content:center}
+  .ap-plane::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #d8ccef}
+  .ap-plane i{position:relative;background:#fff;padding:0 7px;font-style:normal;font-size:15px}
+  .ap-meta{display:flex;gap:14px;padding:8px 18px 10px;margin-top:4px;border-top:1px dashed var(--line)}
+  .ap-meta div{flex:1}
+  .ap-meta span{display:block;font-size:8px;color:var(--muted);letter-spacing:.7px}
+  .ap-meta b{font-size:12px;color:#3a2a63}
+  .ap-bars{height:22px;margin:0 14px 12px;border-radius:3px;opacity:.78;background:repeating-linear-gradient(90deg,#2e1f47 0,#2e1f47 2px,transparent 2px,transparent 4px,#2e1f47 4px,#2e1f47 6.5px,transparent 6.5px,transparent 9px)}
 
   .iti-head{text-align:center;margin-bottom:14px}
   .iti-head .big{font-size:38px}
@@ -181,9 +199,11 @@
   .time .body{font-size:14px;line-height:1.5}
   .time .body b{font-size:14.5px}
   .time .body small{color:var(--muted);display:block;margin-top:2px}
-  /* boarding-pass itinerary cards that sticky-stack + overlap as you scroll */
-  #timeline{padding-bottom:30vh}
-  .bpass{position:-webkit-sticky;position:sticky;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:16px;box-shadow:0 6px 16px rgba(53,28,94,.22),0 1px 4px rgba(53,28,94,.14)}
+  /* boarding-pass itinerary: a JS-driven deck (initTimeline) — pins mid-screen, fans the tops, releases at the end */
+  #timeline{position:relative;margin:0}
+  /* fallback before/without JS: a plain readable stack; initTimeline swaps the cards to absolute */
+  .bpass{position:relative;margin-bottom:14px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10)}
+  #timeline.bp-ready .bpass{position:absolute;left:0;right:0;top:0;margin:0;transform:translateY(0);will-change:transform;-webkit-backface-visibility:hidden;backface-visibility:hidden}
   .bp-head{display:flex;align-items:center;gap:9px;height:34px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border-radius:13px 13px 0 0;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;box-shadow:0 3px 7px rgba(53,28,94,.16)}
   .bp-head:hover{filter:brightness(1.05)}
   .bp-h-time{font-weight:700;font-size:12.5px;white-space:nowrap;letter-spacing:.4px;padding-right:9px;border-right:1px solid rgba(255,255,255,.35)}
@@ -201,6 +221,11 @@
   .bp-seat span{display:block;font-size:8.5px;color:var(--muted);letter-spacing:.7px}
   .bp-seat b{font-size:14px;color:#3a2a63}
   .bp-bars{flex:1;height:26px;border-radius:3px;opacity:.8;background:repeating-linear-gradient(90deg,#2e1f47 0,#2e1f47 2px,transparent 2px,transparent 4px,#2e1f47 4px,#2e1f47 6.5px,transparent 6.5px,transparent 9px)}
+  /* in the deck, only the focused card shows its body; the rest collapse to a peeking header strip */
+  #timeline.bp-ready .bpass .bp-body,#timeline.bp-ready .bpass .bp-perf,#timeline.bp-ready .bpass .bp-stub{transition:opacity .18s ease}
+  #timeline.bp-ready .bpass.is-collapsed .bp-body,#timeline.bp-ready .bpass.is-collapsed .bp-perf,#timeline.bp-ready .bpass.is-collapsed .bp-stub{opacity:0;pointer-events:none}
+  #timeline.bp-ready .bpass.is-collapsed .bp-head{border-radius:13px}
+  @media(prefers-reduced-motion:reduce){.bpass .bp-body,.bpass .bp-perf,.bpass .bp-stub{transition:none}}
   .note{background:#fff6e0;border:1px solid #f3e2a8;border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5;margin-top:14px;color:#6b5a16}
   .safety{background:#f1ecfc;border:1px solid #ddd0f5;border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5;margin-top:12px;color:#4a3578}
   .perks{display:grid;gap:8px;margin-top:14px}
@@ -343,8 +368,22 @@
       <div class="hero">
         <div class="big">⚽💜</div>
         <div class="pill">HAPPY 8 MONTHS · ROUND OF 16 · 5 PM!</div>
+        <div class="arrivalpass" id="arrivalPass">
+          <div class="ap-head"><span class="ap-air">✈ BOARDING PASS</span><span class="ap-status">LANDED 💜</span></div>
+          <div class="ap-route">
+            <div class="ap-port"><b class="ap-edit" id="apFrom" onclick="editArrivalFrom()" title="tap to set where you flew in from">HOME</b><span>you ✈ in</span></div>
+            <div class="ap-plane"><i>✈</i></div>
+            <div class="ap-port"><b>SEA</b><span>seattle 💜</span></div>
+          </div>
+          <div class="ap-meta">
+            <div><span>PASSENGER</span><b>SIDHYA 💜</b></div>
+            <div><span>FLIGHT</span><b>WC 0706</b></div>
+            <div><span>GATE</span><b>R16</b></div>
+          </div>
+          <div class="ap-bars" aria-hidden="true"></div>
+        </div>
         <h2>hey sidhu, you get to pick our <span class="fancy">date!!</span></h2>
-        <p class="sub" style="margin-top:10px">happy 8 months babu!! 💜 i handled all the boring stuff (trains, timing, no car needed) so you just pick the fun: where we watch, what we snack on, where we eat after. you choose and i'll plan around it 🤩 let's gooo ‼️⚽</p>
+        <p class="sub" style="margin-top:10px">happy 8 months babu!! 💜 a whole lot of miles and time zones between us, and you flew across every one of them to be here ✈ a few days in seattle, and now the main event. so i turned our date into boarding passes, one for each stop. you just pick the fun (watch spot, snack, dinner) and i'll fly us there 🤩 let's gooo ‼️⚽</p>
         <input class="namein" id="nameField" value="Sidhya" maxlength="24">
       </div>
       <div class="nav"><span></span><button class="btn primary" onclick="go(1)">Let's go! →</button></div>
@@ -888,7 +927,7 @@ function reveal(){
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
-    return `<div class="bpass" style="top:${10+i*34}px;z-index:${i+2}">`+
+    return `<div class="bpass" style="z-index:${i+2}">`+
       `<div class="bp-head" onclick="scrollToPass(${i})" title="jump to this leg">`+
         `<span class="bp-h-time">✈ ${r[0]}</span>`+
         `<span class="bp-h-plan">${plan}</span>`+
@@ -907,12 +946,17 @@ function reveal(){
   document.getElementById('safetyBox').innerHTML='🛟 <b>Good to know:</b> '+v.safety+
     ' If the US is playing, expect the biggest crowds of the tournament, so we get there early and post up near an exit!';
   document.getElementById('reserveNote').innerHTML =
-    '✅ <b>all booked babu!</b> 💜 i already sorted our 7:30 table at '+pick.after.t+'. nothing to plan or pay for tonight, just show up and enjoy. i got you.';
+    '🗺️ <b>your whole night, mapped out babu.</b> 💜 i planned every train and every stop so there is nothing for you to figure out, just show up and we follow the plan together. '+pick.after.t+' is walk-in, so worst case we wait a few mins for a table, totally worth it. i got you. 💜';
   go(4);
+  if(window.initTimeline){requestAnimationFrame(window.initTimeline);setTimeout(window.initTimeline,140);}
   applyCheekyGate();
   checkDateEnding();
 }
 venueCards();
+/* LDR arrival boarding pass on the welcome screen: editable origin, saved on her phone */
+function loadArrival(){var el=document.getElementById('apFrom');if(!el)return;var v=localStorage.getItem('wc_arrival_from');if(v)el.textContent=v;}
+function editArrivalFrom(){var cur=localStorage.getItem('wc_arrival_from')||'';var v=prompt('where did you fly into seattle from, babu? ✈\n(city or airport code)',cur);if(v===null)return;v=v.trim().toUpperCase().slice(0,9)||'HOME';localStorage.setItem('wc_arrival_from',v);var el=document.getElementById('apFrom');if(el)el.textContent=v;}
+loadArrival();
 /* temporary: hide the cheeky closing line for ~1 hour, then it comes back on its own */
 var CHEEKY_HIDE_UNTIL=1782457721986; /* Thu Jun 25 2026 ~00:08 PDT (1h from when this was set) */
 function applyCheekyGate(){var el=document.getElementById('cheekyLine');if(el)el.style.display=(Date.now()<CHEEKY_HIDE_UNTIL)?'none':'';}
@@ -1375,7 +1419,7 @@ function renderDiary(sec){
     }).join('');
   });
 }
-function renderAllDiary(){document.querySelectorAll('[id^="diary-s"]').forEach(function(b){renderDiary(b.id.replace('diary-',''));});}
+function renderAllDiary(){document.querySelectorAll('[id^="diary-s"]').forEach(function(b){renderDiary(b.id.replace('diary-',''));});var tl=document.getElementById('timeline');if(tl&&tl.__bpMeasure)tl.__bpMeasure();}
 function openRecord(i){
   diaryCurSec='s'+i;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){hint('recording needs a phone/browser with camera support 💜');return;}
@@ -1525,13 +1569,64 @@ function checkDateEnding(){var el=document.getElementById('endCard');if(el)el.st
 setInterval(checkDateEnding,30000);   /* so it pops up live if she's already on the reveal at 9:30 */
 /* TEST: open the site with ?end=1 to force the 9:30 state on a sample reveal */
 if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
-/* tap a stacked boarding-pass header to scroll back up to that leg */
+/* ---------- boarding-pass deck: JS-driven stack — pins mid-screen, fans the tops, releases at the end ---------- */
+/* tap a stacked boarding-pass header to fly to that leg */
 function scrollToPass(i){
-  var c=document.querySelectorAll('#timeline .bpass')[i]; if(!c)return;
-  var pinned=10+i*34;   // matches the inline sticky top
-  var abs=c.getBoundingClientRect().top+window.scrollY;
-  window.scrollTo({top:Math.max(0,abs-pinned-6),behavior:'smooth'});
+  var TL=document.getElementById('timeline'); if(!TL)return;
+  var cards=TL.querySelectorAll('.bpass'); if(!cards.length)return;
+  if(i<0)i=0; if(i>cards.length-1)i=cards.length-1;
+  var SLOT=parseFloat(TL.dataset.slot)||Math.round((window.innerHeight||800)*0.5);
+  var tlTop=TL.getBoundingClientRect().top+(window.scrollY||window.pageYOffset||0);
+  window.scrollTo({top:Math.max(0,tlTop+i*SLOT),behavior:'smooth'});  /* local=i*SLOT => leg i lands on the mid pin */
 }
+function bpBindGlobal(){
+  if(window.__bpBound)return; window.__bpBound=true;
+  var raf=0;
+  function tick(){raf=0;var tl=document.getElementById('timeline');if(tl&&tl.__bpLayout)tl.__bpLayout();}
+  window.addEventListener('scroll',function(){if(!raf)raf=requestAnimationFrame(tick);},{passive:true});
+  var rt;
+  window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){var tl=document.getElementById('timeline');if(tl&&tl.__bpMeasure)tl.__bpMeasure();},120);},{passive:true});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){var tl=document.getElementById('timeline');if(tl&&tl.__bpMeasure)tl.__bpMeasure();});
+}
+window.initTimeline=function(){
+  var TL=document.getElementById('timeline'); if(!TL)return;
+  TL.classList.add('bp-ready');
+  var cards=[].slice.call(TL.querySelectorAll('.bpass'));
+  var N=cards.length; if(!N)return;
+  var PEEK=28,H=[],SLOT=0,midY=0,total=0,ready=false;
+  function measure(){
+    var vh=window.innerHeight||document.documentElement.clientHeight,i,maxH=0;
+    for(i=0;i<N;i++){cards[i].style.transform='none';cards[i].classList.remove('is-collapsed');}
+    for(i=0;i<N;i++){H[i]=cards[i].offsetHeight;if(H[i]>maxH)maxH=H[i];}
+    if(maxH===0){ready=false;return;}            /* still hidden -> retry when the reveal is visible */
+    SLOT=Math.max(maxH+40,Math.round(vh*0.5));
+    midY=Math.round(vh*0.28);
+    total=(N-1)*SLOT+Math.max(vh,midY+H[N-1]+28);
+    TL.style.height=total+'px'; TL.dataset.slot=SLOT;
+    ready=true;
+  }
+  function layout(){
+    if(!ready){measure();if(!ready)return;}
+    var sc=window.scrollY||window.pageYOffset||0;
+    var tlTop=TL.getBoundingClientRect().top+sc;
+    var f=(sc-tlTop)/SLOT; if(f<0)f=0; if(f>N-1)f=N-1;
+    var fi=Math.round(f),i;
+    for(i=0;i<N;i++){
+      var vy;
+      if(i<fi){vy=midY-PEEK*(fi-i);if(vy<8)vy=8;}
+      else if(i===fi){vy=midY;}
+      else{vy=midY+H[fi]+(i-fi-1)*PEEK;}
+      var docY=sc+vy-tlTop;
+      if(docY<0)docY=0;
+      var maxY=total-H[i]; if(docY>maxY)docY=maxY;    /* clamp: enters at the top, releases at the bottom so content below scrolls free */
+      cards[i].style.transform='translateY('+Math.round(docY)+'px)';
+      cards[i].classList.toggle('is-collapsed',i!==fi);
+      cards[i].style.zIndex=(i<=fi)?(200+i):(200+(N-i));
+    }
+  }
+  TL.__bpLayout=layout; TL.__bpMeasure=function(){measure();layout();};
+  measure(); layout(); bpBindGlobal();
+};
 </script>
 <div id="ythost"></div>
 <div id="playerbar" role="region" aria-label="Music player">
