@@ -43,6 +43,12 @@
   .maplink:hover{background:#e7ddf7}
   .addspot{display:inline-flex;align-items:center;gap:5px;margin:0 0 16px 8px;padding:8px 15px;border:1px dashed var(--lav2);border-radius:30px;background:#fff;color:#6a4fb0;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
   .addspot:hover{background:#f1ecfc}
+  .aclist{margin:6px 0 2px;border:1px solid var(--line);border-radius:11px;overflow:hidden;max-height:228px;overflow-y:auto;background:#fff;text-align:left}
+  .acrow{padding:9px 13px;cursor:pointer;border-bottom:1px solid #f1ecfa}
+  .acrow:last-child{border-bottom:none}
+  .acrow:hover{background:#f4eefc}
+  .acname{font-weight:700;font-size:13.5px;color:#3a2a63;line-height:1.2}
+  .acarea{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;color:var(--muted);margin-top:2px}
   .statlist{display:flex;flex-direction:column;gap:12px;max-height:48vh;overflow:auto;margin:8px 0 4px;padding-right:2px}
   .stat-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:baseline}
   .stat-name{font-size:13px;color:#3a2a63;font-weight:700;line-height:1.25}
@@ -725,12 +731,38 @@ function geocodePlace(input){
     var at=input.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/), dm=input.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
     if(dm)return resolve({name:_cleanName(nm),lat:+dm[1],lng:+dm[2]});
     if(at)return resolve({name:_cleanName(nm),lat:+at[1],lng:+at[2]});
-    var q=encodeURIComponent((input.replace(/https?:\/\/\S+/g,'').trim())||nm);
-    fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&viewbox=-122.46,47.80,-121.98,47.40&bounded=1&q='+q)
-      .then(function(r){return r.ok?r.json():[];})
-      .then(function(a){ if(a&&a[0]){resolve({name:_cleanName((gm||!/^https?:/i.test(input))?nm:(a[0].name||a[0].display_name.split(',')[0])),lat:+a[0].lat,lng:+a[0].lon});} else resolve(null); })
+    var q=(input.replace(/https?:\/\/\S+/g,'').trim())||nm;
+    fetch(photonURL(q,1))
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){ var f=d&&d.features&&d.features[0]; if(f){resolve({name:_cleanName((gm||!/^https?:/i.test(input))?nm:(f.properties.name||f.properties.street||q)),lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0]});} else resolve(null); })
       .catch(function(){resolve(null);});
   });
+}
+function photonURL(q,limit){return 'https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&limit='+(limit||6)+'&lat=47.61&lon=-122.33&bbox=-122.46,47.40,-121.98,47.80';}
+/* type-ahead dropdown for the add-a-place input (Photon = OSM autocomplete) */
+var _acTimer=null, _acItems=[];
+function _escAC(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function acName(f){var p=f.properties||{};return p.name||p.street||p.city||'pin';}
+function acArea(f){var p=f.properties||{};var bits=[];if(p.name&&p.street)bits.push(p.street);if(p.city)bits.push(p.city);if(p.state&&p.state!==p.city)bits.push(p.state);return bits.join(', ');}
+function acRender(items){
+  var box=document.getElementById('addPlaceList'); if(!box)return;
+  if(!items||!items.length){box.innerHTML='';box.style.display='none';return;}
+  box.style.display='';
+  box.innerHTML=items.map(function(f,i){return '<div class="acrow" onclick="acPick('+i+')"><div class="acname">'+_escAC(acName(f))+'</div><div class="acarea">📍 '+_escAC(acArea(f))+'</div></div>';}).join('');
+}
+function placeSuggestInput(){
+  var v=document.getElementById('addPlaceInput').value.trim();
+  clearTimeout(_acTimer);
+  if(v.length<3 || /^https?:/i.test(v)){acRender([]);return;}   // links don't need suggestions
+  _acTimer=setTimeout(function(){
+    fetch(photonURL(v,6)).then(function(r){return r.ok?r.json():null;}).then(function(d){_acItems=(d&&d.features)||[];acRender(_acItems);}).catch(function(){acRender([]);});
+  },380);
+}
+function acPick(i){
+  var f=_acItems[i]; if(!f)return;
+  var name=_cleanName(acName(f));
+  addUserPlace(_addKind, {name:name, lat:f.geometry.coordinates[1], lng:f.geometry.coordinates[0]});
+  closeAddPlace(); hint('added '+name+' 💜 it\'s on the map now');
 }
 function USER_VENUE_ART(){return '<svg class="art" viewBox="0 0 400 118" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="118" fill="#9b72e8"/><circle cx="334" cy="32" r="13" fill="#ffe6a8" opacity=".8"/><g fill="#5e3aa6"><rect x="56" y="52" width="32" height="66"/><rect x="104" y="40" width="38" height="78"/><rect x="158" y="60" width="28" height="58"/><rect x="250" y="46" width="36" height="72"/><rect x="298" y="62" width="26" height="56"/></g><g transform="translate(200,42)"><path d="M0 -20 C13 -20 22 -10 22 2 C22 18 0 38 0 38 C0 38 -22 18 -22 2 C-22 -10 -13 -20 0 -20 Z" fill="#fff"/><path d="M0 10 C-7 1 -13 -4 -13 -10 C-13 -14 -9 -16 -5 -14 C-2 -12 0 -8 0 -8 C0 -8 2 -12 5 -14 C9 -16 13 -14 13 -10 C13 -4 7 1 0 10 Z" fill="#7c4dca"/></g><g fill="#4e2f8f"><g transform="translate(44,0)"><circle cx="0" cy="102" r="6"/><path d="M-8 118 L-7 110 Q0 105 7 110 L8 118 Z"/></g><g transform="translate(356,0)"><circle cx="0" cy="102" r="6"/><path d="M-8 118 L-7 110 Q0 105 7 110 L8 118 Z"/></g></g></svg>';}
 function addUserPlace(kind, p, skipSave){
@@ -762,10 +794,10 @@ function loadUserPlaces(){try{var o=JSON.parse(localStorage.getItem('wc_user_pla
 }catch(e){}}
 function addPlace(kind){_addKind=kind||'during';
   document.getElementById('addPlaceTitle').textContent= kind==='venue'?'➕ add a watch spot':(kind==='after'?'➕ add a dinner spot':'➕ add a snack spot');
-  var i=document.getElementById('addPlaceInput'); i.value=''; document.getElementById('addPlaceErr').textContent='';
+  var i=document.getElementById('addPlaceInput'); i.value=''; document.getElementById('addPlaceErr').textContent=''; acRender([]);
   document.getElementById('addPlaceModal').style.display='flex'; setTimeout(function(){i.focus();},40);
 }
-function closeAddPlace(){var m=document.getElementById('addPlaceModal');if(m)m.style.display='none';}
+function closeAddPlace(){clearTimeout(_acTimer);acRender([]);var m=document.getElementById('addPlaceModal');if(m)m.style.display='none';}
 function confirmAddPlace(){
   var inp=document.getElementById('addPlaceInput'), err=document.getElementById('addPlaceErr'), btn=document.getElementById('addPlaceBtn');
   var v=(inp.value||'').trim(); if(!v){err.textContent='type a name or paste a maps link 💜';return;}
@@ -1481,7 +1513,8 @@ if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function
   <div class="modal-card">
     <div class="modal-title" id="addPlaceTitle">➕ add a spot</div>
     <div class="modal-sub">type a place name or paste a google maps link, i'll pin it on the map + drop it in the list 💜</div>
-    <input id="addPlaceInput" class="modal-input" type="text" placeholder="e.g. Spinasse   or   a maps link" onkeydown="if(event.key==='Enter')confirmAddPlace()">
+    <input id="addPlaceInput" class="modal-input" type="text" autocomplete="off" placeholder="start typing a name… or paste a maps link" oninput="placeSuggestInput()" onkeydown="if(event.key==='Enter')confirmAddPlace()">
+    <div class="aclist" id="addPlaceList" style="display:none"></div>
     <div class="modal-err" id="addPlaceErr"></div>
     <div class="modal-row">
       <button class="btn ghost" onclick="closeAddPlace()">cancel</button>
