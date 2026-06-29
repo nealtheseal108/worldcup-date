@@ -35,13 +35,13 @@
   .datemap{display:none;background:var(--paper);border-radius:16px;padding:14px 14px 14px;box-shadow:0 10px 30px rgba(53,28,94,.22);margin:16px 0 40px}
   body.mapview .datemap{display:block}
   .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin:2px 0 12px}
-  #leafmap{height:340px;border-radius:13px;overflow:hidden;background:#efeaf7}
-  @media(max-width:600px){#leafmap{height:280px}}
+  #leafmap{height:min(340px,52vh);border-radius:13px;overflow:hidden;background:#efeaf7}
+  @media(max-width:600px){#leafmap{height:min(280px,48vh)}}
   @keyframes worm{to{stroke-dashoffset:-44}}
   .wormline{stroke-dasharray:2 9;animation:worm 4s linear infinite}
   .maplink{display:inline-flex;align-items:center;gap:6px;margin:0 0 16px;padding:8px 15px;border:1px solid var(--line);border-radius:30px;background:#f1ecfc;color:#5a3fb0;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
   .maplink:hover{background:#e7ddf7}
-  .addspot{display:inline-flex;align-items:center;gap:5px;margin:0 0 16px 8px;padding:8px 15px;border:1px dashed var(--lav2);border-radius:30px;background:#fff;color:#6a4fb0;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .addspot{display:inline-flex;align-items:center;gap:5px;margin:16px 0 16px 8px;padding:8px 15px;border:1px dashed var(--lav2);border-radius:30px;background:#fff;color:#6a4fb0;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
   .addspot:hover{background:#f1ecfc}
   .aclist{margin:6px 0 2px;border:1px solid var(--line);border-radius:11px;overflow:hidden;max-height:228px;overflow-y:auto;background:#fff;text-align:left}
   .acrow{padding:9px 13px;cursor:pointer;border-bottom:1px solid #f1ecfa}
@@ -913,8 +913,9 @@ function reveal(){
   const tk = ` ${name.toUpperCase()} ♥ NEAL · 8 MONTHS · JULY 6 2026 · WORLD CUP R16 · ${MATCHUP} ·`;
   document.getElementById('tkTicker').textContent = tk.repeat(6);
 
+  var arriveAt=(typeof VENUE_LL!=='undefined'&&VENUE_LL[pick.venue])?nearestStationName(VENUE_LL[pick.venue]):'Westlake';
   const rows=[
-    ['~3:45 PM','<b>Arrive Westlake together.</b>', v.transferLine],
+    ['~3:45 PM','<b>Arrive '+arriveAt+' together.</b>', v.transferLine],
     ['4:00 PM',`<b>Snack: ${pick.during.t}!</b>`, pick.during.d+' Then clear security and find a great spot.'],
     ['5:00 PM','<b>Kickoff, Round of 16! ⚽</b>','Watch party at '+v.name+'. Jerseys on! 💜'],
     ['~6:55 PM','<b>full time!</b>','wraps up around 6:55. soak up the vibes, grab some pics, and let the first crowd wave clear out (a lil later if it goes to extra time + pens).'],
@@ -996,6 +997,8 @@ var LINK_2LINE=[
 var NEAL_LINK=[START_NEAL,[47.6680,-122.0950],MARYMOOR,REDMOND_TECH];
 var SIDHYA_LINK=[START_SIDHYA,REDMOND_TECH];
 function nearestLinkIdx(ll){var b=0,bd=1e9;for(var i=0;i<LINK_2LINE.length;i++){var dx=LINK_2LINE[i][0]-ll[0],dy=LINK_2LINE[i][1]-ll[1],d=dx*dx+dy*dy;if(d<bd){bd=d;b=i;}}return b;}
+/* the name of the 2 Line station we get OFF at for a given spot (keeps the boarding-pass header honest with the route) */
+function nearestStationName(ll){var nm='Westlake',bd=1e9;for(var i=0;i<LINK_STATIONS.length;i++){var dx=LINK_STATIONS[i].ll[0]-ll[0],dy=LINK_STATIONS[i].ll[1]-ll[1],d=dx*dx+dy*dy;if(d<bd){bd=d;nm=LINK_STATIONS[i].n;}}return nm;}
 // the actual 2 Line stations we pass through (tiny ticks on the map; hover/tap for the name)
 var LINK_STATIONS=[
   {n:'Marymoor Village',ll:MARYMOOR},
