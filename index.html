@@ -305,6 +305,31 @@
   .tk-foot{display:flex;justify-content:space-between;align-items:center;font-family:'Courier New',monospace;font-size:11px;color:#7c7595;letter-spacing:1px}
   .tk-go{color:#0e1116;background:#cdbdf7;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:1px}
   .capturing .tk-track{animation:none!important;transform:none!important}
+  /* square shareable boarding pass + scan QR */
+  .ticket{aspect-ratio:1/1;display:flex;flex-direction:column;justify-content:space-between;padding:15px 17px}
+  .ticket .tk-title{font-size:22px;line-height:1.12;margin:0}
+  .ticket .tk-pick{margin:0}
+  .ticket .tk-pickname{font-size:19px}
+  .ticket .tk-flapwrap{margin:0 -17px}
+  .tk-stub{display:flex;align-items:center;gap:13px;border-top:2px dashed #333a47;padding-top:11px}
+  .tk-stubL{flex:1;min-width:0}
+  .tk-minis{display:flex;gap:15px}
+  .tk-mini span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-size:8px;letter-spacing:1.4px;color:#8a82a6;font-weight:700;margin-bottom:2px}
+  .tk-mini b{display:flex;align-items:center;font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:800;color:#fff;line-height:1}
+  .tk-scan{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:.4px;color:#ffd166;font-weight:700;margin-top:10px}
+  .tk-stub .tk-foot{margin-top:8px}
+  .tk-qr{width:90px;height:90px;flex:none;background:#fff;border-radius:9px;padding:6px;box-sizing:border-box}
+  .tk-qr img{width:100%;height:100%;display:block;image-rendering:pixelated}
+  /* scannable easter-egg surprise overlay */
+  .egg{position:fixed;inset:0;z-index:200;background:linear-gradient(160deg,#6a3fc0,#9b72e8);display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
+  .egg-hearts{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .egg-hearts i{position:absolute;bottom:-44px;font-style:normal;opacity:.85;animation:eggrise linear infinite}
+  @keyframes eggrise{to{transform:translateY(-122vh) rotate(35deg);opacity:0}}
+  .egg-card{position:relative;z-index:2;background:rgba(255,255,255,.97);border-radius:20px;padding:32px 26px;max-width:360px;text-align:center;box-shadow:0 24px 60px rgba(40,20,70,.5)}
+  .egg-emoji{font-size:46px;line-height:1}
+  .egg-h{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:32px;color:var(--lav);margin:8px 0 14px}
+  .egg-msg{color:var(--ink);font-size:15px;line-height:1.6;margin:0}
+  .egg-sig{font-family:'Courier Prime',ui-monospace,monospace;color:var(--muted);letter-spacing:1px;margin:16px 0 20px;font-size:12.5px}
   .sharerow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
   .sharerow .btn{flex:1;min-width:104px}
   .lav2btn{background:#efe7fb;color:#5e3aa6}
@@ -479,12 +504,6 @@
               <div class="tk-cat"><span class="tk-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 22 L17 4 C20 0.5 27 1 25.5 6 L14 22 Z" fill="#ffd166" opacity=".95"/><circle cx="10.5" cy="15.5" r="4.1" fill="none" stroke="#0e1116" stroke-width="2"/><circle cx="15.5" cy="15.5" r="4.1" fill="none" stroke="#0e1116" stroke-width="2"/></svg></span>GANESH AIR</div>
               <div class="tk-status">● BOARDING</div>
             </div>
-            <div class="tk-route">
-              <div class="tk-rcol"><b>HOME</b><span>ORIGIN</span></div>
-              <div class="tk-rmid"><span class="tk-rline"></span><span class="tk-rplane">✈</span></div>
-              <div class="tk-rcol tk-rcol-r"><b>SEA</b><span>LUMEN FIELD</span></div>
-            </div>
-            <div class="tk-divider"></div>
           </div>
           <div class="tk-title">I'm going with my <span class="fancy" style="color:#cdbdf7">boyfriend</span>!</div>
           <div class="tk-pick">
@@ -495,13 +514,19 @@
             <div class="tk-picksub">World Cup R16 · Sidhu <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#c9b6f5"/></svg> Neal</div></div>
           </div>
           <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
-          <div class="tk-stats">
-            <div><div class="tk-lbl">KICKOFF</div><div class="tk-val">5:00<span>PM</span></div></div>
-            <div><div class="tk-lbl">GATE</div><div class="tk-val">R16</div></div>
-            <div><div class="tk-lbl">SEAT</div><div class="tk-val">2<svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true" style="width:15px;height:15px;margin-left:3px"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#a78bfa"/></svg></div></div>
+          <div class="tk-stub">
+            <div class="tk-stubL">
+              <div class="tk-minis">
+                <div class="tk-mini"><span>KICKOFF</span><b>5:00 PM</b></div>
+                <div class="tk-mini"><span>GATE</span><b>R16</b></div>
+                <div class="tk-mini"><span>SEAT</span><b>2 <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true" style="width:13px;height:13px;margin-left:2px"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#a78bfa"/></svg></b></div>
+              </div>
+              <div class="tk-scan">↓ scan me for a lil surprise</div>
+              <div class="tk-foot"><span id="tkDate">7.06.26 · 5:00PM</span><span class="tk-go">GOING</span></div>
+            </div>
+            <div class="tk-qr" id="shareQR" aria-hidden="true"></div>
           </div>
-          <div class="tk-comp" id="tkComp"></div>
-          <div class="tk-foot"><span id="tkDate">7.06.26 · 5:00PM</span><span class="tk-go">STATUS: GOING</span></div>
+          <div class="tk-comp" id="tkComp" style="display:none"></div>
         </div>
         <div class="sharerow">
           <button class="btn primary" onclick="saveGif()">🎞️ Save GIF</button>
@@ -1016,6 +1041,7 @@ function reveal(){
     `MATCH&nbsp;&nbsp;<b>${MATCHUP}</b><br>WATCH&nbsp;&nbsp;<b>${v.short}</b><br>SNACK&nbsp;&nbsp;<b>${pick.during.t}</b><br>DINNER&nbsp;<b>${pick.after.t}</b>`;
   const tk = ` ${name.toUpperCase()} ♥ NEAL · 8 MONTHS · JULY 6 2026 · WORLD CUP R16 · ${MATCHUP} ·`;
   document.getElementById('tkTicker').textContent = tk.repeat(6);
+  makeQR();
 
   var arriveAt=(typeof VENUE_LL!=='undefined'&&VENUE_LL[pick.venue])?nearestStationName(VENUE_LL[pick.venue]):'Westlake';
   const rows=[
@@ -1050,8 +1076,8 @@ function reveal(){
           '<span class="bp-wm"><b>GANESH</b><i>AIR</i></span>'+
         '</div>'+
         '<div class="bp-code" aria-hidden="true">'+
-          window.bpBarcode(706+i,{h:28,color:"#241733",target:150})+
-          '<span class="bp-codeno">GA 0706 '+window.bpBarcodeNo(706+i)+'</span>'+
+          window.bpBarcode((i+1)*7919+1373,{h:28,color:"#241733",target:150})+
+          '<span class="bp-codeno">GA 0706 '+window.bpBarcodeNo((i+1)*7919+1373)+'</span>'+
         '</div>'+
       '</div>')+
     `</div>`;
@@ -1711,6 +1737,24 @@ function editReturn(){
   var d=prompt('what day do you fly home, babu? 💜 (e.g. 9 JUL)',rd);
   if(d!==null){d=d.trim().toUpperCase().slice(0,12)||'tap to set';localStorage.setItem('wc_return_date',d);var dt=document.getElementById('apBackDate');if(dt)dt.textContent=d;}
 }
+/* scannable QR on the shareable card -> opens the easter egg */
+var EGG_URL='https://worldcup-date.onrender.com/?egg=1';
+function makeQR(){
+  var el=document.getElementById('shareQR'); if(!el||el.getAttribute('data-done')==='1')return;
+  if(typeof qrcode==='undefined'){setTimeout(makeQR,400);return;}
+  try{var qr=qrcode(0,'M');qr.addData(EGG_URL);qr.make();
+    el.innerHTML=qr.createImgTag(4,4);   /* 4-module quiet zone baked in -> scans reliably from the saved photo */
+    var img=el.querySelector('img');if(img){img.removeAttribute('width');img.removeAttribute('height');img.style.cssText='width:100%;height:100%;display:block;image-rendering:pixelated';}
+    el.setAttribute('data-done','1');
+  }catch(e){}
+}
+/* the easter egg itself */
+function spawnEggHearts(){var h=document.getElementById('eggHearts');if(!h||h.children.length)return;var e=['💜','💛','🤍','💜','💚'],s='';
+  for(var i=0;i<18;i++){var l=(i*5.6+2)%100;s+='<i style="left:'+l.toFixed(1)+'%;font-size:'+(16+(i%4)*5)+'px;animation-duration:'+(4+(i%5))+'s;animation-delay:'+((i*0.33)%5).toFixed(2)+'s">'+e[i%e.length]+'</i>';}
+  h.innerHTML=s;}
+function showEgg(){var o=document.getElementById('eggOverlay');if(!o)return;spawnEggHearts();o.style.display='flex';}
+function hideEgg(){var o=document.getElementById('eggOverlay');if(o)o.style.display='none';}
+if(/[?&]egg/.test(location.search)||/egg/.test(location.hash)){setTimeout(showEgg,350);}
 /* TEST: open the site with ?end=1 to force the 9:30 state on a sample reveal */
 if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
 /* ---------- boarding-pass deck: JS-driven stack — pins mid-screen, fans the tops, releases at the end ---------- */
@@ -1850,7 +1894,18 @@ window.initTimeline=function(){
     <button class="btn primary" id="movieDownload" onclick="exportMovie()">⬇ save the movie</button>
   </div>
 </div>
+<div id="eggOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideEgg()">
+  <div class="egg-hearts" id="eggHearts" aria-hidden="true"></div>
+  <div class="egg-card">
+    <div class="egg-emoji">💜</div>
+    <h2 class="egg-h">you found it, babu</h2>
+    <p class="egg-msg" id="eggMsg">8 months, a few thousand miles, and somehow always you. i'd take every flight and every long way home, as long as it ends with you. happy anniversary 💜 here's to the round of 16, and every round after.</p>
+    <div class="egg-sig">💜 always, neal</div>
+    <button class="btn primary" type="button" onclick="hideEgg()">back to our date ✨</button>
+  </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
