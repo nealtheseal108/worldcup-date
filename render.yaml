@@ -5,6 +5,10 @@ services:
     buildCommand: ""
     staticPublishPath: .
     routes:
+      # serve the real robots.txt (don't let the SPA catch-all below rewrite it to index.html)
+      - type: rewrite
+        source: /robots.txt
+        destination: /robots.txt
       - type: rewrite
         source: /*
         destination: /index.html
