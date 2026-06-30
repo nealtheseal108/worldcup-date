@@ -218,12 +218,6 @@
   /* native sticky STACK: each card pins a bit lower than the last (top = 10 + i*40), so the deck piles up
      SMOOTHLY as you scroll (browser sticky = compositor, no JS) and earlier legs' header tops peek above */
   .bpass{position:-webkit-sticky;position:sticky;top:calc(10px + var(--bpi,0) * 40px);background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
-  /* DEPTH on the pile: earlier legs sit a touch smaller + dimmer (recede behind), the current/later
-     legs come forward — so the stack reads as a real 3D deck as it piles. Keyed off the inline --bpi
-     (0..7; 7 = last/front leg). transform/filter ONLY (never position) so the native sticky stack above
-     is untouched and the effect is fully deletable. Compositor-only, works on every iOS Safari. */
-  .bpass{transform-origin:top center;transform:scale(calc(1 - (7 - var(--bpi,0)) * 0.010));filter:brightness(calc(1 - (7 - var(--bpi,0)) * 0.004));transition:transform .35s cubic-bezier(.22,.61,.36,1),filter .35s ease}
-  @media(prefers-reduced-motion:reduce){.bpass{transform:none;filter:none;transition:none}}
   .bp-head{display:flex;align-items:center;gap:9px;height:34px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border-radius:13px 13px 0 0;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;box-shadow:0 3px 7px rgba(53,28,94,.16)}
   .bp-head:hover{filter:brightness(1.05)}
   .bp-h-time{font-weight:700;font-size:12.5px;white-space:nowrap;letter-spacing:.4px;padding-right:9px;border-right:1px solid rgba(255,255,255,.35)}
@@ -243,8 +237,10 @@
   .bp-wm{font-family:'Inter',system-ui,sans-serif;line-height:.95}
   .bp-wm b{display:block;font-size:11px;font-weight:800;letter-spacing:.6px;color:#2e1f47}
   .bp-wm i{display:block;font-style:normal;font-size:8px;font-weight:800;letter-spacing:2.4px;color:var(--lav)}
-  .bp-code{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px;overflow:hidden}
+  .bp-code{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px;overflow:hidden;cursor:pointer}
+  .bp-code:hover .bp-scan{color:var(--lav2)}
   .bp-codeno{font-family:'Courier Prime',ui-monospace,monospace;font-size:8px;letter-spacing:1.4px;color:var(--muted);white-space:nowrap}
+  .bp-scan{font-family:'Courier Prime',ui-monospace,monospace;font-size:7.5px;letter-spacing:.6px;color:var(--lav);font-weight:700;white-space:nowrap}
   /* shared barcode primitives (stub, arrival pass, share card) */
   .bc-row{display:flex;align-items:flex-end;gap:0;line-height:0}
   .bc-row i{display:inline-block;flex:none}
@@ -303,7 +299,7 @@
   .capturing .tk-track{animation:none!important;transform:none!important}
   .tk-stub{display:flex;align-items:center;gap:13px;padding:12px 17px 14px;flex:none}
   .tk-stubL{flex:1;min-width:0}
-  .tk-stubL .bc-row{height:30px}
+  .tk-stubL .bc-row{height:58px}
   .tk-scan{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:.2px;color:var(--lav);font-weight:700;margin-top:8px}
   .tk-qr{width:84px;height:84px;flex:none;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px;box-sizing:border-box}
   .tk-qr img{width:100%;height:100%;display:block;image-rendering:pixelated}
@@ -455,7 +451,7 @@
     <section class="step" id="step2">
       <div class="eyebrow">Step 2 of 3</div>
       <h2>pick our game-time snack babu!</h2>
-      <p class="sub">something yummy AND healthy to fuel the match. easy on the wallet, grab it before kickoff ‼️</p>
+      <p class="sub">something yummy AND healthy to fuel the match. easy on the wallet, we tuck into it during the first half ‼️</p>
       <button class="maplink" type="button" onclick="scrollToMap()">🗺️ peek our route ↓</button>
       <button class="addspot" type="button" onclick="addPlace('during')">➕ add your own snack</button>
       <div class="cards" id="duringCards"></div>
@@ -510,14 +506,14 @@
           <div class="tk-stub">
             <div class="tk-stubL">
               <div class="bc-row" id="tkBars" aria-hidden="true"></div>
-              <div class="tk-scan">↓ scan the code for a lil surprise 💜</div>
+              <div class="tk-scan">↓ scan for a lil surprise 💜</div>
             </div>
             <div class="tk-qr" id="shareQR" aria-hidden="true"></div>
           </div>
         </div>
         <div class="sharerow">
           <button class="btn primary" onclick="saveGif()">🎟️ Save boarding pass</button>
-          <button class="btn lav2btn" onclick="shareCard()">📤 Open boarding pass</button>
+          <button class="btn lav2btn" onclick="shareCard()">📤 Share boarding pass</button>
         </div>
         <div class="sharehint" id="shareHint">Save it, then drop it into WhatsApp or iMessage 💜</div>
       </div>
@@ -526,7 +522,7 @@
         <div class="big">📋💜</div>
         <h2 id="itiTitle">Our Big Date!</h2>
         <div class="venue" id="itiVenue"></div>
-        <div class="lovenote">made this for you sidhu 💜 love you more than anyone</div>
+        <div class="lovenote">made this for you sidhu 💜&nbsp;&nbsp;love you more than anyone</div>
         <div class="sub" style="margin-top:6px">Monday, July 6, 2026 · Round of 16 · Kickoff 5:00 PM · Full time ~6:55 PM</div>
         <div class="wxcard" id="wxcard">☁️ checking the forecast...</div>
       </div>
@@ -1087,9 +1083,10 @@ function reveal(){
 
   var arriveAt=(typeof VENUE_LL!=='undefined'&&VENUE_LL[pick.venue])?nearestStationName(VENUE_LL[pick.venue]):'Westlake';
   const rows=[
-    ['~3:45 PM','<b>Arrive '+arriveAt+' together.</b>', v.transferLine],
-    ['4:00 PM',`<b>Snack: ${pick.during.t}!</b>`, pick.during.d+' Then clear security and find a great spot.'],
+    ['~4:00 PM','<b>Meet at Redmond Tech Station.</b>', "i'm rolling in from Sammamish; you get there by car or the B Line from Crossroads. we tap onto the 2 Line together and we're off 💜"],
+    ['~4:45 PM','<b>Arrive '+arriveAt+'.</b>', v.transferLine],
     ['5:00 PM','<b>Kickoff, Round of 16! ⚽</b>','Watch party at '+v.name+'. Jerseys on! 💜'],
+    ['~5:20 PM',`<b>First-half snack: ${pick.during.t}!</b>`, pick.during.d+' we tuck into it once the first half is underway.'],
     ['~6:55 PM','<b>full time!</b>','wraps up around 6:55. soak up the vibes, grab some pics, and let the first crowd wave clear out (a lil later if it goes to extra time + pens).'],
     ['7:30 PM',`<b>Dinner: ${pick.after.t}!</b>`, pick.after.d],
     ['~9:00 PM','<b>Free Salt &amp; Straw 🍦</b>','We hop off in Bellevue Downtown and cash in our free Salt &amp; Straw. Two spoons, one cup, zero regrets.'],
@@ -1117,9 +1114,10 @@ function reveal(){
           '<span class="bp-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 22 L17 4 C20 0.5 27 1 25.5 6 L14 22 Z" fill="#7c4dca" opacity=".92"></path><circle cx="10.5" cy="15.5" r="4.1" fill="none" stroke="#7c4dca" stroke-width="2"></circle><circle cx="15.5" cy="15.5" r="4.1" fill="none" stroke="#7c4dca" stroke-width="2"></circle></svg></span>'+
           '<span class="bp-wm"><b>GANESH</b><i>AIR</i></span>'+
         '</div>'+
-        '<div class="bp-code" aria-hidden="true">'+
+        '<div class="bp-code" role="button" title="tap to scan 💜" onclick="showEgg()">'+
           window.bpBarcode((i+1)*7919+1373,{h:28,color:"#241733",target:150})+
           '<span class="bp-codeno">GA 0706 '+window.bpBarcodeNo((i+1)*7919+1373)+'</span>'+
+          '<span class="bp-scan">👆 tap to scan</span>'+
         '</div>'+
       '</div>')+
     `</div>`;
@@ -1814,7 +1812,7 @@ function editReturn(){
 /* scannable QR on the shareable card -> opens the easter egg */
 var EGG_URL='https://worldcup-date.onrender.com/?egg=1';
 function makeQR(){
-  var bars=document.getElementById('tkBars'); if(bars&&window.bpBarcode&&!bars.querySelector('.bc-row'))bars.innerHTML=window.bpBarcode(70626,{h:30,color:'#241733',target:210});
+  var bars=document.getElementById('tkBars'); if(bars&&window.bpBarcode&&!bars.querySelector('.bc-row'))bars.innerHTML=window.bpBarcode(70626,{h:58,color:'#241733',target:210});
   var el=document.getElementById('shareQR'); if(!el||el.getAttribute('data-done')==='1')return;
   if(typeof qrcode==='undefined'){setTimeout(makeQR,400);return;}
   try{var qr=qrcode(0,'M');qr.addData(EGG_URL);qr.make();
