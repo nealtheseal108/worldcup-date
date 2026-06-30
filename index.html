@@ -218,6 +218,12 @@
   /* native sticky STACK: each card pins a bit lower than the last (top = 10 + i*40), so the deck piles up
      SMOOTHLY as you scroll (browser sticky = compositor, no JS) and earlier legs' header tops peek above */
   .bpass{position:-webkit-sticky;position:sticky;top:calc(10px + var(--bpi,0) * 40px);background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
+  /* DEPTH on the pile: earlier legs sit a touch smaller + dimmer (recede behind), the current/later
+     legs come forward — so the stack reads as a real 3D deck as it piles. Keyed off the inline --bpi
+     (0..7; 7 = last/front leg). transform/filter ONLY (never position) so the native sticky stack above
+     is untouched and the effect is fully deletable. Compositor-only, works on every iOS Safari. */
+  .bpass{transform-origin:top center;transform:scale(calc(1 - (7 - var(--bpi,0)) * 0.010));filter:brightness(calc(1 - (7 - var(--bpi,0)) * 0.004));transition:transform .35s cubic-bezier(.22,.61,.36,1),filter .35s ease}
+  @media(prefers-reduced-motion:reduce){.bpass{transform:none;filter:none;transition:none}}
   .bp-head{display:flex;align-items:center;gap:9px;height:34px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border-radius:13px 13px 0 0;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;box-shadow:0 3px 7px rgba(53,28,94,.16)}
   .bp-head:hover{filter:brightness(1.05)}
   .bp-h-time{font-weight:700;font-size:12.5px;white-space:nowrap;letter-spacing:.4px;padding-right:9px;border-right:1px solid rgba(255,255,255,.35)}
