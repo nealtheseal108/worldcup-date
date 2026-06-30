@@ -215,11 +215,11 @@
   .time .body b{font-size:14.5px}
   .time .body small{color:var(--muted);display:block;margin-top:2px}
   /* boarding-pass itinerary: native-scroll sticky-header deck (no JS scroll controller, no absolute positioning) */
-  #timeline{position:relative;margin:0}
+  #timeline{position:relative;margin:0 auto;max-width:430px}
   /* native sticky STACK: each card pins a bit lower than the last (top = 10 + i*40), so the deck piles up
      SMOOTHLY as you scroll (browser sticky = compositor, no JS) and earlier legs' header tops peek above */
-  .bpass{position:-webkit-sticky;position:sticky;top:calc(10px + var(--bpi,0) * 40px);background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
-  .bp-head{display:flex;align-items:center;gap:9px;height:34px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border-radius:13px 13px 0 0;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;box-shadow:0 3px 7px rgba(53,28,94,.16)}
+  .bpass{position:-webkit-sticky;position:sticky;top:calc(10px + var(--bpi,0) * 36px);background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
+  .bp-head{display:flex;align-items:center;gap:9px;height:36px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border-radius:13px 13px 0 0;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;box-shadow:0 3px 7px rgba(53,28,94,.16)}
   .bp-head:hover{filter:brightness(1.05)}
   .bp-h-time{font-weight:700;font-size:12.5px;white-space:nowrap;letter-spacing:.4px;padding-right:9px;border-right:1px solid rgba(255,255,255,.35)}
   .bp-h-plan{flex:1;min-width:0;font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.95}
@@ -228,9 +228,6 @@
   .bp-desc{color:#4a3a6b;display:block;font-size:13.5px;line-height:1.5}
   .bp-desc b{color:#2e1f47}
   .bp-perf{position:relative;border-top:2px dashed #d8ccef;margin:12px 16px 0}
-  .bp-perf::before,.bp-perf::after{content:"";position:absolute;top:-10px;width:18px;height:18px;border-radius:50%;background:var(--paper);border:1px solid var(--line)}
-  .bp-perf::before{left:-25px}
-  .bp-perf::after{right:-25px}
   .bp-stub{display:flex;align-items:center;gap:12px;padding:11px 16px 13px;background:#fff;border-radius:0 0 14px 14px}
   .bp-air{display:flex;align-items:center;gap:8px;flex:none}
   .bp-mark{width:26px;height:26px;display:block;flex:none}
