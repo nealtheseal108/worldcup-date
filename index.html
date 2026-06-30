@@ -1799,11 +1799,13 @@ window.initTimeline=function(){
     var tlTop=TL.getBoundingClientRect().top+sc;
     var f=(sc-tlTop)/SLOT; if(f<0)f=0; if(f>N-1)f=N-1;
     var fi=Math.round(f),i;
+    /* shrink the header peek so ALL fanned tops fit above the pin on short viewports (no piling) */
+    var peek=Math.min(PEEK, Math.max(6, (midY-8)/(N-1)));
     for(i=0;i<N;i++){
       var vy;
-      if(i<fi){vy=midY-PEEK*(fi-i);if(vy<8)vy=8;}
+      if(i<fi){vy=midY-peek*(fi-i);if(vy<8)vy=8;}
       else if(i===fi){vy=midY;}
-      else{vy=midY+H[fi]+(i-fi-1)*PEEK;}
+      else{vy=midY+H[fi]+(i-fi-1)*peek;}
       var docY=sc+vy-tlTop;
       if(docY<0)docY=0;
       var maxY=total-H[i]; if(docY>maxY)docY=maxY;    /* clamp: enters at the top, releases at the bottom so content below scrolls free */
