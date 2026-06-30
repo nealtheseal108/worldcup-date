@@ -167,19 +167,19 @@
   .ap-air .ap-mark{width:18px;height:18px;display:block;flex:none}
   .ap-air .ap-mark svg{width:100%;height:100%;display:block}
   .ap-status{font-size:10.5px;font-weight:700;background:rgba(255,255,255,.22);padding:3px 9px;border-radius:20px}
-  .ap-route{display:flex;align-items:center;gap:8px;padding:13px 18px 4px}
-  .ap-port{text-align:center;min-width:56px}
-  .ap-port b{display:block;font-size:21px;font-weight:800;color:var(--ink);letter-spacing:1px}
-  .ap-port span{display:block;font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+  .ap-route{display:flex;align-items:flex-start;gap:8px;padding:15px 18px 13px}
+  .ap-port{text-align:center;min-width:54px}
+  .ap-port b{display:block;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:1px;line-height:1}
+  .ap-port span{display:block;font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:7px}
   .ap-edit{cursor:pointer;border-bottom:2px dotted var(--lav2);padding-bottom:1px}
-  .ap-plane{flex:1;height:22px;position:relative;display:flex;align-items:center;justify-content:center}
+  .ap-plane{flex:1;height:22px;position:relative;display:flex;align-items:center;justify-content:center;margin-top:1px}
   .ap-plane::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #d8ccef}
   .ap-plane i{position:relative;background:#fff;padding:0 7px;font-style:normal;font-size:15px}
-  .ap-meta{display:flex;gap:14px;padding:8px 18px 10px;margin-top:4px;border-top:1px dashed var(--line)}
+  .ap-meta{display:flex;gap:14px;padding:11px 18px 10px;border-top:1px dashed var(--line)}
   .ap-meta div{flex:1}
   .ap-meta span{display:block;font-size:8px;color:var(--muted);letter-spacing:.7px}
   .ap-meta b{font-size:12px;color:#3a2a63}
-  .ap-bars{display:flex;align-items:flex-end;justify-content:flex-start;gap:0;height:24px;margin:2px 16px 12px}
+  .ap-bars{display:flex;align-items:flex-end;justify-content:flex-start;gap:0;height:24px;margin:6px 18px 14px}
   .ap-bars .bc-row{height:24px}
   /* locked date-diary finale */
   .diarylock{text-align:center;background:linear-gradient(160deg,#f3eefc,#ece3fb);border:1px dashed var(--lav2);border-radius:16px;padding:28px 22px;margin-top:6px}
@@ -431,15 +431,15 @@
         <div class="big">⚽💜</div>
         <div class="pill">HAPPY 8 MONTHS · ROUND OF 16 · 5 PM!</div>
         <div class="arrivalpass" id="arrivalPass">
-          <div class="ap-head"><span class="ap-air"><span class="ap-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 22 L17 4 C20 0.5 27 1 25.5 6 L14 22 Z" fill="#fff" opacity=".95"/><circle cx="10.5" cy="15.5" r="4.1" fill="none" stroke="#9b72e8" stroke-width="2"/><circle cx="15.5" cy="15.5" r="4.1" fill="none" stroke="#9b72e8" stroke-width="2"/></svg></span>GANESH AIR</span><span class="ap-status">LANDED 💜</span></div>
+          <div class="ap-head"><span class="ap-air"><span class="ap-mark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 4 L21.5 20 L2.5 20 Z" fill="#fff"/><path d="M12 4 L21.5 20 L12 20 Z" fill="rgba(255,255,255,.6)"/></svg></span>DELTA</span><span class="ap-status">LANDED 💜</span></div>
           <div class="ap-route">
-            <div class="ap-port"><b class="ap-edit" id="apFrom" onclick="editArrivalFrom()" title="tap to edit where you flew in from">SLC</b><span>dep 8:44 PM</span></div>
+            <div class="ap-port"><b>SLC</b><span>dep 8:44 PM</span></div>
             <div class="ap-plane"><i>✈</i></div>
             <div class="ap-port"><b>SEA</b><span>arr 10:05 PM</span></div>
           </div>
           <div class="ap-meta">
             <div><span>PASSENGER</span><b>SIDHYA 💜</b></div>
-            <div><span>FLIGHT</span><b>GA 2016</b></div>
+            <div><span>FLIGHT</span><b>DL 2016</b></div>
             <div><span>DATE</span><b>2 JUL</b></div>
           </div>
           <div class="ap-bars" aria-hidden="true"></div>
