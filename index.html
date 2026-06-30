@@ -35,8 +35,8 @@
   .datemap{display:none;background:var(--paper);border-radius:16px;padding:14px 14px 14px;box-shadow:0 10px 30px rgba(53,28,94,.22);margin:16px 0 40px}
   body.mapview .datemap{display:block}
   .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin:2px 0 12px}
-  #leafmap{height:min(340px,52vh);border-radius:13px;overflow:hidden;background:#efeaf7}
-  @media(max-width:600px){#leafmap{height:min(280px,48vh)}}
+  #leafmap{height:min(320px,calc(100vh - 150px));border-radius:13px;overflow:hidden;background:#efeaf7}
+  @media(max-width:600px){#leafmap{height:min(260px,calc(100vh - 140px))}}
   @keyframes worm{to{stroke-dashoffset:-44}}
   .wormline{stroke-dasharray:2 9;animation:worm 4s linear infinite}
   .maplink{display:inline-flex;align-items:center;gap:6px;margin:0 0 16px;padding:8px 15px;border:1px solid var(--line);border-radius:30px;background:#f1ecfc;color:#5a3fb0;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
@@ -239,7 +239,7 @@
   .bc-row i{display:inline-block;flex:none}
   /* in the deck, only the focused card shows its body; the rest collapse to a peeking header strip */
   #timeline.bp-ready .bpass .bp-body,#timeline.bp-ready .bpass .bp-perf,#timeline.bp-ready .bpass .bp-stub{transition:opacity .18s ease}
-  #timeline.bp-ready .bpass.is-collapsed .bp-body,#timeline.bp-ready .bpass.is-collapsed .bp-perf,#timeline.bp-ready .bpass.is-collapsed .bp-stub{opacity:0;pointer-events:none}
+  #timeline.bp-ready .bpass.is-collapsed .bp-body,#timeline.bp-ready .bpass.is-collapsed .bp-perf,#timeline.bp-ready .bpass.is-collapsed .bp-stub{display:none}
   #timeline.bp-ready .bpass.is-collapsed .bp-head{border-radius:13px}
   @media(prefers-reduced-motion:reduce){.bpass .bp-body,.bpass .bp-perf,.bpass .bp-stub{transition:none}}
   .note{background:#fff6e0;border:1px solid #f3e2a8;border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5;margin-top:14px;color:#6b5a16}
@@ -987,7 +987,7 @@ function foodCards(which){
     wrap.appendChild(c);
   });
 }
-function scrollToMap(){var m=document.getElementById('datemap');if(m)m.scrollIntoView({behavior:'smooth',block:'start'});}
+function scrollToMap(){var m=document.querySelector('.datemap');if(!m)return;var r=m.getBoundingClientRect();var safe=window.innerHeight-70;var off=Math.max(8,(safe-r.height)/2);window.scrollTo({top:Math.max(0,window.scrollY+r.top-off),behavior:'smooth'});}
 /* ---------- Ganesh Air: realistic, deterministic Code128-style barcode (window.bpBarcode) ---------- */
 (function(){
   function lcg(seed){var s=(seed>>>0)||1;if(s===0)s=1;return function(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};}
@@ -1338,12 +1338,12 @@ async function saveGif(){
 /* ---------- background music: looping playlist with fade transitions ----------
    Shotput -> Link Up -> Passionfruit(@1:12) -> Heat Waves(8D) -> Babydoll -> Flight's Booked -> Kiss Me More -> Ay No Puedo -> No One Noticed -> loop  */
 var MUSIC=[
+  {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake', start:55},
   {id:'K4Fk9Clc12w', title:'Shotput (slowed + reverb)', artist:'Still Woozy'},
   {id:'1_w9ZtbHj_E', title:'Link Up', artist:'Don Toliver'},
   {id:'nfJReXaXkTY', title:'Passionfruit (slowed + reverb)', artist:'Drake', start:72},
   {id:'wTPWI3qkx5c', title:'Heat Waves (8D slowed)', artist:'Glass Animals'},
   {id:'l8KS5HiMXn4', title:'Babydoll (slowed + reverb)', artist:'Dominic Fike'},
-  {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake', start:55},
   {id:'ISsxv6i9f_k', title:'Kiss Me More (slowed + reverb)', artist:'Doja Cat & SZA'},
   {id:'y9NPx6NDA6M', title:'Ay No Puedo', artist:'The Marías'},
   {id:'_9hkXCYiEjc', title:'No One Noticed', artist:'The Marías'}
@@ -1706,7 +1706,8 @@ function exportMovie(){
 /* autoplay policies: kick off on the first interaction anywhere */
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
 /* end-of-date: at 9:30 PM the reveal screen surfaces a 'watch our movie' card */
-function dateEnding(){if(window.__forceEnd)return true;var n=new Date();return (n.getHours()*60+n.getMinutes())>=1290;}  /* >= 9:30 PM */
+function dateTargetMs(){return new Date(2026,6,6,21,30,0,0).getTime();}  /* the date night: Jul 6 2026, 9:30 PM local */
+function dateEnding(){if(window.__forceEnd)return true;return Date.now()>=dateTargetMs();}
 function checkDateEnding(){
   var ending=dateEnding();
   var lock=document.getElementById('diaryLock'), open=document.getElementById('diaryOpen');
@@ -1715,8 +1716,9 @@ function checkDateEnding(){
   var cd=document.getElementById('diaryCountdown');
   if(cd){
     if(ending){cd.textContent='';}
-    else{var n=new Date();var mins=1290-(n.getHours()*60+n.getMinutes());
-      if(mins>0){var h=Math.floor(mins/60),m=mins%60;cd.textContent='⏳ about '+(h>0?h+'h ':'')+m+'m to go 💜';}
+    else{var diff=dateTargetMs()-Date.now();
+      if(diff>0){var d=Math.floor(diff/86400000),h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000);
+        cd.textContent='⏳ '+(d>0?d+'d ':'')+(d>0||h>0?h+'h ':'')+m+'m to go 💜';}
       else cd.textContent='almost there 💜';}
   }
 }
@@ -1823,8 +1825,8 @@ window.initTimeline=function(){
   <div class="pb-info">
     <div class="pb-art">🎧</div>
     <div class="pb-meta">
-      <div class="pb-title" id="pbTitle">Shotput (slowed + reverb)</div>
-      <div class="pb-artist" id="pbArtist">Still Woozy</div>
+      <div class="pb-title" id="pbTitle">Flight's Booked</div>
+      <div class="pb-artist" id="pbArtist">Drake</div>
     </div>
   </div>
   <div class="pb-controls">
