@@ -16,6 +16,10 @@
     --player: calc(64px + env(safe-area-inset-bottom, 0px) + 10px); /* space the fixed music player occupies */
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  /* scroll-reveal: rise + fade in ONCE when an element enters view (one-shot observer + GPU transition, no scroll-jack) */
+  .reveal-up{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .7s cubic-bezier(.16,.8,.3,1);will-change:opacity,transform}
+  .reveal-up.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal-up{opacity:1!important;transform:none!important;transition:none}}
   body{
     font-family:'Inter',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
     background:linear-gradient(160deg,#7c4dca 0%,#9b72e8 45%,#c4b5fd 100%);
@@ -838,11 +842,37 @@ const HOMEMADE = {e:"🥛",t:"Elaichi Lassi",d:"i'm making you fresh elaichi las
 
 const pick = {venue:null, during:null, after:null};
 
-function venueCards(){
+/* ---------- scroll-reveal: IntersectionObserver primary + passive safety sweep ---------- */
+/* IO gives the nice staggered reveal on a live (foreground) tab. But IO never fires
+   while a document is hidden (spec), so we ALSO run a cheap rAF-throttled getBoundingClientRect
+   sweep on scroll / visibilitychange / a one-shot timeout. That makes the reveal purely
+   additive: in-view content can never get stuck at opacity:0 if IO doesn't fire. */
+var _revObs,_revFallbackWired=false;
+function _revealInView(){
+  var vh=window.innerHeight||document.documentElement.clientHeight;
+  var els=document.querySelectorAll('.reveal-up:not(.in)');
+  for(var i=0;i<els.length;i++){var r=els[i].getBoundingClientRect();if(r.top<vh*0.95&&r.bottom>0)els[i].classList.add('in');}
+}
+function _wireRevealFallback(){
+  if(_revFallbackWired)return; _revFallbackWired=true;
+  var raf=0;
+  window.addEventListener('scroll',function(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;_revealInView();});},{passive:true});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden){armReveals();_revealInView();}});
+  setTimeout(_revealInView,2600); /* last-resort: never leave in-view content blank */
+}
+function armReveals(){
+  var els=document.querySelectorAll('.reveal-up:not(.in)');
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
+  if(!_revObs)_revObs=new IntersectionObserver(function(ents){ents.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');_revObs.unobserve(en.target);}});},{rootMargin:'0px 0px -7% 0px',threshold:0.06});
+  els.forEach(function(e){_revObs.observe(e);});
+  _wireRevealFallback();
+}
+function venueCards(animate){
   const wrap=document.getElementById('venueCards'); wrap.innerHTML='';
-  Object.entries(VENUES).forEach(([key,v])=>{
+  Object.entries(VENUES).forEach(([key,v],i)=>{
     const c=document.createElement('div');
-    c.className='vcard'+(pick.venue===key?' sel':'');
+    c.className='vcard'+(pick.venue===key?' sel':'')+(animate?' reveal-up':'');
+    if(animate)c.style.transitionDelay=(Math.min(i,6)*55)+'ms';
     c.innerHTML=`${v.crown?'<span class="crown">👑 Top pick</span>':''}
       ${ART[key]}
       <div class="vbody"><div class="ttl">${v.name}</div><div class="desc">${v.desc}</div></div>`;
@@ -854,6 +884,7 @@ function venueCards(){
     };
     wrap.appendChild(c);
   });
+  if(animate)armReveals();
 }
 /* ---------- add-your-own: link a restaurant or watch spot, geocode it, wire it into everything ---------- */
 var USER_DURING=[], USER_AFTER=[], USER_VENUES=[], _addKind='during';
@@ -943,13 +974,14 @@ function confirmAddPlace(){
     closeAddPlace(); hint('added '+p.name+' 💜 it\'s on the map now');
   });
 }
-function foodCards(which){
+function foodCards(which,animate){
   const list = which==='after' ? VENUES[pick.venue].after.concat(EASTSIDE, USER_AFTER) : [HOMEMADE].concat(VENUES[pick.venue].during, USER_DURING);
   const wrap=document.getElementById(which==='during'?'duringCards':'afterCards');
   wrap.innerHTML='';
-  list.forEach(item=>{
+  list.forEach((item,i)=>{
     const c=document.createElement('div');
-    c.className='card'+(pick[which]&&pick[which].t===item.t?' sel':'');
+    c.className='card'+(pick[which]&&pick[which].t===item.t?' sel':'')+(animate?' reveal-up':'');
+    if(animate)c.style.transitionDelay=(Math.min(i,8)*45)+'ms';
     c.innerHTML=`<div class="emoji">${item.e}</div><div>
       <div class="ttl">${item.t}</div>
       <div class="desc">${item.d}</div>
@@ -962,6 +994,7 @@ function foodCards(which){
     };
     wrap.appendChild(c);
   });
+  if(animate)armReveals();
 }
 function scrollToMap(){
   var m=document.querySelector('.datemap');if(!m)return;
@@ -1012,9 +1045,9 @@ function go(n){
   for(let i=0;i<4;i++){document.getElementById('d'+i).classList.toggle('on', i<=Math.min(n,3));}
   var showMap=(n===2||n===3)&&!!pick.venue;          // the map lives only on the snack + dinner screens
   document.body.classList.toggle('mapview', showMap);
-  if(n===1) venueCards();
-  if(n===2){ foodCards('during'); document.getElementById('next2').disabled=!pick.during; }
-  if(n===3){ foodCards('after'); document.getElementById('next3').disabled=!pick.after; }
+  if(n===1) venueCards(true);
+  if(n===2){ foodCards('during',true); document.getElementById('next2').disabled=!pick.during; }
+  if(n===3){ foodCards('after',true); document.getElementById('next3').disabled=!pick.after; }
   if(showMap) setTimeout(function(){drawRoute(pick.venue);},70);   // (re)frame once the container has size
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1077,6 +1110,9 @@ function reveal(){
     '🗺️ <b>your whole night, mapped out babu.</b> 💜 i planned every train and every stop so there is nothing for you to figure out, just show up and we follow the plan together. '+pick.after.t+' is walk-in, so worst case we wait a few mins for a table, totally worth it. i got you. 💜';
   go(4);
   if(window.initTimeline){requestAnimationFrame(window.initTimeline);setTimeout(window.initTimeline,140);}
+  try{['.sharewrap','.iti-head','.twoplan','.merge','#diaryGate'].forEach(function(sel){var e=document.querySelector(sel);if(e&&!e.classList.contains('in'))e.classList.add('reveal-up');});
+    document.querySelectorAll('#step4 .perks').forEach(function(e){if(!e.classList.contains('in'))e.classList.add('reveal-up');});
+    armReveals();}catch(e){}
   applyCheekyGate();
   checkDateEnding();
 }
@@ -1159,6 +1195,29 @@ var REST_LL={
   "Old Mediterranean Kitchen":[47.61136,-122.20174],"Chaat House":[47.62752,-122.14375],"MTR - Mavalli Tiffin Rooms":[47.63102,-122.14488],"Teapot Vegetarian House":[47.63202,-122.13626],"Kanishka Cuisine of India":[47.67244,-122.11777]
 };
 var _map=null,_routeLayer=null;
+/* ---------- map route "draws itself" once, when the map scrolls into view (one-shot rAF grow) ---------- */
+var _wormLine=null,_wormPts=null,_mapSeen=false,_mapDrawObs=null;
+function _densify(pts,per){var out=[],i,j;for(i=0;i<pts.length-1;i++){var a=pts[i],b=pts[i+1];for(j=0;j<per;j++){var t=j/per;out.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]);}}out.push(pts[pts.length-1]);return out;}
+function drawWorm(){
+  if(!_wormLine||!_wormPts)return;
+  var pts=_wormPts,N=pts.length,dur=1100,t0=0;
+  function step(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/dur); var k=1-Math.pow(1-p,3); var n=Math.max(2,Math.round(k*N)); _wormLine.setLatLngs(pts.slice(0,n)); if(p<1)requestAnimationFrame(step); else _wormLine.setLatLngs(pts); }
+  requestAnimationFrame(step);
+  /* safety: rAF is paused while the tab is hidden, so guarantee the full route is drawn regardless */
+  setTimeout(function(){ if(_wormLine)_wormLine.setLatLngs(pts); }, dur+500);
+}
+function _armMapDraw(){
+  if(_mapSeen)return;
+  var el=document.getElementById('leafmap'); if(!el)return;
+  var fire=function(){ if(_mapSeen)return; _mapSeen=true; if(_mapDrawObs){_mapDrawObs.disconnect();_mapDrawObs=null;} drawWorm(); };
+  if(!('IntersectionObserver' in window)){fire();return;}
+  if(!_mapDrawObs){
+    _mapDrawObs=new IntersectionObserver(function(es){for(var i=0;i<es.length;i++){if(es[i].isIntersecting){fire();break;}}},{threshold:0.3});
+    _mapDrawObs.observe(el);
+  }
+  /* safety: if IO never fires (hidden tab/old browser), still draw once the map is in view */
+  setTimeout(function(){ if(_mapSeen)return; var r=el.getBoundingClientRect(); if(r.top<(window.innerHeight||800)&&r.bottom>0)fire(); }, 2800);
+}
 function ensureMap(){
   if(_map||typeof L==='undefined')return _map;
   // interactive via +/- buttons, drag, pinch + double-click; scroll-wheel zoom OFF so it
@@ -1183,7 +1242,11 @@ function drawRoute(k,_n){
   if(s)worm.push(s);
   worm.push(v);
   if(a&&!aEast)worm.push(a);                     // a downtown dinner is a short walk from the venue
-  L.polyline(worm,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round',className:'wormline'}).addTo(_routeLayer);
+  var dworm=_densify(worm,6);
+  _wormLine=L.polyline(dworm,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round',className:'wormline'}).addTo(_routeLayer);
+  _wormPts=dworm;
+  if(!_mapSeen)_wormLine.setLatLngs(dworm.slice(0,2));   /* start undrawn; it draws when the map scrolls into view */
+  _armMapDraw();
   if(a&&aEast){                                  // eastside dinner: follow the 2 line back across the I-90 bridge
     var ret=[v].concat(LINK_2LINE.slice(nearestLinkIdx(a),endIdx+1).reverse()).concat([a]);
     L.polyline(ret,{color:'#7c4dca',weight:4,opacity:.9,dashArray:'2 9',lineCap:'round',className:'wormline'}).addTo(_routeLayer);
