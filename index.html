@@ -140,6 +140,44 @@
   .card .ttl{font-weight:700;font-size:16px;margin-bottom:3px}
   .card .desc{font-size:13.5px;color:var(--muted);line-height:1.45}
   .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--lav);background:#efe7fb;border-radius:20px;padding:2px 9px;margin-top:8px}
+  /* ---------- Tinder-style swipe deck (venue / snack / dinner picks) ---------- */
+  .swipe{display:flex;flex-direction:column;align-items:center}
+  .swipe-progress{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:1.5px;color:var(--muted);font-weight:700;text-transform:uppercase;margin:2px 0 10px}
+  .swipe-stack{position:relative;width:100%;max-width:344px;height:382px;margin:0 auto}
+  .sw-card{position:absolute;inset:0;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 12px 30px rgba(53,28,94,.22);display:flex;flex-direction:column;transform-origin:center;will-change:transform;-webkit-user-select:none;user-select:none}
+  .sw-card.depth-0{z-index:3;cursor:grab;touch-action:pan-y}
+  .sw-card.depth-0:active{cursor:grabbing}
+  .sw-card.depth-1{z-index:2;transform:scale(.95) translateY(12px);filter:brightness(.985);transition:transform .25s ease}
+  .sw-card.depth-2{z-index:1;transform:scale(.90) translateY(24px);filter:brightness(.965);transition:transform .25s ease}
+  .sw-card .sw-art{height:150px;flex:none;overflow:hidden}
+  .sw-card .sw-art svg,.sw-card .sw-art .art{width:100%;height:150px;display:block}
+  .sw-emojihdr{height:150px;flex:none;display:flex;align-items:center;justify-content:center;font-size:62px;background:linear-gradient(150deg,#b79bf0,#e9ddff)}
+  .sw-body{padding:15px 18px;flex:1;min-height:0;overflow:auto}
+  .sw-ttl{font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:18.5px;letter-spacing:-.01em;margin-bottom:6px;color:var(--ink);line-height:1.15}
+  .sw-desc{font-size:13.5px;color:var(--muted);line-height:1.5}
+  .sw-meta{margin-top:2px}
+  .sw-ov{position:absolute;top:16px;z-index:6;font-family:'Inter',system-ui,sans-serif;font-weight:900;font-size:21px;letter-spacing:1px;padding:5px 13px;border-radius:10px;opacity:0;pointer-events:none}
+  .sw-ov-like{left:16px;color:#16a34a;border:3px solid #16a34a;transform:rotate(-13deg)}
+  .sw-ov-nope{right:16px;color:#e11d48;border:3px solid #e11d48;transform:rotate(13deg)}
+  .swipe-btns{display:flex;gap:28px;justify-content:center;margin:16px 0 2px}
+  .sw-btn{width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;font-size:24px;font-weight:800;box-shadow:0 6px 16px rgba(53,28,94,.2);transition:.12s;line-height:1}
+  .sw-btn:active{transform:scale(.9)}
+  .sw-x{background:#fff;color:#e11d48;border:2px solid #ffd9e1}
+  .sw-heart{background:linear-gradient(150deg,var(--lav),var(--lav2));color:#fff}
+  .swipe-hint{font-size:11.5px;color:var(--muted);margin-top:8px;text-align:center}
+  .swipe-done,.sw-chosen{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:14px 6px}
+  .sw-done-emoji{font-size:44px}
+  .sw-done-ttl{font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:18.5px;color:var(--ink)}
+  .sw-done-sub{font-size:14px;color:var(--muted);line-height:1.5;max-width:320px}
+  .sw-done-btns{display:flex;flex-direction:column;gap:9px;width:100%;max-width:300px;margin-top:6px}
+  .sw-pick-list{display:flex;flex-direction:column;gap:10px;width:100%;max-width:344px;margin:4px 0 8px}
+  .sw-pick-item{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;font:inherit;transition:.13s}
+  .sw-pick-item:hover{border-color:var(--lav);background:#f6f1fe}
+  .sw-pick-emoji{font-size:25px;flex:none;width:30px;text-align:center}
+  .sw-pick-name{font-weight:700;font-size:15px;color:var(--ink)}
+  .sw-chosen-badge{background:var(--sun);color:#7a5a00;font-weight:800;font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:5px 13px;border-radius:20px}
+  .sw-chosen-card{position:relative;inset:auto;width:100%;max-width:344px;box-shadow:0 10px 26px rgba(53,28,94,.18)}
+  .sw-again{margin-top:2px}
   .veg{color:#1c7a4a;background:#e3f6ea}
   .price{color:#7a5a16;background:#fdf0c8;letter-spacing:1px}
   .rate{color:#8a6a12;background:#fbf1cf}
@@ -886,25 +924,7 @@ function armReveals(){
   els.forEach(function(e){_revObs.observe(e);});
   _wireRevealFallback();
 }
-function venueCards(animate){
-  const wrap=document.getElementById('venueCards'); wrap.innerHTML='';
-  Object.entries(VENUES).forEach(([key,v],i)=>{
-    const c=document.createElement('div');
-    c.className='vcard'+(pick.venue===key?' sel':'')+(animate?' reveal-up':'');
-    if(animate)c.style.transitionDelay=(Math.min(i,6)*55)+'ms';
-    c.innerHTML=`${v.crown?'<span class="crown">👑 Top pick</span>':''}
-      ${ART[key]}
-      <div class="vbody"><div class="ttl">${v.name}</div><div class="desc">${v.desc}</div></div>`;
-    c.onclick=()=>{
-      if(window.pickVenue){pickVenue(key);return;}
-      if(pick.venue!==key){pick.during=null;pick.after=null;}
-      pick.venue=key; venueCards();
-      document.getElementById('next1').disabled=false;
-    };
-    wrap.appendChild(c);
-  });
-  if(animate)armReveals();
-}
+function venueCards(animate){ renderSwipeStep('venue', animate); }
 /* ---------- add-your-own: link a restaurant or watch spot, geocode it, wire it into everything ---------- */
 var USER_DURING=[], USER_AFTER=[], USER_VENUES=[], _addKind='during';
 function _cleanName(n){n=String(n||'').replace(/\s+/g,' ').trim();return n.length>42?n.slice(0,42):n;}
@@ -957,11 +977,14 @@ function addUserPlace(kind, p, skipSave){
     VENUE_LL[key]=[p.lat,p.lng]; VENUE_LABEL[key]=p.name; ART[key]=USER_VENUE_ART();
     VENUES[key]={name:p.name, short:'your pick · '+p.name, desc:"you wanted to watch here babu, so here we are 💜 i'll sort the best way to get us there.", crown:false, transferLine:"we'll find the smoothest route there together 💜", safety:"a spot you picked, we'll figure out the logistics together and get there early.", during:[], after:[], userAdded:true};
     USER_VENUES.push(key);
-    try{venueCards();}catch(e){}
+    if(skipSave){ try{venueCards();}catch(e){} }
+    else { try{ var _vit=Object.assign({},VENUES[key]); _vit.key=key; _swApplyPick('venue', _vit); }catch(e){ try{venueCards();}catch(_){} } }
   } else {
     REST_LL[p.name]=[p.lat,p.lng];
-    (kind==='after'?USER_AFTER:USER_DURING).push({e:'📍', t:p.name, d:'your pick babu 💜', p:'$$', dishes:[], userAdded:true});
-    try{ if(pick.venue) foodCards(kind); }catch(e){}
+    var _ni={e:'📍', t:p.name, d:'your pick babu 💜', p:'$$', dishes:[], userAdded:true};
+    (kind==='after'?USER_AFTER:USER_DURING).push(_ni);
+    if(skipSave){ try{ if(pick.venue) foodCards(kind); }catch(e){} }
+    else { try{ if(pick.venue) _swApplyPick(kind, _ni); else foodCards(kind); }catch(e){} }
   }
   if(!skipSave)saveUserPlaces();
 }
@@ -993,27 +1016,189 @@ function confirmAddPlace(){
     closeAddPlace(); hint('added '+p.name+' 💜 it\'s on the map now');
   });
 }
-function foodCards(which,animate){
-  const list = which==='after' ? VENUES[pick.venue].after.concat(EASTSIDE, USER_AFTER) : [HOMEMADE].concat(VENUES[pick.venue].during, USER_DURING);
-  const wrap=document.getElementById(which==='during'?'duringCards':'afterCards');
-  wrap.innerHTML='';
-  list.forEach((item,i)=>{
-    const c=document.createElement('div');
-    c.className='card'+(pick[which]&&pick[which].t===item.t?' sel':'')+(animate?' reveal-up':'');
-    if(animate)c.style.transitionDelay=(Math.min(i,8)*45)+'ms';
-    c.innerHTML=`<div class="emoji">${item.e}</div><div>
-      <div class="ttl">${item.t}</div>
-      <div class="desc">${item.d}</div>
-      ${item.dishes&&item.dishes.length?`<div class="dishes">🍽️ ${item.dishes.join(' · ')}</div>`:''}
-      ${item.homemade?'<span class="tag love">💜 homemade by neal</span> ':''}${item.r?`<span class="tag rate">⭐ ${item.r}${item.rc?' · '+item.rc:''}</span> `:''}${item.p?`<span class="tag price">${item.p}</span>`:''}${item.east?' <span class="tag">🚆 2 Line home</span>':''}</div>`;
-    c.onclick=()=>{
-      pick[which]=item; foodCards(which);
-      document.getElementById(which==='during'?'next2':'next3').disabled=false;
-      if(pick.venue&&typeof drawRoute==='function')drawRoute(pick.venue);
-    };
-    wrap.appendChild(c);
-  });
+function foodCards(which,animate){ renderSwipeStep(which, animate); }
+
+/* ================= Tinder-style swipe deck for the venue / snack / dinner picks ================= */
+var SWIPE_CONT={venue:'venueCards',during:'duringCards',after:'afterCards'};
+var SWIPE_STEP={venue:1,during:2,after:3};
+var SWIPE_LABEL={venue:'watch spot',during:'snack',after:'dinner'};
+window._wcDeck=null;   // {stepKey, fly} — the live deck, for keyboard control
+
+function _swItems(stepKey){
+  if(stepKey==='venue')return Object.entries(VENUES).map(function(e){var o=Object.assign({},e[1]);o.key=e[0];return o;});
+  if(!pick.venue)return [];
+  if(stepKey==='during')return [HOMEMADE].concat(VENUES[pick.venue].during, USER_DURING);
+  return VENUES[pick.venue].after.concat(EASTSIDE, USER_AFTER);
+}
+function _swPickId(stepKey){ return stepKey==='venue'?pick.venue:(pick[stepKey]?pick[stepKey].t:null); }
+function _swItemId(stepKey,it){ return stepKey==='venue'?it.key:it.t; }
+function _swCurrentItem(stepKey,items){
+  var id=_swPickId(stepKey); if(id==null)return null;
+  for(var i=0;i<items.length;i++){ if(_swItemId(stepKey,items[i])===id)return items[i]; }
+  return stepKey==='venue'?null:pick[stepKey];
+}
+function _swMeta(it){
+  return (it.homemade?'<span class="tag love">💜 homemade by neal</span> ':'')
+    +(it.r?'<span class="tag rate">⭐ '+it.r+(it.rc?' · '+it.rc:'')+'</span> ':'')
+    +(it.p?'<span class="tag price">'+it.p+'</span>':'')
+    +(it.east?' <span class="tag">🚆 2 Line home</span>':'');
+}
+function _swCardInner(stepKey,it){
+  if(stepKey==='venue'){
+    return (it.crown?'<span class="crown">👑 Top pick</span>':'')
+      +'<div class="sw-art">'+(ART[it.key]||'')+'</div>'
+      +'<div class="sw-body"><div class="sw-ttl">'+it.name+'</div><div class="sw-desc">'+it.desc+'</div></div>';
+  }
+  return '<div class="sw-emojihdr">'+it.e+'</div>'
+    +'<div class="sw-body"><div class="sw-ttl">'+it.t+'</div><div class="sw-desc">'+it.d+'</div>'
+    +(it.dishes&&it.dishes.length?'<div class="dishes">🍽️ '+it.dishes.join(' · ')+'</div>':'')
+    +'<div class="sw-meta">'+_swMeta(it)+'</div></div>';
+}
+function _swName(stepKey,it){ return stepKey==='venue'?it.name:it.t; }
+function _swEmoji(stepKey,it){ return stepKey==='venue'?'📍':it.e; }
+
+function renderSwipeStep(stepKey, animate){
+  var cont=document.getElementById(SWIPE_CONT[stepKey]); if(!cont)return;
+  var items=_swItems(stepKey);
+  if(_swPickId(stepKey)!=null){ _swRenderChosen(stepKey, cont, items); }
+  else { _swRenderDeck(stepKey, cont, items, animate); }
+}
+
+function _swRenderDeck(stepKey, cont, items, animate){
+  window._wcDeck=null;
+  if(!items.length){ _swRenderAllPass(stepKey, cont); return; }
+  cont.innerHTML='<div class="swipe'+(animate?' reveal-up':'')+'">'
+    +'<div class="swipe-progress"></div>'
+    +'<div class="swipe-stack"></div>'
+    +'<div class="swipe-btns"><button type="button" class="sw-btn sw-x" aria-label="pass">✕</button>'
+    +'<button type="button" class="sw-btn sw-heart" aria-label="like">♥</button></div>'
+    +'<div class="swipe-hint">drag the card, tap ✕ / ♥, or use ← →</div></div>';
+  var stack=cont.querySelector('.swipe-stack'), prog=cont.querySelector('.swipe-progress');
+  var idx=0, liked=[], busy=false, topCard=null;
+
+  function paint(){
+    prog.innerHTML='SWIPE &nbsp;·&nbsp; '+Math.min(idx+1,items.length)+' / '+items.length;
+    stack.innerHTML='';
+    var n=Math.min(3, items.length-idx);
+    for(var p=n-1;p>=0;p--){
+      var card=document.createElement('div');
+      card.className='sw-card depth-'+p;
+      card.innerHTML='<div class="sw-ov sw-ov-like">LIKE 💜</div><div class="sw-ov sw-ov-nope">NOPE ✕</div>'+_swCardInner(stepKey, items[idx+p]);
+      stack.appendChild(card);
+    }
+    topCard=stack.querySelector('.sw-card.depth-0');
+    if(topCard)_attachDrag(topCard);
+  }
+  function fly(dir){
+    if(busy||!topCard)return; busy=true;
+    if(dir==='like')liked.push(items[idx]);
+    var card=topCard, off=(dir==='like'?1:-1)*(window.innerWidth||500);
+    card.style.transition='transform .4s cubic-bezier(.3,.1,.5,1), opacity .4s ease';
+    card.style.transform='translate('+off+'px,40px) rotate('+(dir==='like'?20:-20)+'deg)';
+    card.style.opacity='0';
+    var fired=false; function done(){ if(fired)return; fired=true; idx++; busy=false;
+      if(idx>=items.length){ _swFinish(stepKey, cont, liked); } else { paint(); } }
+    card.addEventListener('transitionend', done);
+    setTimeout(done, 480);   // fallback if transitionend is throttled (e.g. hidden tab)
+  }
+  function _attachDrag(card){
+    var sx=0,sy=0,dx=0,dy=0,drag=false;
+    var like=card.querySelector('.sw-ov-like'), nope=card.querySelector('.sw-ov-nope');
+    card.addEventListener('pointerdown',function(e){ if(busy)return; drag=true; sx=e.clientX; sy=e.clientY; dx=dy=0; card.style.transition='none'; try{card.setPointerCapture(e.pointerId);}catch(_){} });
+    card.addEventListener('pointermove',function(e){ if(!drag)return; dx=e.clientX-sx; dy=e.clientY-sy;
+      card.style.transform='translate('+dx+'px,'+(dy*0.22)+'px) rotate('+(dx*0.05)+'deg)';
+      like.style.opacity=Math.max(0,Math.min(1,dx/90)); nope.style.opacity=Math.max(0,Math.min(1,-dx/90)); });
+    function end(){ if(!drag)return; drag=false; card.style.transition='';
+      if(dx>80)fly('like'); else if(dx<-80)fly('pass');
+      else { card.style.transform=''; like.style.opacity=0; nope.style.opacity=0; } }
+    card.addEventListener('pointerup',end); card.addEventListener('pointercancel',end);
+  }
+  cont.querySelector('.sw-x').onclick=function(){fly('pass');};
+  cont.querySelector('.sw-heart').onclick=function(){fly('like');};
+  window._wcDeck={stepKey:stepKey, fly:fly};
+  _swBindKeys();
+  paint();
   if(animate)armReveals();
+}
+
+function _swFinish(stepKey, cont, liked){
+  window._wcDeck=null;
+  if(liked.length===0){ _swRenderAllPass(stepKey, cont); }
+  else if(liked.length===1){ _swApplyPick(stepKey, liked[0]); }
+  else { _swRenderPicker(stepKey, cont, liked); }
+}
+
+function _swRenderAllPass(stepKey, cont){
+  window._wcDeck=null;
+  cont.innerHTML='<div class="swipe-done">'
+    +'<div class="sw-done-emoji">🤔</div>'
+    +'<div class="sw-done-ttl">nothing caught your eye?</div>'
+    +'<div class="sw-done-sub">no worries babu — add your own '+SWIPE_LABEL[stepKey]+' idea and i\'ll sort out how we get there 💜</div>'
+    +'<div class="sw-done-btns">'
+    +'<button type="button" class="btn primary" onclick="addPlace(\''+stepKey+'\')">➕ add my own idea</button>'
+    +'<button type="button" class="btn lav2btn sw-again">↺ swipe again</button>'
+    +'</div></div>';
+  cont.querySelector('.sw-again').onclick=function(){ renderSwipeStep(stepKey); };
+}
+
+function _swRenderPicker(stepKey, cont, liked){
+  window._wcDeck=null;
+  var html='<div class="swipe-done"><div class="sw-done-ttl">you liked a few 💜</div>'
+    +'<div class="sw-done-sub">pick your favorite to lock it in:</div><div class="sw-pick-list">';
+  liked.forEach(function(it,i){
+    html+='<button type="button" class="sw-pick-item" data-i="'+i+'"><span class="sw-pick-emoji">'+_swEmoji(stepKey,it)+'</span><span class="sw-pick-name">'+_swName(stepKey,it)+'</span></button>';
+  });
+  html+='</div><button type="button" class="btn lav2btn sw-again">↺ swipe them again</button></div>';
+  cont.innerHTML=html;
+  cont.querySelectorAll('.sw-pick-item').forEach(function(b){ b.onclick=function(){ _swApplyPick(stepKey, liked[+b.getAttribute('data-i')]); }; });
+  cont.querySelector('.sw-again').onclick=function(){ renderSwipeStep(stepKey); };
+}
+
+function _swRenderChosen(stepKey, cont, items){
+  window._wcDeck=null;
+  var it=_swCurrentItem(stepKey, items);
+  if(!it){ _swRenderDeck(stepKey, cont, items); return; }
+  cont.innerHTML='<div class="sw-chosen"><div class="sw-chosen-badge">✓ your pick</div>'
+    +'<div class="sw-card sw-chosen-card">'+_swCardInner(stepKey, it)+'</div>'
+    +'<button type="button" class="btn lav2btn sw-again">↺ swipe again</button></div>';
+  cont.querySelector('.sw-again').onclick=function(){ _swRePick(stepKey); };
+}
+
+function _swApplyPick(stepKey, it){
+  if(stepKey==='venue'){
+    if(window.pickVenue){ window.pickVenue(it.key); }   // sets pick.venue, clears downstream, enables next1, re-renders -> chosen
+    else { if(pick.venue!==it.key){pick.during=null;pick.after=null;} pick.venue=it.key; var n=document.getElementById('next1'); if(n)n.disabled=false; renderSwipeStep('venue'); }
+  } else {
+    pick[stepKey]=it;
+    var nb=document.getElementById(stepKey==='during'?'next2':'next3'); if(nb)nb.disabled=false;
+    if(pick.venue&&typeof drawRoute==='function')drawRoute(pick.venue);
+    renderSwipeStep(stepKey);
+  }
+}
+
+function _swRePick(stepKey){
+  if(stepKey==='venue'){
+    pick.venue=null; pick.during=null; pick.after=null;
+    ['next1','next2','next3'].forEach(function(id){var n=document.getElementById(id); if(n)n.disabled=true;});
+  } else {
+    pick[stepKey]=null;
+    var nb=document.getElementById(stepKey==='during'?'next2':'next3'); if(nb)nb.disabled=true;
+  }
+  renderSwipeStep(stepKey);
+}
+
+var _swKeysBound=false;
+function _swBindKeys(){
+  if(_swKeysBound)return; _swKeysBound=true;
+  document.addEventListener('keydown',function(e){
+    var d=window._wcDeck; if(!d)return;
+    var m=document.getElementById('addPlaceModal'); if(m&&m.style.display==='flex')return;   // not while adding a place
+    var ae=document.activeElement; if(ae&&/^(input|textarea|select)$/i.test(ae.tagName))return;  // not while typing
+    var st=document.getElementById('step'+SWIPE_STEP[d.stepKey]);
+    if(!st||!st.classList.contains('active'))return;
+    if(e.key==='ArrowLeft'){ e.preventDefault(); d.fly('pass'); }
+    else if(e.key==='ArrowRight'){ e.preventDefault(); d.fly('like'); }
+  });
 }
 function scrollToMap(){
   var m=document.querySelector('.datemap');if(!m)return;
