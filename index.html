@@ -40,7 +40,7 @@
   .datemap{display:none;background:var(--paper);border-radius:16px;padding:14px 14px 14px;box-shadow:0 10px 30px rgba(53,28,94,.22);margin:16px 0 calc(var(--player) + 24px)}
   body.mapview .datemap{display:block}
   .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin:2px 0 12px}
-  #leafmap{--cap:52px;height:min(320px,calc(100vh - var(--player) - var(--cap) - 24px));height:min(320px,calc(100svh - var(--player) - var(--cap) - 24px));border-radius:13px;overflow:hidden;background:#efeaf7;touch-action:pan-y}
+  #leafmap{--cap:52px;height:min(320px,calc(100vh - var(--player) - var(--cap) - 24px));height:min(320px,calc(100svh - var(--player) - var(--cap) - 24px));border-radius:13px;overflow:hidden;background:#efeaf7;touch-action:pan-y;isolation:isolate}
   @media(max-width:600px){#leafmap{height:min(260px,calc(100vh - var(--player) - var(--cap) - 16px));height:min(260px,calc(100svh - var(--player) - var(--cap) - 16px))}}
   @keyframes worm{to{stroke-dashoffset:-44}}
   .wormline{stroke-dasharray:2 9;animation:worm 4s linear infinite}
