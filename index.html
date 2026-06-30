@@ -268,57 +268,38 @@
   .kquote span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-style:normal;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:.85;margin-top:3px}
 
   /* Ganesh Air departure-board share card */
-  .ticket{background:#0e1116;border:1px solid #2a2f3a;border-radius:18px;padding:16px 18px 15px;color:#e8e6f0;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.45)}
-  .tk-board{margin:0 0 2px}
-  .tk-top{display:flex;justify-content:space-between;align-items:center}
-  .tk-cat{display:flex;align-items:center;gap:8px;font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:13px;letter-spacing:1.4px;color:#f0ead8}
-  .tk-mark{width:20px;height:20px;display:block;flex:none}
+  /* shareable SQUARE boarding pass (lavender — matches the site's passes) */
+  .ticket{background:#fff;color:var(--ink);position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 38px rgba(53,28,94,.3);display:flex;flex-direction:column}
+  .tk-head{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;padding:11px 16px;flex:none}
+  .tk-cat{display:flex;align-items:center;gap:8px;font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:14px;letter-spacing:1.2px}
+  .tk-mark{width:22px;height:22px;flex:none}
   .tk-mark svg{width:100%;height:100%;display:block}
-  .tk-status{font-family:'Courier Prime','Courier New',monospace;font-weight:700;font-size:11px;letter-spacing:1.5px;color:#0e1116;background:#ffd166;padding:4px 11px;border-radius:5px}
-  .tk-route{display:flex;align-items:center;gap:10px;margin:14px 0 6px}
-  .tk-rcol{min-width:64px}
-  .tk-rcol b{display:block;font-family:'Inter',system-ui,sans-serif;font-size:24px;font-weight:800;letter-spacing:1px;line-height:1;color:#fff}
-  .tk-rcol span{display:block;font-family:'Courier Prime','Courier New',monospace;font-size:8px;letter-spacing:1.6px;color:#8a82a6;margin-top:4px}
-  .tk-rcol-r{text-align:right}
-  .tk-rmid{flex:1;position:relative;height:18px;display:flex;align-items:center;justify-content:center}
-  .tk-rline{position:absolute;left:0;right:0;top:50%;height:0;border-top:2px dashed #3a2d63}
-  .tk-rplane{position:relative;background:#0e1116;padding:0 8px;color:#a78bfa;font-size:14px}
-  .tk-divider{border-top:1px dashed #333a47;margin:12px 0 13px}
-  .tk-title{font-family:'Inter',system-ui,sans-serif;font-size:25px;font-weight:800;letter-spacing:-.02em;line-height:1.13;margin-bottom:15px}
-  .tk-pick{display:flex;gap:12px;align-items:center;margin-bottom:15px}
-  .tk-thumb{width:52px;height:52px;border-radius:10px;overflow:hidden;flex:none}
+  .tk-status{font-family:'Courier Prime',ui-monospace,monospace;font-weight:700;font-size:11px;letter-spacing:1px;background:rgba(255,255,255,.22);padding:4px 11px;border-radius:20px}
+  .tk-body{display:flex;flex-direction:column;padding:15px 17px 4px}
+  .tk-title{font-family:'Inter',system-ui,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.08}
+  .tk-title .fancy{color:var(--lav)}
+  .tk-sub{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:1.4px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-top:7px}
+  .tk-pick{display:flex;gap:11px;align-items:center;margin-top:13px}
+  .tk-thumb{width:46px;height:46px;border-radius:10px;overflow:hidden;flex:none}
   .tk-thumb svg{width:100%;height:100%;display:block}
-  .tk-pickname{font-family:'Inter',system-ui,sans-serif;font-size:21px;font-weight:800;line-height:1.1}
-  .tk-picksub{font-family:'Courier Prime','Courier New',monospace;font-size:11px;letter-spacing:.6px;color:#9b93b5;margin-top:4px}
+  .tk-pickname{font-family:'Inter',system-ui,sans-serif;font-size:18px;font-weight:800;line-height:1.1;color:var(--ink)}
+  .tk-picksub{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.3px;color:var(--muted);margin-top:3px}
+  .tk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}
+  .tk-grid span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-size:7.5px;letter-spacing:1px;color:var(--muted);font-weight:700}
+  .tk-grid b{display:block;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:800;color:#3a2a63;line-height:1;margin-top:4px;white-space:nowrap}
+  .tk-comp{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;line-height:1.7;color:var(--muted);letter-spacing:.2px;margin-top:13px;padding-top:12px;border-top:1px dashed var(--line)}
+  .tk-comp b{color:#3a2a63}
   .tk-h{width:13px;height:13px;display:inline-block;vertical-align:-2px}
-  .tk-flapwrap{margin:0 -18px 15px;padding:0;background:linear-gradient(180deg,#15161c,#0b0c10);border-top:1px solid #2a2f3a;border-bottom:1px solid #2a2f3a}
-  .tk-ticker{position:relative;height:38px;margin:0;background:linear-gradient(90deg,#121319,#1c1d26,#121319);overflow:hidden;display:flex;align-items:center}
-  .tk-track{white-space:nowrap;font-family:'Courier Prime','Courier New',monospace;font-weight:700;font-size:13px;color:#ffd166;letter-spacing:3px;text-shadow:0 1px 0 #000;animation:tick 22s linear infinite;will-change:transform}
+  .tk-flapwrap{flex:none;background:linear-gradient(90deg,var(--lav),var(--lav2));overflow:hidden}
+  .tk-ticker{position:relative;height:30px;overflow:hidden;display:flex;align-items:center}
+  .tk-track{white-space:nowrap;font-family:'Courier Prime',ui-monospace,monospace;font-weight:700;font-size:12px;color:#fff;letter-spacing:2.5px;animation:tick 22s linear infinite;will-change:transform}
   @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-  .tk-stats{display:flex;gap:10px;margin-bottom:12px}
-  .tk-stats>div{flex:1;background:#15161c;border:1px solid #262a36;border-radius:8px;padding:8px 10px}
-  .tk-lbl{font-family:'Courier Prime','Courier New',monospace;font-size:9px;letter-spacing:2px;color:#8a82a6;font-weight:700;margin-bottom:3px}
-  .tk-val{font-family:'Inter',system-ui,sans-serif;font-size:23px;font-weight:800;color:#fff;line-height:1}
-  .tk-val span{font-size:11px;font-weight:800;color:#a78bfa;margin-left:3px}
-  .tk-comp{font-family:'Courier Prime','Courier New',monospace;font-size:12px;color:#9b93b5;line-height:1.8;border-top:1px dashed #333a47;padding-top:10px;margin-bottom:11px}
-  .tk-comp b{color:#d7d2ea}
-  .tk-foot{display:flex;justify-content:space-between;align-items:center;font-family:'Courier New',monospace;font-size:11px;color:#7c7595;letter-spacing:1px}
-  .tk-go{color:#0e1116;background:#cdbdf7;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:1px}
   .capturing .tk-track{animation:none!important;transform:none!important}
-  /* square shareable boarding pass + scan QR */
-  .ticket{aspect-ratio:1/1;display:flex;flex-direction:column;justify-content:space-between;padding:15px 17px}
-  .ticket .tk-title{font-size:22px;line-height:1.12;margin:0}
-  .ticket .tk-pick{margin:0}
-  .ticket .tk-pickname{font-size:19px}
-  .ticket .tk-flapwrap{margin:0 -17px}
-  .tk-stub{display:flex;align-items:center;gap:13px;border-top:2px dashed #333a47;padding-top:11px}
+  .tk-stub{display:flex;align-items:center;gap:13px;padding:12px 17px 14px;flex:none}
   .tk-stubL{flex:1;min-width:0}
-  .tk-minis{display:flex;gap:15px}
-  .tk-mini span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-size:8px;letter-spacing:1.4px;color:#8a82a6;font-weight:700;margin-bottom:2px}
-  .tk-mini b{display:flex;align-items:center;font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:800;color:#fff;line-height:1}
-  .tk-scan{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:.4px;color:#ffd166;font-weight:700;margin-top:10px}
-  .tk-stub .tk-foot{margin-top:8px}
-  .tk-qr{width:90px;height:90px;flex:none;background:#fff;border-radius:9px;padding:6px;box-sizing:border-box}
+  .tk-stubL .bc-row{height:30px}
+  .tk-scan{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:.2px;color:var(--lav);font-weight:700;margin-top:8px}
+  .tk-qr{width:84px;height:84px;flex:none;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px;box-sizing:border-box}
   .tk-qr img{width:100%;height:100%;display:block;image-rendering:pixelated}
   /* scannable easter-egg surprise overlay */
   .egg{position:fixed;inset:0;z-index:200;background:linear-gradient(160deg,#6a3fc0,#9b72e8);display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
@@ -380,34 +361,34 @@
   @media print{
     @page{margin:0}
     *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-    body{background:#0e1116;padding:0;margin:0}
+    body{background:#faf7ff;padding:0;margin:0}
     .wrap{max-width:none;margin:0;padding:0}
     .topbar,.matchup,.progress,.datemap,#playerbar,.nav,.printrow,.foot,.sharehint,.sharerow,.iti-head,.sectlabel,.twoplan,.merge,#timeline,.note,.safety,.perks,.cheeky,.diaryintro,.endcard{display:none!important}
     .step:not(.active){display:none!important}
     .panel{box-shadow:none;padding:0;background:transparent;border-radius:0}
     .sharewrap{margin:0}
     /* the ticket card becomes a full-page wall poster */
-    .ticket{min-height:100vh;border:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:8vh 9vw!important}
-    .ticket .tk-top{font-size:20px}
-    .ticket .tk-cat{font-size:18px}
-    .ticket .tk-status{font-size:15px}
-    .ticket .tk-route{margin:18px 0}
-    .ticket .tk-rcol b{font-size:40px}
-    .ticket .tk-rcol span{font-size:13px}
-    .ticket .tk-title{font-size:46px;line-height:1.12;margin:14px 0 26px}
-    .ticket .tk-pick{margin-bottom:26px}
-    .ticket .tk-thumb{width:88px;height:88px}
-    .ticket .tk-pickname{font-size:32px}
-    .ticket .tk-picksub{font-size:17px}
-    .ticket .tk-flapwrap{margin:6px 0 22px}
-    .ticket .tk-ticker{height:46px}
-    .ticket .tk-track{font-size:19px}
-    .ticket .tk-stats>div{padding:14px 16px}
-    .ticket .tk-lbl{font-size:15px}
-    .ticket .tk-val{font-size:40px}
-    .ticket .tk-go{font-size:15px}
-    .ticket .tk-comp{font-size:18px;line-height:2.1}
-    .ticket .tk-foot{font-size:16px;margin-top:10px}
+    .ticket{min-height:100vh;aspect-ratio:auto;border:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;padding:0!important}
+    .ticket .tk-head{padding:4vh 8vw}
+    .ticket .tk-cat{font-size:30px}
+    .ticket .tk-mark{width:38px;height:38px}
+    .ticket .tk-status{font-size:18px}
+    .ticket .tk-body{padding:4vh 9vw 2vh;justify-content:center}
+    .ticket .tk-title{font-size:52px;line-height:1.08}
+    .ticket .tk-sub{font-size:18px;margin-top:14px}
+    .ticket .tk-pick{margin-top:34px}
+    .ticket .tk-thumb{width:92px;height:92px}
+    .ticket .tk-pickname{font-size:36px}
+    .ticket .tk-picksub{font-size:18px}
+    .ticket .tk-grid{margin-top:36px;gap:20px}
+    .ticket .tk-grid span{font-size:14px}
+    .ticket .tk-grid b{font-size:26px}
+    .ticket .tk-comp{font-size:20px;line-height:2;padding-top:30px}
+    .ticket .tk-ticker{height:54px}
+    .ticket .tk-track{font-size:22px}
+    .ticket .tk-stub{padding:4vh 9vw}
+    .ticket .tk-scan{font-size:16px}
+    .ticket .tk-qr{width:130px;height:130px}
   }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -499,34 +480,34 @@
       <div class="sharewrap">
         <div class="sectlabel">📸 Your shareable card</div>
         <div class="ticket" id="shareCard">
-          <div class="tk-board">
-            <div class="tk-top">
-              <div class="tk-cat"><span class="tk-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 22 L17 4 C20 0.5 27 1 25.5 6 L14 22 Z" fill="#ffd166" opacity=".95"/><circle cx="10.5" cy="15.5" r="4.1" fill="none" stroke="#0e1116" stroke-width="2"/><circle cx="15.5" cy="15.5" r="4.1" fill="none" stroke="#0e1116" stroke-width="2"/></svg></span>GANESH AIR</div>
-              <div class="tk-status">● BOARDING</div>
-            </div>
+          <div class="tk-head">
+            <div class="tk-cat"><span class="tk-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 22 L17 4 C20 0.5 27 1 25.5 6 L14 22 Z" fill="#fff" opacity=".95"/><circle cx="10.5" cy="15.5" r="4.1" fill="none" stroke="#9b72e8" stroke-width="2"/><circle cx="15.5" cy="15.5" r="4.1" fill="none" stroke="#9b72e8" stroke-width="2"/></svg></span>GANESH AIR</div>
+            <div class="tk-status">GOING <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#fff"/></svg></div>
           </div>
-          <div class="tk-title">I'm going with my <span class="fancy" style="color:#cdbdf7">boyfriend</span>!</div>
-          <div class="tk-pick">
-            <div class="tk-thumb">
-              <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="#2a1f4d"/><path d="M26 40 C8 28 12 14 22 18 C25 19 26 22 26 22 C26 22 27 19 30 18 C40 14 44 28 26 40 Z" fill="#b9a5f0"/></svg>
+          <div class="tk-body">
+            <div class="tk-title">I'm going with my <span class="fancy">boyfriend</span>!</div>
+            <div class="tk-sub">World Cup · Round of 16 · July 6 2026</div>
+            <div class="tk-pick">
+              <div class="tk-thumb"><svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="#efe7fb"/><path d="M26 40 C8 28 12 14 22 18 C25 19 26 22 26 22 C26 22 27 19 30 18 C40 14 44 28 26 40 Z" fill="#7c4dca"/></svg></div>
+              <div><div class="tk-pickname" id="tkVenue">Seattle Center</div>
+              <div class="tk-picksub">Sidhya <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#7c4dca"/></svg> Neal · 8 months strong</div></div>
             </div>
-            <div><div class="tk-pickname" id="tkVenue">Seattle Center</div>
-            <div class="tk-picksub">World Cup R16 · Sidhu <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#c9b6f5"/></svg> Neal</div></div>
+            <div class="tk-grid">
+              <div><span>PASSENGER</span><b>SIDHYA <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#7c4dca"/></svg></b></div>
+              <div><span>KICKOFF</span><b>5:00 PM</b></div>
+              <div><span>GATE</span><b>R16</b></div>
+              <div><span>SEAT</span><b>2 <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#7c4dca"/></svg></b></div>
+            </div>
+            <div class="tk-comp" id="tkComp"></div>
           </div>
           <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
           <div class="tk-stub">
             <div class="tk-stubL">
-              <div class="tk-minis">
-                <div class="tk-mini"><span>KICKOFF</span><b>5:00 PM</b></div>
-                <div class="tk-mini"><span>GATE</span><b>R16</b></div>
-                <div class="tk-mini"><span>SEAT</span><b>2 <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true" style="width:13px;height:13px;margin-left:2px"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#a78bfa"/></svg></b></div>
-              </div>
-              <div class="tk-scan">↓ scan me for a lil surprise</div>
-              <div class="tk-foot"><span id="tkDate">7.06.26 · 5:00PM</span><span class="tk-go">GOING</span></div>
+              <div class="bc-row" id="tkBars" aria-hidden="true"></div>
+              <div class="tk-scan">↓ scan the code for a lil surprise 💜</div>
             </div>
             <div class="tk-qr" id="shareQR" aria-hidden="true"></div>
           </div>
-          <div class="tk-comp" id="tkComp" style="display:none"></div>
         </div>
         <div class="sharerow">
           <button class="btn primary" onclick="saveGif()">🎞️ Save GIF</button>
@@ -1237,7 +1218,7 @@ window.pickVenue=function(k){
 async function cardBlob(){
   const card=document.getElementById('shareCard');
   card.classList.add('capturing');
-  const canvas=await html2canvas(card,{scale:2,backgroundColor:'#0e1116',useCORS:true});
+  const canvas=await html2canvas(card,{scale:2,backgroundColor:'#faf7ff',useCORS:true});
   card.classList.remove('capturing');
   return await new Promise(r=>canvas.toBlob(r,'image/png'));
 }
@@ -1294,7 +1275,7 @@ async function cardGifBlob(onProgress){
   // 1) one STATIC base capture with the ticker text hidden (everything else frozen)
   const pAnim=track.style.animation, pVis=track.style.visibility;
   track.style.animation='none'; track.style.transform='none'; track.style.visibility='hidden';
-  const base=await html2canvas(card,{scale:SCALE,backgroundColor:'#0e1116',useCORS:true});
+  const base=await html2canvas(card,{scale:SCALE,backgroundColor:'#faf7ff',useCORS:true});
   if(onProgress)onProgress(0.25);
   // 2) the ticker text by itself on a transparent strip
   track.style.visibility='visible';
@@ -1306,7 +1287,7 @@ async function cardGifBlob(onProgress){
   const stripY=Math.round(ty+(th-strip.height)/2);
   const fc=document.createElement('canvas'); fc.width=base.width; fc.height=base.height;
   const ctx=fc.getContext('2d');
-  const gif=new GIF({workers:2,quality:10,width:base.width,height:base.height,workerScript:wUrl,background:'#0e1116',repeat:0});
+  const gif=new GIF({workers:2,quality:10,width:base.width,height:base.height,workerScript:wUrl,background:'#faf7ff',repeat:0});
   for(let i=0;i<FRAMES;i++){
     const off=loopUnit*(i/FRAMES);              // gentle, slow scroll
     ctx.clearRect(0,0,fc.width,fc.height);
@@ -1742,6 +1723,7 @@ function editReturn(){
 /* scannable QR on the shareable card -> opens the easter egg */
 var EGG_URL='https://worldcup-date.onrender.com/?egg=1';
 function makeQR(){
+  var bars=document.getElementById('tkBars'); if(bars&&window.bpBarcode&&!bars.querySelector('.bc-row'))bars.innerHTML=window.bpBarcode(70626,{h:30,color:'#241733',target:210});
   var el=document.getElementById('shareQR'); if(!el||el.getAttribute('data-done')==='1')return;
   if(typeof qrcode==='undefined'){setTimeout(makeQR,400);return;}
   try{var qr=qrcode(0,'M');qr.addData(EGG_URL);qr.make();
