@@ -13,12 +13,13 @@
     --lav:#7c4dca; --lav2:#9b72e8; --lav3:#c4b5fd; --accent:#b57edc; --accent2:#6a4fe0;
     --sun:#ffd166; --ink:#2e1f47; --paper:#faf7ff;
     --card:#ffffff; --line:#e7ddf7; --muted:#6b5d82;
+    --player: calc(64px + env(safe-area-inset-bottom, 0px) + 10px); /* space the fixed music player occupies */
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     font-family:'Inter',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
     background:linear-gradient(160deg,#7c4dca 0%,#9b72e8 45%,#c4b5fd 100%);
-    color:var(--ink);min-height:100vh;padding:24px 16px 96px;
+    color:var(--ink);min-height:100vh;padding:24px 16px calc(var(--player) + 40px);
   }
   h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;letter-spacing:-.02em}
   .fancy{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:1.2em;line-height:1;color:var(--accent2)}
@@ -32,11 +33,11 @@
   .matchup .chip{display:inline-flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#3a2a63;background:rgba(255,255,255,.92);border-radius:30px;padding:6px 14px;box-shadow:0 3px 12px rgba(53,28,94,.22)}
   .matchup b{color:var(--lav);font-weight:700}
   .matchup .mu-note{color:#b06a00}
-  .datemap{display:none;background:var(--paper);border-radius:16px;padding:14px 14px 14px;box-shadow:0 10px 30px rgba(53,28,94,.22);margin:16px 0 40px}
+  .datemap{display:none;background:var(--paper);border-radius:16px;padding:14px 14px 14px;box-shadow:0 10px 30px rgba(53,28,94,.22);margin:16px 0 calc(var(--player) + 24px)}
   body.mapview .datemap{display:block}
   .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin:2px 0 12px}
-  #leafmap{height:min(320px,calc(100vh - 150px));border-radius:13px;overflow:hidden;background:#efeaf7}
-  @media(max-width:600px){#leafmap{height:min(260px,calc(100vh - 140px))}}
+  #leafmap{--cap:52px;height:min(320px,calc(100vh - var(--player) - var(--cap) - 24px));height:min(320px,calc(100svh - var(--player) - var(--cap) - 24px));border-radius:13px;overflow:hidden;background:#efeaf7;touch-action:pan-y}
+  @media(max-width:600px){#leafmap{height:min(260px,calc(100vh - var(--player) - var(--cap) - 16px));height:min(260px,calc(100svh - var(--player) - var(--cap) - 16px))}}
   @keyframes worm{to{stroke-dashoffset:-44}}
   .wormline{stroke-dasharray:2 9;animation:worm 4s linear infinite}
   .maplink{display:inline-flex;align-items:center;gap:6px;margin:0 0 16px;padding:8px 15px;border:1px solid var(--line);border-radius:30px;background:#f1ecfc;color:#5a3fb0;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
@@ -208,24 +209,25 @@
   .time .body{font-size:14px;line-height:1.5}
   .time .body b{font-size:14.5px}
   .time .body small{color:var(--muted);display:block;margin-top:2px}
-  /* boarding-pass itinerary: a JS-driven deck (initTimeline) — pins mid-screen, fans the tops, releases at the end */
+  /* boarding-pass itinerary: native-scroll sticky-header deck (no JS scroll controller, no absolute positioning) */
   #timeline{position:relative;margin:0}
-  /* fallback before/without JS: a plain readable stack; initTimeline swaps the cards to absolute */
-  .bpass{position:relative;margin-bottom:14px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10)}
-  #timeline.bp-ready .bpass{position:absolute;left:0;right:0;top:0;margin:0;transform:translateY(0);will-change:transform;-webkit-backface-visibility:hidden;backface-visibility:hidden}
-  .bp-head{display:flex;align-items:center;gap:9px;height:34px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border-radius:13px 13px 0 0;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;box-shadow:0 3px 7px rgba(53,28,94,.16)}
+  /* each ticket is a normal-flow block; small negative overlap + layered shadows read as a stack of tickets */
+  .bpass{position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;margin-top:-10px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
+  .bpass:first-child{margin-top:0}
+  /* sticky header: the current leg's header pins to the top of the scroll viewport, then the next card pushes it up */
+  .bp-head{position:-webkit-sticky;position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:9px;height:34px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border-radius:13px 13px 0 0;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;box-shadow:0 3px 7px rgba(53,28,94,.16)}
   .bp-head:hover{filter:brightness(1.05)}
   .bp-h-time{font-weight:700;font-size:12.5px;white-space:nowrap;letter-spacing:.4px;padding-right:9px;border-right:1px solid rgba(255,255,255,.35)}
   .bp-h-plan{flex:1;min-width:0;font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.95}
   .bp-h-no{font-size:10.5px;opacity:.78;white-space:nowrap;letter-spacing:.5px}
-  .bp-body{padding:13px 16px 6px}
+  .bp-body{padding:13px 16px 6px;background:#fff;position:relative;z-index:1}
   .bp-desc{color:#4a3a6b;display:block;font-size:13.5px;line-height:1.5}
   .bp-desc b{color:#2e1f47}
   .bp-perf{position:relative;border-top:2px dashed #d8ccef;margin:12px 16px 0}
   .bp-perf::before,.bp-perf::after{content:"";position:absolute;top:-10px;width:18px;height:18px;border-radius:50%;background:var(--paper);border:1px solid var(--line)}
   .bp-perf::before{left:-25px}
   .bp-perf::after{right:-25px}
-  .bp-stub{display:flex;align-items:center;gap:12px;padding:11px 16px 13px}
+  .bp-stub{display:flex;align-items:center;gap:12px;padding:11px 16px 13px;background:#fff;border-radius:0 0 14px 14px}
   .bp-air{display:flex;align-items:center;gap:8px;flex:none}
   .bp-mark{width:26px;height:26px;display:block;flex:none}
   .bp-mark svg{width:100%;height:100%;display:block}
@@ -237,11 +239,6 @@
   /* shared barcode primitives (stub, arrival pass, share card) */
   .bc-row{display:flex;align-items:flex-end;gap:0;line-height:0}
   .bc-row i{display:inline-block;flex:none}
-  /* in the deck, only the focused card shows its body; the rest collapse to a peeking header strip */
-  #timeline.bp-ready .bpass .bp-body,#timeline.bp-ready .bpass .bp-perf,#timeline.bp-ready .bpass .bp-stub{transition:opacity .18s ease}
-  #timeline.bp-ready .bpass.is-collapsed .bp-body,#timeline.bp-ready .bpass.is-collapsed .bp-perf,#timeline.bp-ready .bpass.is-collapsed .bp-stub{display:none}
-  #timeline.bp-ready .bpass.is-collapsed .bp-head{border-radius:13px}
-  @media(prefers-reduced-motion:reduce){.bpass .bp-body,.bpass .bp-perf,.bpass .bp-stub{transition:none}}
   .note{background:#fff6e0;border:1px solid #f3e2a8;border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5;margin-top:14px;color:#6b5a16}
   .safety{background:#f1ecfc;border:1px solid #ddd0f5;border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5;margin-top:12px;color:#4a3578}
   .perks{display:grid;gap:8px;margin-top:14px}
@@ -968,7 +965,19 @@ function foodCards(which){
     wrap.appendChild(c);
   });
 }
-function scrollToMap(){var m=document.querySelector('.datemap');if(!m)return;var r=m.getBoundingClientRect();var safe=window.innerHeight-70;var off=Math.max(8,(safe-r.height)/2);window.scrollTo({top:Math.max(0,window.scrollY+r.top-off),behavior:'smooth'});}
+function scrollToMap(){
+  var m=document.querySelector('.datemap');if(!m)return;
+  var r=m.getBoundingClientRect();
+  var vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
+  var probe=document.createElement('div');
+  probe.style.cssText='position:absolute;height:var(--player);visibility:hidden;pointer-events:none';
+  document.body.appendChild(probe);
+  var player=probe.getBoundingClientRect().height||74;
+  document.body.removeChild(probe);
+  var safe=vh-player;
+  var off=Math.max(8,(safe-r.height)/2);
+  window.scrollTo({top:Math.max(0,window.scrollY+r.top-off),behavior:'smooth'});
+}
 /* ---------- Ganesh Air: realistic, deterministic Code128-style barcode (window.bpBarcode) ---------- */
 (function(){
   function lcg(seed){var s=(seed>>>0)||1;if(s===0)s=1;return function(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};}
@@ -1542,7 +1551,7 @@ function renderDiary(sec){
     }).join('');
   });
 }
-function renderAllDiary(){document.querySelectorAll('[id^="diary-s"]').forEach(function(b){renderDiary(b.id.replace('diary-',''));});var tl=document.getElementById('timeline');if(tl&&tl.__bpMeasure)tl.__bpMeasure();}
+function renderAllDiary(){document.querySelectorAll('[id^="diary-s"]').forEach(function(b){renderDiary(b.id.replace('diary-',''));});}
 function openRecord(i){
   diaryCurSec='s'+i;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){hint('recording needs a phone/browser with camera support 💜');return;}
@@ -1741,66 +1750,16 @@ function hideEgg(){var o=document.getElementById('eggOverlay');if(o)o.style.disp
 if(/[?&]egg/.test(location.search)||/egg/.test(location.hash)){setTimeout(showEgg,350);}
 /* TEST: open the site with ?end=1 to force the 9:30 state on a sample reveal */
 if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
-/* ---------- boarding-pass deck: JS-driven stack — pins mid-screen, fans the tops, releases at the end ---------- */
-/* tap a stacked boarding-pass header to fly to that leg */
+/* ---------- boarding-pass deck: native sticky-header scroll (no scroll-jacking) ---------- */
+/* tap a leg header to scroll to it; .bpass scroll-margin-top offsets it under the sticky header */
 function scrollToPass(i){
   var TL=document.getElementById('timeline'); if(!TL)return;
   var cards=TL.querySelectorAll('.bpass'); if(!cards.length)return;
   if(i<0)i=0; if(i>cards.length-1)i=cards.length-1;
-  var SLOT=parseFloat(TL.dataset.slot)||Math.round((window.innerHeight||800)*0.5);
-  var tlTop=TL.getBoundingClientRect().top+(window.scrollY||window.pageYOffset||0);
-  window.scrollTo({top:Math.max(0,tlTop+i*SLOT),behavior:'smooth'});  /* local=i*SLOT => leg i lands on the mid pin */
+  cards[i].scrollIntoView({behavior:'smooth',block:'start'});
 }
-function bpBindGlobal(){
-  if(window.__bpBound)return; window.__bpBound=true;
-  var raf=0;
-  function tick(){raf=0;var tl=document.getElementById('timeline');if(tl&&tl.__bpLayout)tl.__bpLayout();}
-  window.addEventListener('scroll',function(){if(!raf)raf=requestAnimationFrame(tick);},{passive:true});
-  var rt;
-  window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){var tl=document.getElementById('timeline');if(tl&&tl.__bpMeasure)tl.__bpMeasure();},120);},{passive:true});
-  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){var tl=document.getElementById('timeline');if(tl&&tl.__bpMeasure)tl.__bpMeasure();});
-}
-window.initTimeline=function(){
-  var TL=document.getElementById('timeline'); if(!TL)return;
-  TL.classList.add('bp-ready');
-  var cards=[].slice.call(TL.querySelectorAll('.bpass'));
-  var N=cards.length; if(!N)return;
-  var PEEK=28,H=[],SLOT=0,midY=0,total=0,ready=false;
-  function measure(){
-    var vh=window.innerHeight||document.documentElement.clientHeight,i,maxH=0;
-    for(i=0;i<N;i++){cards[i].style.transform='none';cards[i].classList.remove('is-collapsed');}
-    for(i=0;i<N;i++){H[i]=cards[i].offsetHeight;if(H[i]>maxH)maxH=H[i];}
-    if(maxH===0){ready=false;return;}            /* still hidden -> retry when the reveal is visible */
-    SLOT=Math.max(maxH+40,Math.round(vh*0.5));
-    midY=Math.round(vh*0.28);
-    total=(N-1)*SLOT+Math.max(vh,midY+H[N-1]+28);
-    TL.style.height=total+'px'; TL.dataset.slot=SLOT;
-    ready=true;
-  }
-  function layout(){
-    if(!ready){measure();if(!ready)return;}
-    var sc=window.scrollY||window.pageYOffset||0;
-    var tlTop=TL.getBoundingClientRect().top+sc;
-    var f=(sc-tlTop)/SLOT; if(f<0)f=0; if(f>N-1)f=N-1;
-    var fi=Math.round(f),i;
-    /* shrink the header peek so ALL fanned tops fit above the pin on short viewports (no piling) */
-    var peek=Math.min(PEEK, Math.max(6, (midY-8)/(N-1)));
-    for(i=0;i<N;i++){
-      var vy;
-      if(i<fi){vy=midY-peek*(fi-i);if(vy<8)vy=8;}
-      else if(i===fi){vy=midY;}
-      else{vy=midY+H[fi]+(i-fi-1)*peek;}
-      var docY=sc+vy-tlTop;
-      if(docY<0)docY=0;
-      var maxY=total-H[i]; if(docY>maxY)docY=maxY;    /* clamp: enters at the top, releases at the bottom so content below scrolls free */
-      cards[i].style.transform='translateY('+Math.round(docY)+'px)';
-      cards[i].classList.toggle('is-collapsed',i!==fi);
-      cards[i].style.zIndex=(i<=fi)?(200+i):(200+(N-i));
-    }
-  }
-  TL.__bpLayout=layout; TL.__bpMeasure=function(){measure();layout();};
-  measure(); layout(); bpBindGlobal();
-};
+/* the deck is pure CSS now (normal flow + position:sticky headers) — no scroll controller needed */
+window.initTimeline=function(){};
 </script>
 <div id="ythost"></div>
 <div id="playerbar" role="region" aria-label="Music player">
