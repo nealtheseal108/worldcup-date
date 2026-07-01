@@ -638,7 +638,6 @@
           <div class="tk-stub">
             <div class="tk-stubL">
               <div class="bc-row" id="tkBars" aria-hidden="true"></div>
-              <div class="tk-scan">👆 tap the pass for a lil surprise 💜</div>
             </div>
           </div>
         </div>
@@ -1465,6 +1464,7 @@ function reveal(){
     '🗺️ <b>your whole night, mapped out babu.</b> 💜 i planned every train and every stop so there is nothing for you to figure out, just show up and we follow the plan together. '+pick.after.t+' is walk-in, so worst case we wait a few mins for a table, totally worth it. i got you. 💜';
   go(4);
   if(window.buzz)buzz(24);
+  requestAnimationFrame(fitTicketBarcode); setTimeout(fitTicketBarcode,180);
   if(window.initTimeline){requestAnimationFrame(window.initTimeline);setTimeout(window.initTimeline,140);}
   try{['.sharewrap','.iti-head','.twoplan','.merge','#diaryGate'].forEach(function(sel){var e=document.querySelector(sel);if(e&&!e.classList.contains('in'))e.classList.add('reveal-up');});
     document.querySelectorAll('#step4 .perks').forEach(function(e){if(!e.classList.contains('in'))e.classList.add('reveal-up');});
@@ -2238,8 +2238,15 @@ function editReturn(){
 }
 /* scannable QR on the shareable card -> opens the easter egg */
 var EGG_URL='https://worldcup-date.onrender.com/?egg=1';
+function fitTicketBarcode(){
+  var bars=document.getElementById('tkBars'); if(!bars||!window.bpBarcode)return;
+  var p=bars.parentElement, w=p?p.clientWidth:0;
+  if(w<80)return;   // card not laid out yet (step4 hidden)
+  bars.innerHTML=window.bpBarcode(70626,{h:60,color:'#241733',target:Math.round(w)});
+}
+window.addEventListener('resize',function(){ fitTicketBarcode(); },{passive:true});
 function makeQR(){
-  var bars=document.getElementById('tkBars'); if(bars&&window.bpBarcode&&!bars.querySelector('.bc-row'))bars.innerHTML=window.bpBarcode(70626,{h:60,color:'#241733',target:300});
+  fitTicketBarcode();
   var el=document.getElementById('shareQR'); if(!el||el.getAttribute('data-done')==='1')return;
   if(typeof qrcode==='undefined'){setTimeout(makeQR,400);return;}
   try{var qr=qrcode(0,'M');qr.addData(EGG_URL);qr.make();
