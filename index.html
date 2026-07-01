@@ -398,13 +398,14 @@
   .tk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:20px}
   .tk-grid span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-size:7.5px;letter-spacing:1px;color:var(--muted);font-weight:700}
   .tk-grid b{display:block;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:800;color:#3a2a63;line-height:1;margin-top:4px;white-space:nowrap}
-  .tk-comp{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;line-height:1.85;color:var(--muted);letter-spacing:.2px;margin-top:19px;padding-top:17px;border-top:1px dashed var(--line)}
+  .tk-summary{display:flex;gap:16px;align-items:flex-start;margin-top:19px;padding-top:16px;border-top:1px dashed var(--line)}
+  .tk-comp{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;line-height:1.85;color:var(--muted);letter-spacing:.2px;flex:0 1 auto;min-width:0}
   .tk-comp b{color:#3a2a63}
-  .tk-steps{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-family:'Courier Prime',ui-monospace,monospace}
+  .tk-steps{flex:1;min-width:0;font-family:'Courier Prime',ui-monospace,monospace;text-align:right}
   .tk-steps-h{font-size:8px;letter-spacing:1.1px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:5px}
-  .tk-step{display:flex;gap:6px;font-size:8px;line-height:1.5}
-  .tk-step-t{color:var(--lav);font-weight:700;min-width:46px;flex:none}
-  .tk-step-n{color:#3a2a63;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tk-step{display:flex;justify-content:flex-end;gap:7px;font-size:8px;line-height:1.55}
+  .tk-step-n{color:#3a2a63;font-weight:600;flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tk-step-t{color:var(--lav);font-weight:700;flex:none}
   .tk-h{width:13px;height:13px;display:inline-block;vertical-align:-2px}
   .tk-flapwrap{flex:none;background:linear-gradient(90deg,var(--lav),var(--lav2));overflow:hidden}
   .tk-ticker{position:relative;height:30px;overflow:hidden;display:flex;align-items:center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
@@ -645,8 +646,10 @@
               <div><span>GATE</span><b>R16</b></div>
               <div><span>SEAT</span><b>2 <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#7c4dca"/></svg></b></div>
             </div>
-            <div class="tk-comp" id="tkComp"></div>
-            <div class="tk-steps" id="tkSteps"></div>
+            <div class="tk-summary">
+              <div class="tk-comp" id="tkComp"></div>
+              <div class="tk-steps" id="tkSteps"></div>
+            </div>
           </div>
           <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
           <div class="tk-stub">
@@ -1456,7 +1459,7 @@ function reveal(){
   if(_tkSteps){
     var _plans=rows.map(function(r,i){return {t:r[0],n:window.diaryLabels[i]||''};}).filter(function(s){return !/stolen hour/i.test(s.n);});   // drop the stolen-hour leg on the shareable pass only
     _tkSteps.innerHTML='<div class="tk-steps-h">THE DAY · '+_plans.length+' STOPS</div>'+
-      _plans.map(function(s){ return '<div class="tk-step"><span class="tk-step-t">'+s.t+'</span><span class="tk-step-n">'+s.n+'</span></div>'; }).join('');
+      _plans.map(function(s){ return '<div class="tk-step"><span class="tk-step-n">'+s.n+'</span><span class="tk-step-t">'+s.t+'</span></div>'; }).join('');
   }
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
