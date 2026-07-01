@@ -1036,11 +1036,16 @@ function _swCurrentItem(stepKey,items){
   for(var i=0;i<items.length;i++){ if(_swItemId(stepKey,items[i])===id)return items[i]; }
   return stepKey==='venue'?null:pick[stepKey];
 }
-function _swMeta(it){
+function _swMeta(stepKey,it){
+  var station='';
+  if(stepKey==='after'&&typeof REST_LL!=='undefined'&&REST_LL[it.t]&&typeof nearestStationName==='function'){
+    station=' <span class="tag">🚉 '+nearestStationName(REST_LL[it.t])+' stn</span>';
+  }
   return (it.homemade?'<span class="tag love">💜 homemade by neal</span> ':'')
     +(it.r?'<span class="tag rate">⭐ '+it.r+(it.rc?' · '+it.rc:'')+'</span> ':'')
     +(it.p?'<span class="tag price">'+it.p+'</span>':'')
-    +(it.east?' <span class="tag">🚆 2 Line home</span>':'');
+    +(it.east?' <span class="tag">🚆 2 Line home</span>':'')
+    +station;
 }
 function _swCardInner(stepKey,it){
   if(stepKey==='venue'){
@@ -1051,7 +1056,7 @@ function _swCardInner(stepKey,it){
   return '<div class="sw-emojihdr">'+it.e+'</div>'
     +'<div class="sw-body"><div class="sw-ttl">'+it.t+'</div><div class="sw-desc">'+it.d+'</div>'
     +(it.dishes&&it.dishes.length?'<div class="dishes">🍽️ '+it.dishes.join(' · ')+'</div>':'')
-    +'<div class="sw-meta">'+_swMeta(it)+'</div></div>';
+    +'<div class="sw-meta">'+_swMeta(stepKey,it)+'</div></div>';
 }
 function _swName(stepKey,it){ return stepKey==='venue'?it.name:it.t; }
 function _swEmoji(stepKey,it){ return stepKey==='venue'?'📍':it.e; }
