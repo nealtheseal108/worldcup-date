@@ -1420,10 +1420,10 @@ function reveal(){
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
-    // COVER-STACK: every pass pins at the same top, so each one cleanly covers the previous
-    // (no header-fan => nothing to collapse/bleed at the container end). The card behind peeks
-    // at the BOTTOM as the next leg, and a decorative shadow-edge keeps the "deck" look.
-    var topOff = 52;
+    // CAPPED FAN: pin each pass 36px below the last so the next tucks under IMMEDIATELY
+    // (tight pile, headers peek, only the active body shows). Cap at 5 so legs 6+ cleanly
+    // COVER-stack at one point -> no deep-fan collapse/bleed at the container end.
+    var topOff = 46 + Math.min(i,4)*36;
     return `<div class="bpass" style="top:${topOff}px;z-index:${i+2}">`+
       `<div class="bp-head" onclick="scrollToPass(${i})" title="jump to this leg">`+
         `<span class="bp-h-time">✈ ${r[0]}</span>`+
