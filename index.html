@@ -400,6 +400,14 @@
   .tk-grid b{display:block;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:800;color:#3a2a63;line-height:1;margin-top:4px;white-space:nowrap}
   .tk-comp{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;line-height:1.85;color:var(--muted);letter-spacing:.2px;margin-top:19px;padding-top:17px;border-top:1px dashed var(--line)}
   .tk-comp b{color:#3a2a63}
+  .tk-steps{margin-top:15px;padding-top:14px;border-top:1px dashed var(--line);font-family:'Courier Prime',ui-monospace,monospace}
+  .tk-steps-h{font-size:9px;letter-spacing:1.5px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:8px}
+  .tk-step{display:flex;gap:9px;font-size:10px;line-height:1.75}
+  .tk-step-t{color:var(--lav);font-weight:700;min-width:60px;flex:none}
+  .tk-step-n{color:#3a2a63;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ticket .tk-steps-h{font-size:16px}
+  .ticket .tk-step{font-size:17px;gap:16px;line-height:2}
+  .ticket .tk-step-t{min-width:120px}
   .tk-h{width:13px;height:13px;display:inline-block;vertical-align:-2px}
   .tk-flapwrap{flex:none;background:linear-gradient(90deg,var(--lav),var(--lav2));overflow:hidden}
   .tk-ticker{position:relative;height:30px;overflow:hidden;display:flex;align-items:center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
@@ -441,9 +449,9 @@
   /* floating music button */
   /* Spotify-style bottom player bar */
   #playerbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
-    padding:9px 16px;background:rgba(18,12,34,.93);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    padding:9px 16px;background:#160e2b;
     border-top:1px solid rgba(167,139,250,.32);box-shadow:0 -6px 26px rgba(18,8,38,.45);color:#fff;
-    transform:translateY(120%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+    transform:translateY(120%);transition:transform .4s cubic-bezier(.2,.8,.2,1);will-change:transform;backface-visibility:hidden}
   #playerbar.show{transform:none}
   .pb-info{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
   .pb-art{width:42px;height:42px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;font-size:21px;
@@ -637,6 +645,7 @@
               <div><span>SEAT</span><b>2 <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#7c4dca"/></svg></b></div>
             </div>
             <div class="tk-comp" id="tkComp"></div>
+            <div class="tk-steps" id="tkSteps"></div>
           </div>
           <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
           <div class="tk-stub">
@@ -747,7 +756,7 @@
         </div>
       </div>
 
-      <div class="cheeky" id="cheekyLine">Sex is not included in this date unfortunately. 💔😅</div>
+      <div class="cheeky" id="cheekyLine">Lotus sex in the car may or may not be included in this date. 😏💜</div>
 
       <div class="printrow">
         <button class="btn primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
@@ -1442,6 +1451,9 @@ function reveal(){
     ['~9:45 PM','<b>Easy ride home.</b>','Back on the 2 Line, which runs until midnight, so there is never a rush home.']
   ];
   window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
+  var _tkSteps=document.getElementById('tkSteps');
+  if(_tkSteps)_tkSteps.innerHTML='<div class="tk-steps-h">THE DAY · ALL '+rows.length+' STOPS</div>'+
+    rows.map(function(r,i){ return '<div class="tk-step"><span class="tk-step-t">'+r[0]+'</span><span class="tk-step-n">'+(window.diaryLabels[i]||'')+'</span></div>'; }).join('');
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
@@ -1851,10 +1863,10 @@ async function saveGif(){
 }
 
 /* ---------- background music: looping playlist with fade transitions ----------
-   Shotput -> Link Up -> Passionfruit(@1:12) -> Heat Waves(8D) -> Babydoll -> Flight's Booked -> Kiss Me More -> Ay No Puedo -> No One Noticed -> loop  */
+   Shotput -> Flight's Booked -> Link Up -> Passionfruit(@1:12) -> Heat Waves(8D) -> Babydoll -> Kiss Me More -> Ay No Puedo -> No One Noticed -> loop  */
 var MUSIC=[
-  {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake', start:55},
   {id:'K4Fk9Clc12w', title:'Shotput (slowed + reverb)', artist:'Still Woozy'},
+  {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake', start:55},
   {id:'1_w9ZtbHj_E', title:'Link Up', artist:'Don Toliver'},
   {id:'nfJReXaXkTY', title:'Passionfruit (slowed + reverb)', artist:'Drake', start:72},
   {id:'wTPWI3qkx5c', title:'Heat Waves (8D slowed)', artist:'Glass Animals'},
@@ -2355,8 +2367,8 @@ window.initTimeline=function(){};
   <div class="pb-info">
     <div class="pb-art">🎧</div>
     <div class="pb-meta">
-      <div class="pb-title" id="pbTitle">Flight's Booked</div>
-      <div class="pb-artist" id="pbArtist">Drake</div>
+      <div class="pb-title" id="pbTitle">Shotput (slowed + reverb)</div>
+      <div class="pb-artist" id="pbArtist">Still Woozy</div>
     </div>
   </div>
   <div class="pb-controls">
