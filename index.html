@@ -2255,14 +2255,18 @@ function placeWithCoords(lat,lng){
 /* the activity at each itinerary moment (s0..s7), used as the movie's activity subtitle */
 var ACTIVITY=['on our way in 🚆','snack time 🥐','kickoff ⚽','full time 🙌','dinner 🍽️','salt & straw 🍦','the park 💜','heading home 🚆'];
 function movieActivity(c){var i=parseInt((c.sec||'s0').slice(1));return ACTIVITY[i]||(window.diaryLabels&&window.diaryLabels[i])||'a moment';}
+function localClips(){   // this phone's IndexedDB backups — fallback when the cloud is empty/down at movie time
+  return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){all.push(c.value);c.continue();}else{all.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});res(all);}};cur.onerror=function(){res(all);};});}).catch(function(){return [];});
+}
 function gatherClips(){
   if(cloudOn()){
     return cloudList().then(function(list){
+      if(!list||!list.length) return localClips();   // cloud reachable but has nothing -> use on-phone backups
       list.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});
-      return Promise.all(list.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {sec:c.sec,lat:c.lat,lng:c.lng,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){return arr.filter(Boolean);});
-    }).catch(function(){return [];});
+      return Promise.all(list.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {sec:c.sec,lat:c.lat,lng:c.lng,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:localClips();});   // every download failed -> local
+    }).catch(function(){return localClips();});   // cloud unreachable -> on-phone backups
   }
-  return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){all.push(c.value);c.continue();}else{all.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});res(all);}};cur.onerror=function(){res(all);};});});
+  return localClips();
 }
 function compileMovie(){gatherClips().then(function(all){if(!all.length){hint("record a few moments first, then i'll cut our movie 🎬💜");return;}movieClips=all;openMovie();});}
 function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
