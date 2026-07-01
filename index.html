@@ -1472,7 +1472,7 @@ loadArrival();
 /* ============ LIVE FLIGHT STATUS: reunion countdown -> together counter -> since-we-met ============ */
 /* EDIT if any are off. metDate is my best guess from the site's "8 months" framing (Nov 6 2025). */
 var US = {
-  metDate: new Date(2025,10,6,0,0,0),   // when you two got together -> "8 months" on Jul 6 2026
+  metDate: new Date('2025-10-25T22:00:00-07:00'), // you two got together: Oct 25 2025, 10 PM PT
   landing: new Date(2026,6,2,22,5,0),   // Sidhya's DL 2016 arrival: Jul 2, 10:05 PM (Seattle)
   home:    {lat:40.7608,lng:-111.8910}, // Salt Lake City
   seattle: {lat:47.6062,lng:-122.3321}
@@ -1480,6 +1480,7 @@ var US = {
 function _haversineMi(a,b){var R=3958.8,dLa=(b.lat-a.lat)*Math.PI/180,dLo=(b.lng-a.lng)*Math.PI/180,la1=a.lat*Math.PI/180,la2=b.lat*Math.PI/180;var h=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(la1)*Math.cos(la2)*Math.sin(dLo/2)*Math.sin(dLo/2);return 2*R*Math.asin(Math.sqrt(h));}
 var US_MILES = Math.round(_haversineMi(US.home,US.seattle));
 function _p2(n){n=String(n);return n.length<2?'0'+n:n;}
+function _p3(n){n=String(n);while(n.length<3)n='0'+n;return n;}
 function buzz(ms){try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e){}}
 var _fsCells=[], _fsLanded=false, _fsLandAt=null;
 function _fsSince(now){
@@ -1490,7 +1491,7 @@ function _fsSince(now){
   return m+' month'+(m===1?'':'s')+(d?', '+d+' day'+(d===1?'':'s'):'');
 }
 function _fsSetClock(d,h,mi,s){
-  var digs=(_p2(d)+_p2(h)+_p2(mi)+_p2(s)).split('');
+  var digs=(_p3(d)+_p2(h)+_p2(mi)+_p2(s)).split('');
   for(var i=0;i<_fsCells.length;i++){ if(_fsCells[i].textContent!==digs[i]){ _fsCells[i].textContent=digs[i]; _fsCells[i].classList.remove('flip'); void _fsCells[i].offsetWidth; _fsCells[i].classList.add('flip'); } }
 }
 function _fsTick(){
@@ -1505,7 +1506,7 @@ function _fsTick(){
     var win=1.5*86400000; if(plane)plane.style.left=(8+Math.max(0,Math.min(1,1-ms/win))*70)+'%';
     el.classList.remove('landed'); if(btn)btn.style.display='';
   }else{
-    var base=_fsLandAt||US.landing, ms2=Math.max(0,now-base), s2=Math.floor(ms2/1000), d2=Math.floor(s2/86400); s2-=d2*86400; var h2=Math.floor(s2/3600); s2-=h2*3600; var m2=Math.floor(s2/60); s2-=m2*60;
+    var base=US.metDate, ms2=Math.max(0,now-base), s2=Math.floor(ms2/1000), d2=Math.floor(s2/86400); s2-=d2*86400; var h2=Math.floor(s2/3600); s2-=h2*3600; var m2=Math.floor(s2/60); s2-=m2*60;
     _fsSetClock(d2,h2,m2,s2);
     label.textContent='💜 TOGETHER FOR';
     dist.innerHTML='<b>0 mi</b> apart · you made it 💜';
@@ -1515,7 +1516,7 @@ function _fsTick(){
 }
 function fsInit(){
   var clock=document.getElementById('fsClock'); if(!clock) return;
-  clock.innerHTML=['d','h','m','s'].map(function(u){return '<span class="fs-cell"></span><span class="fs-cell"></span><span class="fs-unit">'+u+'</span>';}).join('');
+  clock.innerHTML='<span class="fs-cell"></span><span class="fs-cell"></span><span class="fs-cell"></span><span class="fs-unit">d</span>'+['h','m','s'].map(function(u){return '<span class="fs-cell"></span><span class="fs-cell"></span><span class="fs-unit">'+u+'</span>';}).join('');
   _fsCells=Array.prototype.slice.call(clock.querySelectorAll('.fs-cell'));
   try{ var stored=localStorage.getItem('wc_landed'); if(stored){ _fsLanded=true; _fsLandAt=new Date(+stored); } }catch(e){}
   var btn=document.getElementById('fsLandBtn');
