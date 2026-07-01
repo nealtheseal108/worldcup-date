@@ -181,6 +181,22 @@
   .sw-chosen-badge{background:var(--sun);color:#7a5a00;font-weight:800;font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:5px 13px;border-radius:20px}
   .sw-chosen-card{position:relative;inset:auto;width:100%;max-width:344px;box-shadow:0 10px 26px rgba(53,28,94,.18)}
   .sw-again{margin-top:2px}
+  /* ---------- Tap-to-pick grid (non-swipe view, default for steps 1/2/3) ---------- */
+  .pick-hint{font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;letter-spacing:1.2px;color:var(--muted);font-weight:700;text-transform:uppercase;text-align:center;margin:0 0 13px}
+  .pickgrid{display:grid;gap:14px;grid-template-columns:1fr}
+  @media(min-width:560px){.pickgrid{grid-template-columns:1fr 1fr}}
+  .pickcard{position:relative;display:flex;flex-direction:column;text-align:left;width:100%;padding:0;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(53,28,94,.10);cursor:pointer;font-family:inherit;color:inherit;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+  .pickcard:hover{transform:translateY(-3px);box-shadow:0 15px 32px rgba(53,28,94,.20);border-color:var(--lav2)}
+  .pickcard:active{transform:translateY(-1px) scale(.99)}
+  .pickcard:focus-visible{outline:2px solid var(--lav);outline-offset:2px}
+  .pickcard .sw-art,.pickcard .sw-art svg,.pickcard .sw-art .art{height:114px}
+  .pickcard .sw-emojihdr{height:106px;font-size:52px}
+  .pickcard .sw-body{padding:13px 16px 15px;overflow:visible;flex:1}
+  .pickcard .sw-desc{font-size:13px}
+  .pickcard .sw-cta{display:block;text-align:center;font-size:11.5px;font-weight:800;letter-spacing:.4px;color:var(--lav);background:#f2ecfd;border-top:1px solid var(--line);padding:9px 10px;transition:background .16s ease,color .16s ease}
+  .pickcard:hover .sw-cta{background:var(--lav);color:#fff}
+  .pick-toggle{display:block;margin:18px auto 2px;background:none;border:none;color:var(--lav);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .pick-toggle:hover{color:#5a3aa0}
   .veg{color:#1c7a4a;background:#e3f6ea}
   .price{color:#7a5a16;background:#fdf0c8;letter-spacing:1px}
   .rate{color:#8a6a12;background:#fbf1cf}
@@ -1035,6 +1051,7 @@ function foodCards(which,animate){ renderSwipeStep(which, animate); }
 var SWIPE_CONT={venue:'venueCards',during:'duringCards',after:'afterCards'};
 var SWIPE_STEP={venue:1,during:2,after:3};
 var SWIPE_LABEL={venue:'watch spot',during:'snack',after:'dinner'};
+var _swMode={venue:'grid',during:'grid',after:'grid'};   // 'grid' (tap-to-pick, default) | 'deck' (tinder swipe)
 window._wcDeck=null;   // {stepKey, fly} — the live deck, for keyboard control
 
 function _swItems(stepKey){
@@ -1079,7 +1096,33 @@ function renderSwipeStep(stepKey, animate){
   var cont=document.getElementById(SWIPE_CONT[stepKey]); if(!cont)return;
   var items=_swItems(stepKey);
   if(_swPickId(stepKey)!=null){ _swRenderChosen(stepKey, cont, items); }
-  else { _swRenderDeck(stepKey, cont, items, animate); }
+  else if(_swMode[stepKey]==='deck'){ _swRenderDeck(stepKey, cont, items, animate); }
+  else { _swRenderGrid(stepKey, cont, items, animate); }
+}
+
+/* Tap-to-pick grid: every option laid out at once, tap one to lock it in.
+   Reuses _swCardInner (same card content as the deck) and _swApplyPick (same commit path),
+   so the two views can never drift out of sync. */
+function _swRenderGrid(stepKey, cont, items, animate){
+  window._wcDeck=null;
+  if(!items.length){ _swRenderAllPass(stepKey, cont); return; }
+  var html='<div class="pickview'+(animate?' reveal-up':'')+'">'
+    +'<div class="pick-hint">👆 tap a card to lock it in, babu</div>'
+    +'<div class="pickgrid">';
+  items.forEach(function(it,i){
+    html+='<button type="button" class="pickcard" data-i="'+i+'">'
+      +_swCardInner(stepKey, it)
+      +'<span class="sw-cta">tap to pick this 💜</span></button>';
+  });
+  html+='</div>'
+    +'<button type="button" class="pick-toggle sw-toggle-deck">😜 rather swipe them? tap here</button>'
+    +'</div>';
+  cont.innerHTML=html;
+  cont.querySelectorAll('.pickcard').forEach(function(b){
+    b.onclick=function(){ _swApplyPick(stepKey, items[+b.getAttribute('data-i')]); };
+  });
+  cont.querySelector('.sw-toggle-deck').onclick=function(){ _swMode[stepKey]='deck'; renderSwipeStep(stepKey, true); };
+  if(animate)armReveals();
 }
 
 function _swRenderDeck(stepKey, cont, items, animate){
@@ -1090,7 +1133,8 @@ function _swRenderDeck(stepKey, cont, items, animate){
     +'<div class="swipe-stack"></div>'
     +'<div class="swipe-btns"><button type="button" class="sw-btn sw-x" aria-label="pass">✕</button>'
     +'<button type="button" class="sw-btn sw-heart" aria-label="like">♥</button></div>'
-    +'<div class="swipe-hint">drag the card, tap ✕ / ♥, or use ← →</div></div>';
+    +'<div class="swipe-hint">drag the card, tap ✕ / ♥, or use ← →</div>'
+    +'<button type="button" class="pick-toggle sw-toggle-grid">☰ see them all instead</button></div>';
   var stack=cont.querySelector('.swipe-stack'), prog=cont.querySelector('.swipe-progress');
   var idx=0, liked=[], busy=false, topCard=null;
 
@@ -1133,6 +1177,7 @@ function _swRenderDeck(stepKey, cont, items, animate){
   }
   cont.querySelector('.sw-x').onclick=function(){fly('pass');};
   cont.querySelector('.sw-heart').onclick=function(){fly('like');};
+  cont.querySelector('.sw-toggle-grid').onclick=function(){ _swMode[stepKey]='grid'; renderSwipeStep(stepKey, true); };
   window._wcDeck={stepKey:stepKey, fly:fly};
   _swBindKeys();
   paint();
@@ -1178,7 +1223,7 @@ function _swRenderChosen(stepKey, cont, items){
   if(!it){ _swRenderDeck(stepKey, cont, items); return; }
   cont.innerHTML='<div class="sw-chosen"><div class="sw-chosen-badge">✓ your pick</div>'
     +'<div class="sw-card sw-chosen-card">'+_swCardInner(stepKey, it)+'</div>'
-    +'<button type="button" class="btn lav2btn sw-again">↺ swipe again</button></div>';
+    +'<button type="button" class="btn lav2btn sw-again">↺ change my pick</button></div>';
   cont.querySelector('.sw-again').onclick=function(){ _swRePick(stepKey); };
 }
 
