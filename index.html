@@ -256,7 +256,7 @@
   #timeline{position:relative;margin:0 auto;max-width:430px;padding-bottom:200px}
   /* native sticky STACK: each card pins a bit lower than the last (top = 10 + i*40), so the deck piles up
      SMOOTHLY as you scroll (browser sticky = compositor, no JS) and earlier legs' header tops peek above */
-  .bpass{position:-webkit-sticky;position:sticky;top:calc(10px + var(--bpi,0) * 36px);background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
+  .bpass{position:-webkit-sticky;position:sticky;top:calc(46px + var(--bpi,0) * 36px);background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
   .bp-head{display:flex;align-items:center;gap:9px;height:36px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border-radius:13px 13px 0 0;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;box-shadow:0 3px 7px rgba(53,28,94,.16)}
   .bp-head:hover{filter:brightness(1.05)}
   .bp-h-time{font-weight:700;font-size:12.5px;white-space:nowrap;letter-spacing:.4px;padding-right:9px;border-right:1px solid rgba(255,255,255,.35)}
@@ -288,6 +288,8 @@
   .cheeky{text-align:center;font-style:italic;color:var(--muted);font-size:13.5px;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
   .printrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
   .sectlabel{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+  /* deck label pins at the top so the pile stacks below it (anchor lower, starts when it hits the top) */
+  .sectlabel.deck-label{position:-webkit-sticky;position:sticky;top:0;z-index:20;background:var(--paper);margin:0;padding:13px 0 9px}
 
   /* shareable card */
   .sharewrap{margin:6px auto 0;max-width:430px}
@@ -577,7 +579,7 @@
       </div>
       <div class="merge">💜 Our paths cross: we meet on the 2 Line around 3:00 PM and ride into Seattle together!</div>
 
-      <div class="sectlabel">🛫 your boarding passes · the whole day, leg by leg</div>
+      <div class="sectlabel deck-label">🛫 your boarding passes · the whole day, leg by leg</div>
       <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild from 6:00-7:30 around full time, record as much as you want. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <span style="font-size:12px;color:var(--muted)">your movie unlocks at the end of the night 🎬</span></div>
       <div id="timeline"></div>
 
