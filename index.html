@@ -266,6 +266,20 @@
   .flightstatus.landed .fs-board{background:linear-gradient(160deg,#241645,#3a1f63)}
   .flightstatus.landed .fs-cell{color:#7cffb0}
   @media(prefers-reduced-motion:reduce){.fs-cell.flip{animation:none}.fs-plane,.fs-track{transition:none}}
+  /* ---------- GANESH AIR frequent-flyer mileage statement (real stats, count-up) ---------- */
+  .statement{max-width:430px;margin:0 auto;background:linear-gradient(160deg,#fff,#f7f2ff);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px rgba(53,28,94,.14);padding:16px 18px 15px;font-family:'Courier Prime',ui-monospace,monospace}
+  .stmt-head{display:flex;align-items:center;justify-content:space-between}
+  .stmt-air{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;letter-spacing:1px;color:var(--ink)}
+  .stmt-mark{width:24px;height:24px;display:inline-block;flex:none}
+  .stmt-mark svg{width:100%;height:100%;display:block}
+  .stmt-tier{background:linear-gradient(90deg,#3a2c5e,#6b4bb0);color:#ffe9a8;font-weight:800;font-size:10.5px;letter-spacing:1.5px;padding:4px 11px;border-radius:20px}
+  .stmt-sub{font-size:10px;letter-spacing:1.4px;color:var(--muted);font-weight:700;margin:6px 0 13px;text-transform:uppercase}
+  .stmt-rows{display:flex;flex-direction:column;gap:9px}
+  .stmt-row{display:flex;align-items:baseline;gap:12px;border-bottom:1px dashed var(--line);padding-bottom:8px}
+  .stmt-row:last-child{border-bottom:none;padding-bottom:0}
+  .stmt-n,.stmt-emoji{font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:22px;color:var(--lav);min-width:92px;text-align:right;flex:none;letter-spacing:-.02em}
+  .stmt-l{font-size:13px;color:var(--muted);font-weight:600;line-height:1.3}
+  .stmt-foot{margin-top:14px;font-size:9.5px;letter-spacing:1px;color:var(--lav);font-weight:700;text-align:center;text-transform:uppercase}
   /* locked date-diary finale */
   .diarylock{text-align:center;background:linear-gradient(160deg,#f3eefc,#ece3fb);border:1px dashed var(--lav2);border-radius:16px;padding:28px 22px;margin-top:6px}
   .dl-ico{font-size:32px;margin-bottom:6px}
@@ -625,6 +639,24 @@
           <button class="btn lav2btn" onclick="shareCard()">📤 Share boarding pass</button>
         </div>
         <div class="sharehint" id="shareHint">Save it, then drop it into WhatsApp or iMessage 💜</div>
+      </div>
+
+      <div class="sectlabel">✈ Your GANESH AIR statement</div>
+      <div class="statement" id="statement">
+        <div class="stmt-head">
+          <span class="stmt-air"><span class="stmt-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="10.8" cy="14" r="6" fill="none" stroke="#7c4dca" stroke-width="2.6"/><circle cx="17.2" cy="14" r="6" fill="none" stroke="#b79bf0" stroke-width="2.6"/></svg></span>GANESH AIR</span>
+          <span class="stmt-tier">★ PLATINUM</span>
+        </div>
+        <div class="stmt-sub">FREQUENT FLYER · SIDHYA 💜 NEAL</div>
+        <div class="stmt-rows">
+          <div class="stmt-row"><span class="stmt-n" data-days="1" data-to="242">0</span><span class="stmt-l">days together, and counting 💜</span></div>
+          <div class="stmt-row"><span class="stmt-n" data-to="700" data-suf=" mi">0</span><span class="stmt-l">you crossed to be here ✈</span></div>
+          <div class="stmt-row"><span class="stmt-n" data-to="32560">0</span><span class="stmt-l">texts, all-time 📱</span></div>
+          <div class="stmt-row"><span class="stmt-n" data-to="4441">0</span><span class="stmt-l">texts in June alone 🔥</span></div>
+          <div class="stmt-row"><span class="stmt-n" data-to="987">0</span><span class="stmt-l">"i love you"s sent 💌</span></div>
+          <div class="stmt-row"><span class="stmt-emoji">😭</span><span class="stmt-l">our most-texted emoji (382×, lol)</span></div>
+        </div>
+        <div class="stmt-foot">STATUS: BOARDING · destination — every round after 💜</div>
       </div>
 
       <div class="iti-head" style="margin-top:18px">
@@ -1509,9 +1541,21 @@ function burstConfetti(originEl,opts){
       sp.style.transform='translate(-50%,-50%) translate('+(dx*e)+'px,'+(dy*e+280*p*p)+'px) rotate('+(rot*p)+'deg)'; sp.style.opacity=String(1-p*p);
       requestAnimationFrame(fr); }
     requestAnimationFrame(fr);
+    setTimeout(function(){ if(sp.parentNode)sp.remove(); }, dur+400);
   })();}
 }
 fsInit();
+/* ---------- GANESH AIR statement count-up (real stats, fires when scrolled into view) ---------- */
+function _countUp(el,to,suf,dur){ suf=suf||''; dur=dur||1100; var t0=null,raf=0; function fr(t){ if(t0===null)t0=t; var p=Math.min(1,(t-t0)/dur); var e=1-Math.pow(1-p,3); el.textContent=Math.round(to*e).toLocaleString()+suf; if(p<1)raf=requestAnimationFrame(fr); } raf=requestAnimationFrame(fr); setTimeout(function(){ if(raf)cancelAnimationFrame(raf); el.textContent=to.toLocaleString()+suf; }, dur+500); }
+function initStatement(){
+  var box=document.getElementById('statement'); if(!box) return;
+  var dEl=box.querySelector('[data-days]'); if(dEl){ var days=Math.max(0,Math.floor((new Date()-US.metDate)/86400000)); dEl.setAttribute('data-to',String(days)); }
+  var done=false;
+  function run(){ if(done)return; done=true; Array.prototype.forEach.call(box.querySelectorAll('.stmt-n'),function(n){ _countUp(n,+n.getAttribute('data-to'),n.getAttribute('data-suf')||''); }); }
+  if('IntersectionObserver' in window){ var io=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ run(); io.disconnect(); } }); },{threshold:0.3}); io.observe(box); }
+  else run();
+}
+initStatement();
 /* temporary: hide the cheeky closing line for ~1 hour, then it comes back on its own */
 var CHEEKY_HIDE_UNTIL=1782457721986; /* Thu Jun 25 2026 ~00:08 PDT (1h from when this was set) */
 function applyCheekyGate(){var el=document.getElementById('cheekyLine');if(el)el.style.display=(Date.now()<CHEEKY_HIDE_UNTIL)?'none':'';}
