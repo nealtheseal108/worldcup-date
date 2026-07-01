@@ -271,7 +271,7 @@
   .time .body b{font-size:14.5px}
   .time .body small{color:var(--muted);display:block;margin-top:2px}
   /* boarding-pass itinerary: native-scroll sticky-header deck (no JS scroll controller, no absolute positioning) */
-  #timeline{position:relative;margin:0 auto;max-width:430px;padding-bottom:calc(100vh + 120px)}
+  #timeline{position:relative;margin:0 auto;max-width:430px;padding-bottom:220px}
   /* native sticky STACK: each card pins a bit lower than the last (top = 10 + i*40), so the deck piles up
      SMOOTHLY as you scroll (browser sticky = compositor, no JS) and earlier legs' header tops peek above */
   .bpass{position:-webkit-sticky;position:sticky;top:calc(46px + var(--bpi,0) * 36px);background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
@@ -1350,8 +1350,10 @@ function reveal(){
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
-    // first 4 legs peek at a full 36px; the rest compress to an 11px stacked edge (no hard collision on card 5/6)
-    var topOff = 46 + i*36;   // every card shows its full 36px header
+    // COVER-STACK: every pass pins at the same top, so each one cleanly covers the previous
+    // (no header-fan => nothing to collapse/bleed at the container end). The card behind peeks
+    // at the BOTTOM as the next leg, and a decorative shadow-edge keeps the "deck" look.
+    var topOff = 52;
     return `<div class="bpass" style="top:${topOff}px;z-index:${i+2}">`+
       `<div class="bp-head" onclick="scrollToPass(${i})" title="jump to this leg">`+
         `<span class="bp-h-time">✈ ${r[0]}</span>`+
