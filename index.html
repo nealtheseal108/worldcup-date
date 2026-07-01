@@ -466,6 +466,31 @@
   .ft-status{color:#b79bf0;font-size:9.5px;letter-spacing:.6px;text-transform:uppercase}
   .ft-status.ft-live{color:#4ade80}
   .ft-empty{display:inline-flex;align-items:center;height:100%;padding:0 16px;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:#b79bf0}
+  /* live date tracker + shared photo album (step7) */
+  .trk-cta{width:100%;margin:0 0 18px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.25}
+  .trk-cta span{font-size:11.5px;font-weight:600;opacity:.9}
+  .trk-now{background:linear-gradient(150deg,#fff,#f4eeff);border:1px solid var(--line);border-radius:15px;padding:14px 16px;margin:0 0 12px;box-shadow:0 8px 22px rgba(53,28,94,.12)}
+  .trk-now-lbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--lav);font-weight:700}
+  .trk-now-step{font-family:'Inter',system-ui,sans-serif;font-size:19px;font-weight:800;color:var(--ink);margin-top:5px;line-height:1.2;letter-spacing:-.01em}
+  .trk-next{font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;color:var(--muted);margin-top:7px}
+  .trk-next b{color:#3a2a63}
+  .trk-match{background:#160e2b;color:#fff;border-radius:15px;padding:13px 16px 14px;margin:0 0 16px;text-align:center;box-shadow:0 8px 22px rgba(18,8,38,.3)}
+  .trk-match-h{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--lav3)}
+  .trk-match-teams{font-family:'Inter',system-ui,sans-serif;font-size:23px;font-weight:800;margin-top:5px;letter-spacing:-.01em}
+  .trk-match-info{font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:#b79bf0;margin-top:4px;letter-spacing:.5px}
+  .album-count{font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;margin-left:7px}
+  .album-add-row{display:flex;gap:10px;margin:4px 0 12px}
+  .album-add-row .btn{flex:1}
+  .album-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .album-cell{padding:0;border:none;background:#efe7fb;border-radius:12px;overflow:hidden;aspect-ratio:1;cursor:pointer;box-shadow:0 3px 10px rgba(53,28,94,.12)}
+  .album-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+  .album-cell:active img{transform:scale(.96)}
+  .album-empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:28px 12px;background:#f6f1ff;border:1px dashed var(--line);border-radius:12px;line-height:1.5}
+  .trk-actions{margin-top:16px}
+  .trk-actions .btn{width:100%}
+  #lightbox{position:fixed;inset:0;z-index:210;background:rgba(20,10,35,.93);display:none;align-items:center;justify-content:center;padding:16px}
+  #lightbox img{max-width:100%;max-height:86vh;border-radius:12px;box-shadow:0 20px 55px rgba(0,0,0,.55)}
+  .lb-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.16);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:19px;cursor:pointer;line-height:1}
   #playerbar{position:fixed;left:0;right:0;bottom:calc(var(--tick) + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:9px 16px;background:#160e2b;
     border-top:1px solid rgba(167,139,250,.32);box-shadow:0 -6px 26px rgba(18,8,38,.45);color:#fff;
@@ -718,6 +743,8 @@
         <div class="wxcard" id="wxcard">☁️ checking the forecast...</div>
       </div>
 
+      <button class="btn primary trk-cta" type="button" onclick="openTracker()">📸 our live date tracker<span>photos, the score & where we're at, live 💜</span></button>
+
       <!-- the date diary lives at the end now, locked until ~9:30 PM -->
       <div class="sectlabel">Step 1 · two routes that cross 🚆</div>
       <div class="twoplan">
@@ -818,6 +845,36 @@
         <button class="btn ghost" onclick="closeMovie()">← back to our date</button>
         <button class="btn primary" id="movieDownload" onclick="exportMovie()">⬇ save the movie</button>
       </div>
+    </section>
+
+    <!-- STEP 7 — live date tracker + shared photo album -->
+    <section class="step" id="step7">
+      <div class="iti-head" style="margin-top:2px"><div class="big">📸💜</div><h2 style="font-size:24px">our live date</h2><div class="venue">where we're at, the score, and our photos</div></div>
+
+      <div class="trk-now">
+        <div class="trk-now-lbl" id="trkNowLbl">📍 right now</div>
+        <div class="trk-now-step" id="trkNowStep">loading the plan…</div>
+        <div class="trk-next" id="trkNext"></div>
+      </div>
+
+      <div class="trk-match">
+        <div class="trk-match-h">⚽ the match</div>
+        <div class="trk-match-teams" id="trkMatchTeams">TBD 🆚 TBD</div>
+        <div class="trk-match-info" id="trkMatchInfo">Round of 16 · Kickoff 5:00 PM</div>
+      </div>
+
+      <div class="sectlabel" style="margin-top:4px">📸 our album<span class="album-count" id="albumCount"></span></div>
+      <div class="album-add-row">
+        <button class="btn primary" type="button" onclick="pickPhoto()">➕ add a photo</button>
+        <button class="btn lav2btn" type="button" onclick="renderPhotos(true)">↻ refresh</button>
+      </div>
+      <div class="album-grid" id="albumGrid"><div class="album-empty">loading our photos…</div></div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoPicked(event)">
+
+      <div class="trk-actions">
+        <button class="btn lav2btn" type="button" onclick="go(5)">🎬 date diary &amp; movie</button>
+      </div>
+      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
     </section>
 
   </div>
@@ -1493,6 +1550,7 @@ function reveal(){
     ['~9:45 PM','<b>Easy ride home.</b>','Back on the 2 Line, which runs until midnight, so there is never a rush home.']
   ];
   window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
+  window.dayPlan = rows.map(function(r){return {t:r[0], label:(r[1]||'').replace(/<[^>]+>/g,'').trim(), mins:(typeof _parseLegTime==='function'?_parseLegTime(r[0]):null)};});   // for the live tracker's now/next
   var _tkSteps=document.getElementById('tkSteps');
   if(_tkSteps){
     var _train=/all aboard|arrive|ride home/i;   // shareable pass: keep ONLY the train rides
@@ -2255,20 +2313,68 @@ function placeWithCoords(lat,lng){
 /* the activity at each itinerary moment (s0..s7), used as the movie's activity subtitle */
 var ACTIVITY=['on our way in 🚆','snack time 🥐','kickoff ⚽','full time 🙌','dinner 🍽️','salt & straw 🍦','the park 💜','heading home 🚆'];
 function movieActivity(c){var i=parseInt((c.sec||'s0').slice(1));return ACTIVITY[i]||(window.diaryLabels&&window.diaryLabels[i])||'a moment';}
-function localClips(){   // this phone's IndexedDB backups — fallback when the cloud is empty/down at movie time
-  return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){all.push(c.value);c.continue();}else{all.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});res(all);}};cur.onerror=function(){res(all);};});}).catch(function(){return [];});
+function localItems(pred){   // this phone's IndexedDB backups (optionally filtered) — fallback when the cloud is empty/down
+  return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){if(!pred||pred(c.value))all.push(c.value);c.continue();}else{res(all);}};cur.onerror=function(){res(all);};});}).catch(function(){return [];});
 }
-function gatherClips(){
+function bySection(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;}
+function localClips(){ return localItems(function(c){return c.sec!=='photo';}).then(function(a){a.sort(bySection);return a;}); }
+function gatherClips(){   // VIDEO clips for the movie (photos excluded)
   if(cloudOn()){
     return cloudList().then(function(list){
-      if(!list||!list.length) return localClips();   // cloud reachable but has nothing -> use on-phone backups
-      list.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});
-      return Promise.all(list.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {sec:c.sec,lat:c.lat,lng:c.lng,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:localClips();});   // every download failed -> local
+      var vids=(list||[]).filter(function(c){return c.sec!=='photo';});
+      if(!vids.length) return localClips();   // cloud reachable but no videos -> on-phone backups
+      vids.sort(bySection);
+      return Promise.all(vids.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {sec:c.sec,lat:c.lat,lng:c.lng,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:localClips();});
     }).catch(function(){return localClips();});   // cloud unreachable -> on-phone backups
   }
   return localClips();
 }
+function gatherPhotos(){   // PHOTOS for the album (shared via the same cloud, sec='photo')
+  function loc(){ return localItems(function(c){return c.sec==='photo';}).then(function(a){a.sort(function(x,y){return (x.t||0)-(y.t||0);});return a;}); }
+  if(cloudOn()){
+    return cloudList().then(function(list){
+      var ph=(list||[]).filter(function(c){return c.sec==='photo';});
+      if(!ph.length) return loc();
+      ph.sort(function(a,b){return (a.t||0)-(b.t||0);});
+      return Promise.all(ph.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {id:c.id,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:loc();});
+    }).catch(function(){return loc();});
+  }
+  return loc();
+}
 function compileMovie(){gatherClips().then(function(all){if(!all.length){hint("record a few moments first, then i'll cut our movie 🎬💜");return;}movieClips=all;openMovie();});}
+
+/* ---------- live date tracker + shared photo album (step7) ---------- */
+function _esc7(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function openTracker(){ go(7); renderPhotos(true); updateTracker(); if(!window._trkTimer){ window._trkTimer=setInterval(function(){ var s=document.getElementById('step7'); if(s&&s.classList.contains('active')){ updateTracker(); } },30000); } }
+function pickPhoto(){ var i=document.getElementById('photoInput'); if(i)i.click(); }
+function _downscaleImg(file,maxDim,q){ return new Promise(function(res){ try{ var img=new Image(),url=URL.createObjectURL(file); img.onload=function(){ var w=img.width||1,h=img.height||1,sc=Math.min(1,maxDim/Math.max(w,h)); var cv=document.createElement('canvas'); cv.width=Math.max(1,Math.round(w*sc)); cv.height=Math.max(1,Math.round(h*sc)); try{cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);}catch(e){} URL.revokeObjectURL(url); cv.toBlob(function(b){res(b&&b.size?b:file);},'image/jpeg',q||0.85); }; img.onerror=function(){URL.revokeObjectURL(url);res(file);}; img.src=url; }catch(e){res(file);} }); }
+function onPhotoPicked(ev){ var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value=''; if(!f)return; hint('adding your photo… 📸'); _downscaleImg(f,1400,0.85).then(function(blob){ var rec={sec:'photo',blob:blob,t:Date.now()}; if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).then(function(r){ hint(r?'added to our album 📸💜':'saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }).catch(function(){ hint('saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }); } else { diaryAdd(rec).then(function(){ hint('added to our album 📸💜'); renderPhotos(true); }).catch(function(){ hint('could not add the photo 😭'); }); } }); }
+var _albumUrls=[], _albumBusy=false;
+function renderPhotos(force){ var grid=document.getElementById('albumGrid'); if(!grid)return; if(_albumBusy&&!force)return; _albumBusy=true; gatherPhotos().then(function(photos){ _albumBusy=false; _albumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _albumUrls=[]; var cnt=document.getElementById('albumCount'); if(cnt)cnt.textContent=photos.length?('· '+photos.length+' photo'+(photos.length>1?'s':'')):''; if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet — tap ➕ to add the first one 📸💜<br>every pic you add shows up here for both of us</div>'; return; } grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _albumUrls.push(u); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="our date"></button>'; }).join(''); }).catch(function(){ _albumBusy=false; }); }
+function openLightbox(u){ var o=document.getElementById('lightbox'),i=document.getElementById('lightboxImg'); if(o&&i){ i.src=u; o.style.display='flex'; } }
+function closeLightbox(){ var o=document.getElementById('lightbox'); if(o)o.style.display='none'; }
+function _laMins(){ try{ var s=new Date().toLocaleTimeString('en-US',{timeZone:'America/Los_Angeles',hour12:false,hour:'2-digit',minute:'2-digit'}); var m=s.match(/(\d+):(\d+)/); return m?(+m[1]*60 + +m[2]):null; }catch(e){ return new Date().getHours()*60+new Date().getMinutes(); } }
+function _laToday(){ try{ var p=new Date().toLocaleDateString('en-US',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}); var m=p.match(/(\d+)\/(\d+)\/(\d+)/); return m?(m[3]+m[1]+m[2]):''; }catch(e){ return ''; } }
+function _ourMatch(){ var gs=window.ftGames||[]; if(typeof MATCHUP==='undefined')return null; var parts=MATCHUP.split('🆚').map(function(x){return x.trim();}); if(parts.length<2)return null; var A=parts[0],B=parts[1]; if(!A||!B||A.indexOf('/')>=0||B.indexOf('/')>=0)return null; for(var i=0;i<gs.length;i++){ var s=[gs[i].h,gs[i].a]; if(s.indexOf(A)>=0&&s.indexOf(B)>=0)return gs[i]; } return null; }
+function updateTracker(){
+  var plan=window.dayPlan||[], nowStep=document.getElementById('trkNowStep'), nextEl=document.getElementById('trkNext'), lbl=document.getElementById('trkNowLbl');
+  if(nowStep){
+    var isDay=_laToday()==='20260706';
+    if(plan.length && isDay){
+      var now=_laMins(), cur=-1; for(var i=0;i<plan.length;i++){ if(plan[i].mins!=null && plan[i].mins<=now) cur=i; }
+      if(lbl)lbl.textContent='📍 right now';
+      if(cur<0){ nowStep.textContent='the date starts soon 💜'; if(nextEl)nextEl.innerHTML='first up: <b>'+_esc7(plan[0].label)+'</b> · '+_esc7(plan[0].t); }
+      else { nowStep.textContent=plan[cur].label; if(nextEl){ var nx=plan[cur+1]; nextEl.innerHTML= nx? ('up next: <b>'+_esc7(nx.label)+'</b> · '+_esc7(nx.t)) : "that's a wrap on the night 💜"; } }
+    } else if(plan.length){
+      if(lbl)lbl.textContent='📅 the plan';
+      nowStep.textContent='our big day is July 6 💜';
+      if(nextEl)nextEl.innerHTML='kicks off with: <b>'+_esc7(plan[0].label)+'</b> · '+_esc7(plan[0].t);
+    } else { nowStep.textContent='pick your date first 💜'; }
+  }
+  var teams=document.getElementById('trkMatchTeams'); if(teams&&typeof MATCHUP!=='undefined')teams.textContent=MATCHUP;
+  var info=document.getElementById('trkMatchInfo');
+  if(info){ var g=_ourMatch(); if(g){ info.innerHTML=(g.state==='in'?'🔴 LIVE · ':'')+((g.state!=='pre')?(_esc7(g.h)+' '+_esc7(g.hs)+' - '+_esc7(g.as)+' '+_esc7(g.a)+' · '):'')+_esc7(g.detail); } else { info.textContent='Round of 16 · Kickoff 5:00 PM'; } }
+}
 function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
 function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
@@ -2505,7 +2611,8 @@ if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function
     }
     step().then(function(){
       games.sort(function(a,b){ return (b.ms||0)-(a.ms||0); });   // newest / upcoming-today first, then back in time
-      try{ var mu=resolveMatchup(games); if(mu){ MATCHUP=mu.matchup; MATCHUP_NOTE=mu.note; if(typeof applyMatchup==='function')applyMatchup(); } }catch(e){}   // LIVE-update our R16 matchup from the feeders
+      window.ftGames=games;   // expose for the live date tracker's match score
+      try{ var mu=resolveMatchup(games); if(mu){ MATCHUP=mu.matchup; MATCHUP_NOTE=mu.note; if(typeof applyMatchup==='function')applyMatchup(); if(typeof updateTracker==='function')updateTracker(); } }catch(e){}   // LIVE-update our R16 matchup from the feeders
       if(games.length){ render(games); } else if(!track.querySelector('.ft-game')){ render([]); }
     }).catch(function(){ if(!track.querySelector('.ft-game')){ track.innerHTML='<span class="ft-empty">⚽ World Cup scores unavailable right now 💜</span>'; } });
   }
@@ -2631,6 +2738,7 @@ window.initTimeline=function(){};
     <button class="btn primary" type="button" onclick="hideRide()">okok, back to the pass ✨</button>
   </div>
 </div>
+<div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
 <div id="complimentOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideCompliment()">
   <div class="egg-hearts" id="compHearts" aria-hidden="true"></div>
   <div class="egg-card cmp-card">
