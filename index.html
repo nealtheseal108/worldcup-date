@@ -15,6 +15,7 @@
     --sun:#ffd166; --ink:#2e1f47; --paper:#faf7ff;
     --card:#ffffff; --line:#e7ddf7; --muted:#6b5d82;
     --player: calc(64px + env(safe-area-inset-bottom, 0px) + 10px); /* space the fixed music player occupies */
+    --tick: 30px; /* fifa score ticker, sits just above the player */
   }
   *{box-sizing:border-box;margin:0;padding:0}
   /* scroll-reveal: rise + fade in ONCE when an element enters view (one-shot observer + GPU transition, no scroll-jack) */
@@ -24,7 +25,7 @@
   body{
     font-family:'Inter',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
     background:linear-gradient(160deg,#7c4dca 0%,#9b72e8 45%,#c4b5fd 100%);
-    color:var(--ink);min-height:100vh;padding:24px 16px calc(var(--player) + 40px);
+    color:var(--ink);min-height:100vh;padding:24px 16px calc(var(--player) + var(--tick) + 40px);
   }
   h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;letter-spacing:-.02em}
   .fancy{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:1.2em;line-height:1;color:var(--accent2)}
@@ -41,8 +42,8 @@
   .datemap{display:none;background:var(--paper);border-radius:16px;padding:14px 14px 14px;box-shadow:0 10px 30px rgba(53,28,94,.22);margin:16px 0 18px}
   body.mapview .datemap{display:block}
   .datemap .cap{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);text-align:center;margin:2px 0 12px}
-  #leafmap{--cap:52px;height:min(320px,calc(100vh - var(--player) - var(--cap) - 24px));height:min(320px,calc(100svh - var(--player) - var(--cap) - 24px));border-radius:13px;overflow:hidden;background:#efeaf7;touch-action:pan-y;isolation:isolate}
-  @media(max-width:600px){#leafmap{height:min(260px,calc(100vh - var(--player) - var(--cap) - 16px));height:min(260px,calc(100svh - var(--player) - var(--cap) - 16px))}}
+  #leafmap{--cap:52px;height:min(320px,calc(100vh - var(--player) - var(--tick) - var(--cap) - 24px));height:min(320px,calc(100svh - var(--player) - var(--tick) - var(--cap) - 24px));border-radius:13px;overflow:hidden;background:#efeaf7;touch-action:pan-y;isolation:isolate}
+  @media(max-width:600px){#leafmap{height:min(260px,calc(100vh - var(--player) - var(--tick) - var(--cap) - 16px));height:min(260px,calc(100svh - var(--player) - var(--tick) - var(--cap) - 16px))}}
   @keyframes worm{to{stroke-dashoffset:-44}}
   .wormline{stroke-dasharray:2 9;animation:worm 4s linear infinite}
   .maplink{display:inline-flex;align-items:center;gap:6px;margin:0 0 16px;padding:8px 15px;border:1px solid var(--line);border-radius:30px;background:#f1ecfc;color:#5a3fb0;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
@@ -449,7 +450,23 @@
   .lav2btn:hover{background:#e3d6f7}
   /* floating music button */
   /* Spotify-style bottom player bar */
-  #playerbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  /* FIFA World Cup score ticker — fixed strip just above the music player, on every page */
+  #fifatick{position:fixed;left:0;right:0;bottom:0;height:calc(var(--tick) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);z-index:59;display:flex;align-items:stretch;background:#120a26;color:#fff;overflow:hidden;box-shadow:0 -4px 16px rgba(18,8,38,.4);border-top:1px solid rgba(167,139,250,.28)}
+  .ft-badge{flex:none;display:flex;align-items:center;gap:5px;padding:0 11px;background:linear-gradient(90deg,var(--lav),var(--lav2));font-family:'Courier Prime',ui-monospace,monospace;font-weight:700;font-size:9.5px;letter-spacing:1.2px;white-space:nowrap;z-index:2;box-shadow:4px 0 10px rgba(18,8,38,.45)}
+  .ft-view{flex:1;position:relative;overflow:hidden}
+  .ft-track{position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;white-space:nowrap;will-change:transform;animation:ftscroll 44s linear infinite}
+  #fifatick:hover .ft-track,.ft-track.ft-paused{animation-play-state:paused}
+  @keyframes ftscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @media(prefers-reduced-motion:reduce){.ft-track{animation:none}}
+  .ft-game{display:inline-flex;align-items:center;gap:7px;padding:0 15px;height:100%;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;border-right:1px solid rgba(255,255,255,.10)}
+  .ft-game:hover{background:rgba(167,139,250,.16)}
+  .ft-team{font-weight:700;color:#fff}
+  .ft-vs{color:#8f7fb8;font-size:10px}
+  .ft-score{font-weight:700;color:#ffd54a;letter-spacing:.5px}
+  .ft-status{color:#b79bf0;font-size:9.5px;letter-spacing:.6px;text-transform:uppercase}
+  .ft-status.ft-live{color:#4ade80}
+  .ft-empty{display:inline-flex;align-items:center;height:100%;padding:0 16px;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:#b79bf0}
+  #playerbar{position:fixed;left:0;right:0;bottom:calc(var(--tick) + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:9px 16px;background:#160e2b;
     border-top:1px solid rgba(167,139,250,.32);box-shadow:0 -6px 26px rgba(18,8,38,.45);color:#fff;
     transform:translateY(120%);transition:transform .4s cubic-bezier(.2,.8,.2,1);will-change:transform;backface-visibility:hidden}
@@ -495,7 +512,7 @@
     *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     body{background:#faf7ff;padding:0;margin:0}
     .wrap{max-width:none;margin:0;padding:0}
-    .topbar,.matchup,.progress,.datemap,#playerbar,.nav,.printrow,.foot,.sharehint,.sharerow,.iti-head,.sectlabel,.twoplan,.merge,#timeline,.note,.safety,.perks,.cheeky,.diaryintro,.endcard{display:none!important}
+    .topbar,.matchup,.progress,.datemap,#playerbar,#fifatick,.nav,.printrow,.foot,.sharehint,.sharerow,.iti-head,.sectlabel,.twoplan,.merge,#timeline,.note,.safety,.perks,.cheeky,.diaryintro,.endcard{display:none!important}
     .step:not(.active){display:none!important}
     .panel{box-shadow:none;padding:0;background:transparent;border-radius:0}
     .sharewrap{margin:0;max-width:none}
@@ -1397,9 +1414,9 @@ function scrollToMap(){
   var r=m.getBoundingClientRect();
   var vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
   var probe=document.createElement('div');
-  probe.style.cssText='position:absolute;height:var(--player);visibility:hidden;pointer-events:none';
+  probe.style.cssText='position:absolute;height:calc(var(--player) + var(--tick));visibility:hidden;pointer-events:none';
   document.body.appendChild(probe);
-  var player=probe.getBoundingClientRect().height||74;
+  var player=probe.getBoundingClientRect().height||104;
   document.body.removeChild(probe);
   var safe=vh-player;
   var off=Math.max(8,(safe-r.height)/2);
@@ -2412,6 +2429,52 @@ function legGcalUrl(i,rows){
 if(/[?&]egg/.test(location.search)||/egg/.test(location.hash)){setTimeout(showEgg,350);}
 /* TEST: open the site with ?end=1 to force the 9:30 state on a sample reveal */
 if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
+
+/* ---------- FIFA World Cup live score ticker (bottom strip, every page) ---------- */
+(function(){
+  function boot(){
+  var track=document.getElementById('ftTrack'); if(!track) return;
+  var ESPN='https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function parseEvents(j){
+    return ((j&&j.events)||[]).map(function(ev){
+      var c=ev.competitions&&ev.competitions[0]; if(!c) return null;
+      var cs=c.competitors||[];
+      var home=cs.filter(function(x){return x.homeAway==='home';})[0]||cs[0];
+      var away=cs.filter(function(x){return x.homeAway==='away';})[0]||cs[1];
+      if(!home||!away) return null;
+      var st=(ev.status&&ev.status.type)||{};
+      var href=(ev.links&&ev.links[0]&&ev.links[0].href)||('https://www.google.com/search?q='+encodeURIComponent((ev.shortName||'')+' world cup'));
+      return { h:(home.team&&(home.team.abbreviation||home.team.shortDisplayName))||'', a:(away.team&&(away.team.abbreviation||away.team.shortDisplayName))||'',
+        hs:home.score, as:away.score, state:st.state||'pre', detail:st.shortDetail||'', href:href };
+    }).filter(Boolean);
+  }
+  function itemHTML(g){
+    var mid, stat;
+    if(g.state==='pre'){ mid='<span class="ft-vs">vs</span>'; stat='<span class="ft-status">'+esc(g.detail)+'</span>'; }
+    else { var live=g.state==='in'; mid='<span class="ft-score">'+esc(g.hs)+'&nbsp;-&nbsp;'+esc(g.as)+'</span>'; stat='<span class="ft-status'+(live?' ft-live':'')+'">'+(live?'🔴 ':'')+esc(g.detail)+'</span>'; }
+    return '<span class="ft-game" data-href="'+esc(g.href)+'"><span class="ft-team">'+esc(g.h)+'</span> '+mid+' <span class="ft-team">'+esc(g.a)+'</span> '+stat+'</span>';
+  }
+  function setDur(){ var half=track.scrollWidth/2; if(half>40){ track.style.animationDuration=Math.max(18,Math.round(half/55))+'s'; } }
+  function render(games){
+    if(!games.length){ track.innerHTML='<span class="ft-empty">⚽ no live World Cup games right now — check back at kickoff 💜</span>'; track.style.animation='none'; return; }
+    var one=games.map(itemHTML).join('');
+    track.innerHTML=one+one;   // duplicate so translateX(-50%) loops seamlessly
+    track.style.animation='';
+    requestAnimationFrame(setDur); setTimeout(setDur,220);
+  }
+  function load(){
+    fetch(ESPN,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){ render(parseEvents(j)); })
+      .catch(function(){ if(!track.querySelector('.ft-game')) track.innerHTML='<span class="ft-empty">⚽ World Cup scores unavailable right now 💜</span>'; });
+  }
+  track.addEventListener('click',function(e){ var g=e.target.closest&&e.target.closest('.ft-game'); if(g&&g.getAttribute('data-href')) window.open(g.getAttribute('data-href'),'_blank','noopener'); });
+  var ft=document.getElementById('fifatick'), rt=null;   // touch: pause while touched (mouse uses :hover in CSS)
+  if(ft){ ft.addEventListener('touchstart',function(){ if(rt)clearTimeout(rt); track.classList.add('ft-paused'); },{passive:true});
+    ft.addEventListener('touchend',function(){ if(rt)clearTimeout(rt); rt=setTimeout(function(){track.classList.remove('ft-paused');},3500); },{passive:true}); }
+  load(); setInterval(load, 60000);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+})();
 /* ---------- boarding-pass deck: native sticky-header scroll (no scroll-jacking) ---------- */
 /* tap a leg header to scroll to it; .bpass scroll-margin-top offsets it under the sticky header */
 function scrollToPass(i){
@@ -2424,6 +2487,10 @@ function scrollToPass(i){
 window.initTimeline=function(){};
 </script>
 <div id="ythost"></div>
+<div id="fifatick" aria-label="World Cup scores" title="World Cup scores · hover to pause, tap a game">
+  <div class="ft-badge">⚽ WORLD&nbsp;CUP</div>
+  <div class="ft-view"><div class="ft-track" id="ftTrack"><span class="ft-empty">⚽ loading World Cup scores…</span></div></div>
+</div>
 <div id="playerbar" role="region" aria-label="Music player">
   <div class="pb-info">
     <div class="pb-art">🎧</div>
