@@ -380,7 +380,8 @@
 
   /* Ganesh Air departure-board share card */
   /* shareable boarding pass (upright, lavender — matches the site's passes) */
-  .ticket{background:#fff;color:var(--ink);position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 38px rgba(53,28,94,.3);display:flex;flex-direction:column;cursor:pointer}
+  .ticket{background:#fff;color:var(--ink);position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 38px rgba(53,28,94,.3);display:flex;flex-direction:column;cursor:pointer;width:640px}
+  .tk-scaler{position:relative;overflow:hidden;margin:0 auto}
   .tk-head{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;padding:15px 16px;flex:none}
   .tk-cat{display:flex;align-items:center;gap:8px;font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:14px;letter-spacing:1.2px}
   .tk-mark{width:22px;height:22px;flex:none}
@@ -398,10 +399,12 @@
   .tk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:20px}
   .tk-grid span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-size:7.5px;letter-spacing:1px;color:var(--muted);font-weight:700}
   .tk-grid b{display:block;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:800;color:#3a2a63;line-height:1;margin-top:4px;white-space:nowrap}
-  .tk-summary{display:flex;gap:16px;align-items:flex-start;margin-top:19px;padding-top:16px;border-top:1px dashed var(--line)}
-  .tk-comp{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;line-height:1.85;color:var(--muted);letter-spacing:.2px;flex:0 1 auto;min-width:0}
+  .tk-cols{display:flex;gap:18px;align-items:stretch;margin-top:18px}
+  .tk-main{flex:1 1 55%;min-width:0;display:flex;flex-direction:column}
+  .tk-main .tk-pick{margin-top:0}
+  .tk-comp{font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;line-height:1.9;color:var(--muted);letter-spacing:.2px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
   .tk-comp b{color:#3a2a63}
-  .tk-steps{flex:1;min-width:0;font-family:'Courier Prime',ui-monospace,monospace;text-align:right}
+  .tk-steps{flex:1 1 45%;min-width:0;font-family:'Courier Prime',ui-monospace,monospace;text-align:right;border-left:1px dashed var(--line);padding-left:18px}
   .tk-steps-h{font-size:8px;letter-spacing:1.1px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:5px}
   .tk-step{display:flex;justify-content:flex-end;gap:7px;font-size:8px;line-height:1.55}
   .tk-step-n{color:#3a2a63;font-weight:600;flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -496,8 +499,12 @@
     .step:not(.active){display:none!important}
     .panel{box-shadow:none;padding:0;background:transparent;border-radius:0}
     .sharewrap{margin:0;max-width:none}
+    /* undo the on-screen fit-scale + wide-fixed width so the poster fills the page */
+    .tk-scaler{overflow:visible!important;height:auto!important;margin:0}
+    .tk-cols{display:block!important}
+    .tk-steps{border-left:none!important;padding-left:0!important;text-align:left!important;margin-top:18px}
     /* the ticket card becomes a full-page wall poster */
-    .ticket{min-height:100vh;aspect-ratio:auto;border:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;padding:0!important}
+    .ticket{min-height:100vh;aspect-ratio:auto;border:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;padding:0!important;width:auto!important;transform:none!important}
     .ticket .tk-head{padding:4vh 8vw}
     .ticket .tk-cat{font-size:30px}
     .ticket .tk-mark{width:38px;height:38px}
@@ -627,6 +634,7 @@
       <!-- shareable ticket card -->
       <div class="sharewrap">
         <div class="sectlabel">📸 Your shareable card</div>
+        <div class="tk-scaler" id="tkScaler">
         <div class="ticket" id="shareCard" onclick="showEgg()" title="tap for a lil surprise 💜">
           <div class="tk-head">
             <div class="tk-cat"><span class="tk-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="10.8" cy="14" r="6" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="17.2" cy="14" r="6" fill="none" stroke="#7c4dca" stroke-width="4.4"/><circle cx="17.2" cy="14" r="6" fill="none" stroke="#fff" stroke-width="2.6"/></svg></span>GANESH AIR</div>
@@ -635,6 +643,8 @@
           <div class="tk-body">
             <div class="tk-title">I'm going with my <span class="fancy">boyfriend!</span></div>
             <div class="tk-sub">World Cup · Round of 16 · July 6 2026</div>
+            <div class="tk-cols">
+            <div class="tk-main">
             <div class="tk-pick">
               <div class="tk-thumb" id="tkThumb"><svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="#efe7fb"/><path d="M26 40 C8 28 12 14 22 18 C25 19 26 22 26 22 C26 22 27 19 30 18 C40 14 44 28 26 40 Z" fill="#7c4dca"/></svg></div>
               <div><div class="tk-pickname" id="tkVenue">Seattle Center</div>
@@ -646,10 +656,10 @@
               <div><span>GATE</span><b>R16</b></div>
               <div><span>SEAT</span><b>2 <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#7c4dca"/></svg></b></div>
             </div>
-            <div class="tk-summary">
               <div class="tk-comp" id="tkComp"></div>
-              <div class="tk-steps" id="tkSteps"></div>
-            </div>
+            </div><!-- /tk-main -->
+            <div class="tk-steps" id="tkSteps"></div>
+            </div><!-- /tk-cols -->
           </div>
           <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
           <div class="tk-stub">
@@ -658,6 +668,7 @@
             </div>
           </div>
         </div>
+        </div><!-- /tk-scaler -->
         <div class="sharerow">
           <button class="btn primary" onclick="saveGif()">🎟️ Save boarding pass</button>
           <button class="btn lav2btn" onclick="shareCard()">📤 Share boarding pass</button>
@@ -1502,6 +1513,7 @@ function reveal(){
   go(4);
   if(window.buzz)buzz(24);
   requestAnimationFrame(fitTicketBarcode); setTimeout(fitTicketBarcode,180);
+  [400,900,1600].forEach(function(ms){setTimeout(fitTicketScale,ms);});   // re-fit once fonts/reveal-anim settle
   if(window.initTimeline){requestAnimationFrame(window.initTimeline);setTimeout(window.initTimeline,140);}
   try{['.sharewrap','.iti-head','.twoplan','.merge','#diaryGate'].forEach(function(sel){var e=document.querySelector(sel);if(e&&!e.classList.contains('in'))e.classList.add('reveal-up');});
     document.querySelectorAll('#step4 .perks').forEach(function(e){if(!e.classList.contains('in'))e.classList.add('reveal-up');});
@@ -1770,9 +1782,13 @@ window.pickVenue=function(k){
 /* ---------- shareable image export ---------- */
 async function cardBlob(){
   const card=document.getElementById('shareCard');
+  const sc=document.getElementById('tkScaler');
   card.classList.add('capturing');
+  const pt=card.style.transform, ph=sc?sc.style.height:'', po=sc?sc.style.overflow:'';
+  card.style.transform='none'; if(sc){sc.style.height='auto';sc.style.overflow='visible';}   // capture at full WIDE size
   const canvas=await html2canvas(card,{scale:2,backgroundColor:'#faf7ff',useCORS:true});
   card.classList.remove('capturing');
+  card.style.transform=pt; if(sc){sc.style.height=ph;sc.style.overflow=po;} fitTicketScale();
   return await new Promise(r=>canvas.toBlob(r,'image/png'));
 }
 function hint(msg){const h=document.getElementById('shareHint');if(h)h.textContent=msg;}
@@ -1820,6 +1836,9 @@ async function cardGifBlob(onProgress){
   const card=document.getElementById('shareCard');
   const ticker=card.querySelector('.tk-ticker');
   const track=card.querySelector('.tk-track');
+  const _tkSc=document.getElementById('tkScaler');   // render the card at its natural WIDE size (undo the fit-scale)
+  const _tkPT=card.style.transform, _tkPH=_tkSc?_tkSc.style.height:'', _tkPO=_tkSc?_tkSc.style.overflow:'';
+  card.style.transform='none'; if(_tkSc){_tkSc.style.height='auto';_tkSc.style.overflow='visible';}
   const SCALE=1.25, FRAMES=44, DELAY=167;   // ~7.3s/loop to match the live ticker (-50% over 22s)
   // ticker window geometry, relative to the card, in capture pixels
   const cr=card.getBoundingClientRect(), tr=ticker.getBoundingClientRect();
@@ -1834,6 +1853,7 @@ async function cardGifBlob(onProgress){
   track.style.visibility='visible';
   const strip=await html2canvas(track,{scale:SCALE,backgroundColor:null,useCORS:true});
   track.style.transform=''; track.style.animation=pAnim; track.style.visibility=pVis;
+  card.style.transform=_tkPT; if(_tkSc){_tkSc.style.height=_tkPH;_tkSc.style.overflow=_tkPO;} fitTicketScale();
   if(onProgress)onProgress(0.5);
   // 3) composite: redraw the identical base each frame, scroll ONLY the clipped ticker strip
   const loopUnit=strip.width/6;                 // ticker text is repeated 6x -> one unit = a seamless loop
@@ -2298,6 +2318,24 @@ function fitTicketBarcode(){
   var p=bars.parentElement, w=p?p.clientWidth:0;
   if(w<80)return;   // card not laid out yet (step4 hidden)
   bars.innerHTML=window.bpBarcode(70626,{h:60,color:'#241733',target:Math.round(w)});
+  fitTicketScale();
+}
+/* the card is laid out at a fixed WIDE design width (640px) so nothing wraps and it reads
+   as a horizontal boarding pass; scale it down (transform) to fit whatever width we have.
+   layout box stays 640 -> barcode/GIF geometry are computed natural; only the visual is scaled. */
+var _tkFitTries=0;
+function fitTicketScale(){
+  var sc=document.getElementById('tkScaler'), card=document.getElementById('shareCard');
+  if(!sc||!card)return;
+  // offsetWidth/Height are LAYOUT sizes (unaffected by the transform), so no need to reset it to measure
+  var avail=(sc.parentElement?sc.parentElement.clientWidth:0)||0;
+  var natural=card.offsetWidth||640;
+  if(avail<40){ if(_tkFitTries++<40)setTimeout(fitTicketScale,120); return; }   // container not laid out yet -> retry, keep prior scale
+  _tkFitTries=0;
+  var s=avail/natural; if(s>1)s=1;
+  card.style.transformOrigin='top left';
+  card.style.transform='scale('+s+')';
+  sc.style.height=Math.round(card.offsetHeight*s)+'px';
 }
 window.addEventListener('resize',function(){ fitTicketBarcode(); },{passive:true});
 function makeQR(){
