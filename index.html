@@ -271,7 +271,7 @@
   .time .body b{font-size:14.5px}
   .time .body small{color:var(--muted);display:block;margin-top:2px}
   /* boarding-pass itinerary: native-scroll sticky-header deck (no JS scroll controller, no absolute positioning) */
-  #timeline{position:relative;margin:0 auto;max-width:430px;padding-bottom:200px}
+  #timeline{position:relative;margin:0 auto;max-width:430px;padding-bottom:calc(100vh + 120px)}
   /* native sticky STACK: each card pins a bit lower than the last (top = 10 + i*40), so the deck piles up
      SMOOTHLY as you scroll (browser sticky = compositor, no JS) and earlier legs' header tops peek above */
   .bpass{position:-webkit-sticky;position:sticky;top:calc(46px + var(--bpi,0) * 36px);background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
@@ -1370,10 +1370,9 @@ function reveal(){
           '<span class="bp-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="10.8" cy="14" r="6" fill="none" stroke="#7c4dca" stroke-width="2.6"></circle><circle cx="17.2" cy="14" r="6" fill="none" stroke="#fff" stroke-width="4.4"></circle><circle cx="17.2" cy="14" r="6" fill="none" stroke="#7c4dca" stroke-width="2.6"></circle></svg></span>'+
           '<span class="bp-wm"><b>GANESH</b><i>AIR</i></span>'+
         '</div>'+
-        '<div class="bp-code" role="button" title="tap to scan 💜" onclick="showCompliment('+i+')">'+
+        '<div class="bp-code" role="button" aria-label="reveal a note" onclick="showCompliment('+i+')">'+
           window.bpBarcode((i+1)*7919+1373,{h:28,color:"#241733",target:150})+
           '<span class="bp-codeno">GA 0706 '+window.bpBarcodeNo((i+1)*7919+1373)+'</span>'+
-          '<span class="bp-scan">👆 tap to scan 💜</span>'+
         '</div>'+
       '</div>')+
     `</div>`;
@@ -2085,15 +2084,15 @@ function showEgg(){var o=document.getElementById('eggOverlay');if(!o)return;spaw
 function hideEgg(){var o=document.getElementById('eggOverlay');if(o)o.style.display='none';}
 /* tap a boarding-pass barcode -> reveal the real compliments you two traded (his line + her matching line back) */
 var BP_PAIRS = [
-  {n:{t:"my best friend", d:"Jun 3, 2026"}, s:{t:"ur my best friend ever", d:"Jun 25, 2026"}},
-  {n:{t:"you're my favorite baby", d:"Jun 7, 2026"}, s:{t:"you're my favorite person ever", d:"Jun 7, 2026"}},
+  {n:{t:"you're so hot", d:"Jun 4, 2026"}, s:{t:"you're my best friend and you're so hot???", d:"Jun 3, 2026"}},
+  {n:{t:"i want to look sexy for you", d:"Jun 3, 2026"}, s:{t:"sexyyyyyyyyy boyyyyy", d:"Jun 3, 2026"}},
+  {n:{t:"want to be hot for you", d:"Jun 7, 2026"}, s:{t:"you are so handsome and hot!!!", d:"Jun 7, 2026"}},
   {n:{t:"really hot 🥵", d:"Jun 19, 2026"}, s:{t:"i have the hottest man in the world", d:"Jun 15, 2026"}},
-  {n:{t:"that dress is so pretty", d:"Jun 3, 2026"}, s:{t:"you have the kindest eyes in the world", d:"Jun 3, 2026"}},
-  {n:{t:"absolutely perfect love", d:"Jun 7, 2026"}, s:{t:"you're my perfect partner, love u the most", d:"Jun 16, 2026"}},
-  {n:{t:"i am so proud of you", d:"Jun 15, 2026"}, s:{t:"so proud of you", d:"Jun 5, 2026"}},
-  {n:{t:"i love you and we're a team", d:"Jun 2, 2026"}, s:{t:"we're so so lucky", d:"Jun 4, 2026"}},
-  {n:{t:"so glad i met you so early in this life", d:"Jun 19, 2026"}, s:{t:"you're my biggest blessing and i thank god for bringing us together so young 💓", d:"Jun 30, 2026"}},
-  {n:{t:"i love you and i miss you", d:"Jun 19, 2026"}, s:{t:"i miss you a lot my love", d:"Jun 2, 2026"}},
+  {n:{t:"you are so fucking beautiful", d:"Jun 15, 2026"}, s:{t:"you look so so so so sexy", d:"Jun 4, 2026"}},
+  {n:{t:"i want you to rip my clothes off", d:"Jun 3, 2026"}, s:{t:"ughhhhhh wanna touch your body", d:"Jun 4, 2026"}},
+  {n:{t:"can't wait to grab your ass when i'm back", d:"Jun 30, 2026"}, s:{t:"ugh i want you so bad", d:"Jun 17, 2026"}},
+  {n:{t:"want to sleepy cuddle with you", d:"Jun 11, 2026"}, s:{t:"i could just keep kissing you and snuggling with you whenever i wanted", d:"Jun 30, 2026"}},
+  {n:{t:"i love holding you in lotus", d:"Jun 3, 2026"}, s:{t:"you make me go crazy", d:"Jun 5, 2026"}},
   {n:{t:"i love you more than anyone", d:"Jun 25, 2026"}, s:{t:"i love you the MOST", d:"Jun 30, 2026"}}
 ];
 function showCompliment(i){
