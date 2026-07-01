@@ -399,16 +399,13 @@
   .tk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:20px}
   .tk-grid span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-size:7.5px;letter-spacing:1px;color:var(--muted);font-weight:700}
   .tk-grid b{display:block;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:800;color:#3a2a63;line-height:1;margin-top:4px;white-space:nowrap}
-  .tk-cols{display:flex;gap:18px;align-items:stretch;margin-top:18px}
-  .tk-main{flex:1 1 55%;min-width:0;display:flex;flex-direction:column}
-  .tk-main .tk-pick{margin-top:0}
-  .tk-comp{font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;line-height:1.9;color:var(--muted);letter-spacing:.2px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
-  .tk-comp b{color:#3a2a63}
-  .tk-steps{flex:1 1 45%;min-width:0;font-family:'Courier Prime',ui-monospace,monospace;text-align:right;border-left:1px dashed var(--line);padding-left:18px}
-  .tk-steps-h{font-size:8px;letter-spacing:1.1px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:5px}
-  .tk-step{display:flex;justify-content:flex-end;gap:7px;font-size:8px;line-height:1.55}
-  .tk-step-n{color:#3a2a63;font-weight:600;flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tk-step-t{color:var(--lav);font-weight:700;flex:none}
+  /* shareable pass = JUST the day's transit itinerary, full-width departure-board style */
+  .tk-steps{font-family:'Courier Prime',ui-monospace,monospace;margin-top:4px}
+  .tk-steps-h{font-size:11px;letter-spacing:2.5px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:12px;text-align:center}
+  .tk-step{display:flex;align-items:baseline;justify-content:space-between;gap:14px;font-size:12.5px;line-height:1.4;padding:4.5px 2px;border-bottom:1px dotted rgba(53,28,94,.16)}
+  .tk-step:last-child{border-bottom:none}
+  .tk-step-n{color:#3a2a63;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+  .tk-step-t{color:var(--lav);font-weight:700;flex:none;font-size:11.5px}
   .tk-h{width:13px;height:13px;display:inline-block;vertical-align:-2px}
   .tk-flapwrap{flex:none;background:linear-gradient(90deg,var(--lav),var(--lav2));overflow:hidden}
   .tk-ticker{position:relative;height:30px;overflow:hidden;display:flex;align-items:center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
@@ -641,25 +638,7 @@
             <div class="tk-status">GOING <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#fff"/></svg></div>
           </div>
           <div class="tk-body">
-            <div class="tk-title">I'm going with my <span class="fancy">boyfriend!</span></div>
-            <div class="tk-sub">World Cup · Round of 16 · July 6 2026</div>
-            <div class="tk-cols">
-            <div class="tk-main">
-            <div class="tk-pick">
-              <div class="tk-thumb" id="tkThumb"><svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><rect width="52" height="52" fill="#efe7fb"/><path d="M26 40 C8 28 12 14 22 18 C25 19 26 22 26 22 C26 22 27 19 30 18 C40 14 44 28 26 40 Z" fill="#7c4dca"/></svg></div>
-              <div><div class="tk-pickname" id="tkVenue">Seattle Center</div>
-              <div class="tk-picksub">Sidhya <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#7c4dca"/></svg> Neal · 8 months strong</div></div>
-            </div>
-            <div class="tk-grid">
-              <div><span>PASSENGER</span><b id="tkPass">SIDHYA</b></div>
-              <div><span>KICKOFF</span><b>5:00 PM</b></div>
-              <div><span>GATE</span><b>R16</b></div>
-              <div><span>SEAT</span><b>2 <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#7c4dca"/></svg></b></div>
-            </div>
-              <div class="tk-comp" id="tkComp"></div>
-            </div><!-- /tk-main -->
             <div class="tk-steps" id="tkSteps"></div>
-            </div><!-- /tk-cols -->
           </div>
           <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
           <div class="tk-stub">
@@ -1443,10 +1422,10 @@ function reveal(){
   document.getElementById('itiTitle').textContent = `${name} & Neal's Big Date!`;
   document.getElementById('itiVenue').textContent = v.name;
   // shareable ticket
-  document.getElementById('tkVenue').textContent = v.name.split(',')[0].trim();   // concise venue name (no awkward wrap)
+  var _tkV=document.getElementById('tkVenue'); if(_tkV) _tkV.textContent = v.name.split(',')[0].trim();   // concise venue name (no awkward wrap)
   var _tkThumb=document.getElementById('tkThumb'); if(_tkThumb && typeof TKICON!=='undefined' && TKICON[pick.venue]) _tkThumb.innerHTML = TKICON[pick.venue];  // recognizable Seattle landmark (Space Needle for Seattle Center)
   var _tkPass=document.getElementById('tkPass'); if(_tkPass) _tkPass.textContent = name.toUpperCase();
-  document.getElementById('tkComp').innerHTML =
+  var _tkC=document.getElementById('tkComp'); if(_tkC) _tkC.innerHTML =
     `MATCH&nbsp;&nbsp;<b>${MATCHUP}</b><br>WATCH&nbsp;&nbsp;<b>${v.short}</b><br>SNACK&nbsp;&nbsp;<b>${pick.during.t}</b><br>DINNER&nbsp;<b>${pick.after.t}</b>`;
   const tk = ` ${name.toUpperCase()} ♥ NEAL · 8 MONTHS · JULY 6 2026 · WORLD CUP R16 · ${MATCHUP} ·`;
   document.getElementById('tkTicker').textContent = tk.repeat(6);
