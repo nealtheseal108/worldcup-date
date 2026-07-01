@@ -1306,7 +1306,7 @@ function reveal(){
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
     // first 4 legs peek at a full 36px; the rest compress to an 11px stacked edge (no hard collision on card 5/6)
-    var topOff = i<=3 ? (46 + i*36) : (154 + (i-3)*11);
+    var topOff = 46 + i*36;   // every card shows its full 36px header
     return `<div class="bpass" style="top:${topOff}px;z-index:${i+2}">`+
       `<div class="bp-head" onclick="scrollToPass(${i})" title="jump to this leg">`+
         `<span class="bp-h-time">✈ ${r[0]}</span>`+
