@@ -376,7 +376,7 @@
   .sharehint{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}
 
   .foot{text-align:center;color:rgba(255,255,255,.92);font-size:12px;margin-top:16px;line-height:1.5}
-  .kquote{position:fixed;right:14px;bottom:74px;z-index:40;max-width:260px;text-align:right;font-family:'Instrument Serif',Georgia,serif;font-style:italic;color:rgba(255,255,255,.62);font-size:13px;line-height:1.25;margin:0;pointer-events:none;text-shadow:0 1px 5px rgba(40,20,70,.45)}
+  .kquote{position:fixed;right:14px;bottom:calc(var(--player) + var(--tick) + 8px);z-index:40;max-width:260px;text-align:right;font-family:'Instrument Serif',Georgia,serif;font-style:italic;color:rgba(255,255,255,.62);font-size:13px;line-height:1.25;margin:0;pointer-events:none;text-shadow:0 1px 5px rgba(40,20,70,.45)}
   .kquote span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-style:normal;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:.85;margin-top:3px}
 
   /* Ganesh Air departure-board share card */
@@ -2445,7 +2445,7 @@ if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function
       if(!home||!away) return null;
       var st=(ev.status&&ev.status.type)||{};
       var href=(ev.links&&ev.links[0]&&ev.links[0].href)||('https://www.google.com/search?q='+encodeURIComponent((ev.shortName||'')+' world cup'));
-      return { h:(home.team&&(home.team.abbreviation||home.team.shortDisplayName))||'', a:(away.team&&(away.team.abbreviation||away.team.shortDisplayName))||'',
+      return { id:ev.id||((ev.shortName||'')+ev.date), ms:Date.parse(ev.date)||0, h:(home.team&&(home.team.abbreviation||home.team.shortDisplayName))||'', a:(away.team&&(away.team.abbreviation||away.team.shortDisplayName))||'',
         hs:home.score, as:away.score, state:st.state||'pre', detail:st.shortDetail||'', href:href };
     }).filter(Boolean);
   }
@@ -2455,17 +2455,36 @@ if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function
     else { var live=g.state==='in'; mid='<span class="ft-score">'+esc(g.hs)+'&nbsp;-&nbsp;'+esc(g.as)+'</span>'; stat='<span class="ft-status'+(live?' ft-live':'')+'">'+(live?'🔴 ':'')+esc(g.detail)+'</span>'; }
     return '<span class="ft-game" data-href="'+esc(g.href)+'"><span class="ft-team">'+esc(g.h)+'</span> '+mid+' <span class="ft-team">'+esc(g.a)+'</span> '+stat+'</span>';
   }
-  function setDur(){ var half=track.scrollWidth/2; if(half>40){ track.style.animationDuration=Math.max(18,Math.round(half/55))+'s'; } }
   function render(games){
-    if(!games.length){ track.innerHTML='<span class="ft-empty">⚽ no live World Cup games right now — check back at kickoff 💜</span>'; track.style.animation='none'; return; }
+    if(!games.length){ track.innerHTML='<span class="ft-empty">⚽ no recent World Cup games — check back at kickoff 💜</span>'; track.style.animation='none'; return; }
     var one=games.map(itemHTML).join('');
-    track.innerHTML=one+one;   // duplicate so translateX(-50%) loops seamlessly
-    track.style.animation='';
-    requestAnimationFrame(setDur); setTimeout(setDur,220);
+    track.style.animation=''; track.innerHTML=one+one;
+    var fill=function(){
+      var vw=(track.parentElement&&track.parentElement.clientWidth)||window.innerWidth||400;
+      var oneW=track.scrollWidth/2;
+      if(oneW>0 && oneW<vw*1.05){ var reps=Math.ceil((vw*1.05)/oneW)+1, unit=''; for(var i=0;i<reps;i++){unit+=one;} track.innerHTML=unit+unit; oneW=track.scrollWidth/2; }   // repeat so one copy always spans the screen (no gap)
+      if(oneW>40){ track.style.animationDuration=Math.max(20,Math.round(oneW/55))+'s'; }
+    };
+    requestAnimationFrame(fill); setTimeout(fill,240); setTimeout(fill,700);
   }
+  function laYMD(off){ var d=new Date(Date.now()+(off||0)*86400000); var p=d.toLocaleDateString('en-US',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}); var m=p.match(/(\d+)\/(\d+)\/(\d+)/); return m?(m[3]+m[1]+m[2]):''; }
+  function fetchDay(ymd){ return fetch(ESPN+'?dates='+ymd,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){return parseEvents(j);}).catch(function(){return [];}); }
+  function estW(g){ return (String(g.h).length+String(g.a).length+String(g.detail||'').length+9)*7 + 30; }   // rough px width of one game item
   function load(){
-    fetch(ESPN,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){ render(parseEvents(j)); })
-      .catch(function(){ if(!track.querySelector('.ft-game')) track.innerHTML='<span class="ft-empty">⚽ World Cup scores unavailable right now 💜</span>'; });
+    var view=track.parentElement, need=(((view&&view.clientWidth)||window.innerWidth||400))*1.1;   // fill the screen width
+    var seen={}, games=[], back=0;
+    function step(){
+      return fetchDay(laYMD(-back)).then(function(list){   // today (incl its future matches), then back a day at a time
+        (list||[]).forEach(function(g){ if(g&&!seen[g.id]){ seen[g.id]=1; games.push(g); } });
+        back++;
+        var w=0; for(var i=0;i<games.length;i++){ w+=estW(games[i]); }
+        if(w<need && back<=13){ return step(); }   // keep pulling PAST days until the width is filled
+      });
+    }
+    step().then(function(){
+      games.sort(function(a,b){ return (b.ms||0)-(a.ms||0); });   // newest / upcoming-today first, then back in time
+      if(games.length){ render(games); } else if(!track.querySelector('.ft-game')){ render([]); }
+    }).catch(function(){ if(!track.querySelector('.ft-game')){ track.innerHTML='<span class="ft-empty">⚽ World Cup scores unavailable right now 💜</span>'; } });
   }
   track.addEventListener('click',function(e){ var g=e.target.closest&&e.target.closest('.ft-game'); if(g&&g.getAttribute('data-href')) window.open(g.getAttribute('data-href'),'_blank','noopener'); });
   var ft=document.getElementById('fifatick'), rt=null;   // touch: pause while touched (mouse uses :hover in CSS)
