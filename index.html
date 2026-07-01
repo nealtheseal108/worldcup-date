@@ -66,6 +66,8 @@
   .stat-fine{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:.3px;color:var(--muted);margin:-4px 0 4px}
   .diaryintro{background:#f6f1ff;border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#4a3578;line-height:1.45}
   .diarybtn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 12px;border:1px solid var(--line);border-radius:20px;background:#f1ecfc;color:#5a3fb0;font-weight:700;font-size:11.5px;cursor:pointer;font-family:inherit}
+  a.gcalbtn{text-decoration:none;margin-left:7px;background:#eaf1ff;border-color:#cfe0ff;color:#2f5fd0}
+  a.gcalbtn:hover{background:#dfeaff}
   .diarybtn:hover{background:#e7ddf7}
   .diarybtn.on{background:#ddf3e4;color:#1f7a44;border-color:#bce6c9}
   .diary-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px}
@@ -1314,6 +1316,7 @@ function reveal(){
       `<div class="bp-body">`+
         `<div class="bp-desc">${r[2]}</div>`+
         `<button class="diarybtn" type="button" onclick="openRecord(${i})">📹 record this moment</button>`+
+        `<a class="diarybtn gcalbtn" href="${legGcalUrl(i,rows)}" target="_blank" rel="noopener">📅 add to my calendar</a>`+
         `<div class="diary-row" id="diary-s${i}"></div>`+
       `</div>`+
       `<div class="bp-perf"></div>`+
@@ -2058,6 +2061,22 @@ function showCompliment(i){
   o.style.display='flex';
 }
 function hideCompliment(){var o=document.getElementById('complimentOverlay');if(o)o.style.display='none';}
+/* Google Calendar "add event" links — one per leg, pre-filled (opens Google Calendar, she taps Save; no OAuth/app-verification needed) */
+function _parseLegTime(s){s=String(s).replace(/[~ \s]/g,'');var m=s.match(/(\d{1,2}):(\d{2})(am|pm)/i);if(!m)return null;var h=+m[1],mn=+m[2],pm=/pm/i.test(m[3]);if(pm&&h<12)h+=12;if(!pm&&h===12)h=0;return h*60+mn;}
+function _fmtGcal(mins){var h=Math.floor(mins/60)%24,mn=mins%60;return '20260706T'+('0'+h).slice(-2)+('0'+mn).slice(-2)+'00';}
+function legGcalUrl(i,rows){
+  var start=_parseLegTime(rows[i][0]); if(start==null)return '';
+  var nxt=(i+1<rows.length)?_parseLegTime(rows[i+1][0]):null;
+  var end=(nxt!=null&&nxt>start)?Math.min(nxt,start+90):start+45;
+  var title=String(rows[i][1]||'').replace(/<[^>]+>/g,'').trim();
+  var det=String(rows[i][2]||'').replace(/<[^>]+>/g,'').trim();
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+    +'&text='+encodeURIComponent('💜 '+title)
+    +'&dates='+_fmtGcal(start)+'/'+_fmtGcal(end)
+    +'&details='+encodeURIComponent(det+'\n\n💜 from our world cup date, july 6')
+    +'&location='+encodeURIComponent('Seattle, WA')
+    +'&ctz=America/Los_Angeles';
+}
 if(/[?&]egg/.test(location.search)||/egg/.test(location.hash)){setTimeout(showEgg,350);}
 /* TEST: open the site with ?end=1 to force the 9:30 state on a sample reveal */
 if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
