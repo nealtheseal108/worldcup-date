@@ -1189,7 +1189,7 @@ function _swRenderGrid(stepKey, cont, items, animate){
     +'</div>';
   cont.innerHTML=html;
   cont.querySelectorAll('.pickcard').forEach(function(b){
-    b.onclick=function(){ if(window.burstConfetti)burstConfetti(b,{count:16}); if(window.buzz)buzz(); _swApplyPick(stepKey, items[+b.getAttribute('data-i')]); };
+    b.onclick=function(){ if(window.buzz)buzz(); _swApplyPick(stepKey, items[+b.getAttribute('data-i')]); };
   });
   cont.querySelector('.sw-toggle-deck').onclick=function(){ _swMode[stepKey]='deck'; renderSwipeStep(stepKey, true); };
   if(animate)armReveals();
@@ -1455,7 +1455,6 @@ function reveal(){
   document.getElementById('reserveNote').innerHTML =
     '🗺️ <b>your whole night, mapped out babu.</b> 💜 i planned every train and every stop so there is nothing for you to figure out, just show up and we follow the plan together. '+pick.after.t+' is walk-in, so worst case we wait a few mins for a table, totally worth it. i got you. 💜';
   go(4);
-  if(window.burstConfetti)setTimeout(function(){burstConfetti(null,{count:42,emojis:['⚽','💜','❤️','🎡','✨','🎉','🎬']});},260);
   if(window.buzz)buzz(24);
   if(window.initTimeline){requestAnimationFrame(window.initTimeline);setTimeout(window.initTimeline,140);}
   try{['.sharewrap','.iti-head','.twoplan','.merge','#diaryGate'].forEach(function(sel){var e=document.querySelector(sel);if(e&&!e.classList.contains('in'))e.classList.add('reveal-up');});
@@ -1518,9 +1517,9 @@ function fsInit(){
   var clock=document.getElementById('fsClock'); if(!clock) return;
   clock.innerHTML='<span class="fs-cell"></span><span class="fs-cell"></span><span class="fs-cell"></span><span class="fs-unit">d</span>'+['h','m','s'].map(function(u){return '<span class="fs-cell"></span><span class="fs-cell"></span><span class="fs-unit">'+u+'</span>';}).join('');
   _fsCells=Array.prototype.slice.call(clock.querySelectorAll('.fs-cell'));
-  try{ var stored=localStorage.getItem('wc_landed'); if(stored){ _fsLanded=true; _fsLandAt=new Date(+stored); } }catch(e){}
+  try{ localStorage.removeItem('wc_landed'); }catch(e){}   // no persistence: the board auto-flips to TOGETHER at US.landing; a tap only triggers it early for this session
   var btn=document.getElementById('fsLandBtn');
-  if(btn)btn.onclick=function(){ _fsLanded=true; _fsLandAt=new Date(); try{localStorage.setItem('wc_landed',String(_fsLandAt.getTime()));}catch(e){} _fsTick(); buzz(20); burstConfetti(this,{count:34}); };
+  if(btn)btn.onclick=function(){ _fsLanded=true; _fsLandAt=new Date(); _fsTick(); buzz(20); };
   _fsTick(); setInterval(_fsTick,1000);
 }
 /* ---------- self-contained emoji confetti (no CDN, transform/opacity only) ---------- */
