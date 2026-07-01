@@ -2077,7 +2077,7 @@ function makeQR(){
   }catch(e){}
 }
 /* the easter egg itself */
-function spawnEggHearts(id){var h=document.getElementById(id||'eggHearts');if(!h||h.children.length)return;var e=['💜','💛','🤍','💜','💚'],s='';
+function spawnEggHearts(id){var h=document.getElementById(id||'eggHearts');if(!h||h.children.length)return;var e=['💜','❤️','💛','💜','🧡'],s='';
   for(var i=0;i<18;i++){var l=(i*5.6+2)%100;s+='<i style="left:'+l.toFixed(1)+'%;font-size:'+(16+(i%4)*5)+'px;animation-duration:'+(4+(i%5))+'s;animation-delay:'+((i*0.33)%5).toFixed(2)+'s">'+e[i%e.length]+'</i>';}
   h.innerHTML=s;}
 function showEgg(){var o=document.getElementById('eggOverlay');if(!o)return;spawnEggHearts();o.style.display='flex';}
