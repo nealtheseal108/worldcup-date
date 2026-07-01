@@ -243,6 +243,29 @@
   .ap-meta b{font-size:12px;color:#3a2a63}
   .ap-bars{display:flex;align-items:flex-end;justify-content:flex-start;gap:0;height:24px;margin:6px 18px 14px}
   .ap-bars .bc-row{height:24px}
+  /* ---------- hero live flight-status band (reunion countdown + miles-to-zero) ---------- */
+  .flightstatus{max-width:340px;margin:-6px auto 24px;background:linear-gradient(165deg,#fff,#f7f2ff);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 22px rgba(53,28,94,.14);padding:12px 15px 15px;text-align:center;font-family:'Courier Prime',ui-monospace,monospace}
+  .fs-top{font-size:10px;letter-spacing:2px;color:var(--lav);font-weight:700}
+  .fs-arc{display:flex;align-items:center;gap:9px;margin:11px auto 5px;max-width:280px}
+  .fs-city{font-weight:800;font-size:13px;color:var(--ink);letter-spacing:1px;flex:none}
+  .fs-track{flex:1 1 auto;height:2px;background:repeating-linear-gradient(90deg,var(--lav2) 0 5px,transparent 5px 11px);position:relative;border-radius:2px;transition:flex-basis .9s cubic-bezier(.5,.1,.3,1),max-width .9s cubic-bezier(.5,.1,.3,1);max-width:400px}
+  .fs-plane{position:absolute;top:50%;left:12%;transform:translate(-50%,-50%);font-size:15px;transition:left 1s cubic-bezier(.5,.1,.4,1)}
+  .fs-dist{font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:11px}
+  .fs-dist b{color:#e0679b}
+  .fs-board{background:#181030;border-radius:9px;padding:8px 6px 9px;box-shadow:inset 0 2px 9px rgba(0,0,0,.45)}
+  .fs-label{font-size:8.5px;letter-spacing:2px;color:#b79bf0;font-weight:700;margin-bottom:6px}
+  .fs-clock{display:flex;justify-content:center;align-items:flex-end;gap:1px;perspective:200px}
+  .fs-cell{background:#0a0616;color:#ffcf6b;font-weight:800;font-size:19px;line-height:1;padding:5px 3px;border-radius:3px;min-width:14px;text-align:center;box-shadow:inset 0 -5px 7px rgba(0,0,0,.55);border-top:1px solid #2b2340}
+  .fs-cell.flip{animation:fsflip .3s ease}
+  @keyframes fsflip{0%{transform:rotateX(0)}45%{transform:rotateX(-85deg)}100%{transform:rotateX(0)}}
+  .fs-unit{color:#7a5aa8;font-size:8.5px;font-weight:700;align-self:flex-end;margin:0 5px 3px 2px;letter-spacing:1px}
+  .fs-since{font-size:11px;color:var(--lav);font-weight:700;margin-top:10px}
+  .fs-land{margin-top:11px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border:none;border-radius:22px;padding:8px 22px;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;box-shadow:0 4px 12px rgba(124,77,202,.35)}
+  .fs-land:active{transform:scale(.97)}
+  .flightstatus.landed .fs-track{max-width:26px}
+  .flightstatus.landed .fs-board{background:linear-gradient(160deg,#241645,#3a1f63)}
+  .flightstatus.landed .fs-cell{color:#7cffb0}
+  @media(prefers-reduced-motion:reduce){.fs-cell.flip{animation:none}.fs-plane,.fs-track{transition:none}}
   /* locked date-diary finale */
   .diarylock{text-align:center;background:linear-gradient(160deg,#f3eefc,#ece3fb);border:1px dashed var(--lav2);border-radius:16px;padding:28px 22px;margin-top:6px}
   .dl-ico{font-size:32px;margin-bottom:6px}
@@ -498,6 +521,21 @@
             <div><span>DATE</span><b>2 JUL</b></div>
           </div>
           <div class="ap-bars" aria-hidden="true"></div>
+        </div>
+        <div class="flightstatus" id="flightStatus" aria-live="polite">
+          <div class="fs-top">GANESH AIR ✈ LIVE FLIGHT STATUS</div>
+          <div class="fs-arc">
+            <span class="fs-city">SLC</span>
+            <span class="fs-track"><span class="fs-plane" id="fsPlane">✈</span></span>
+            <span class="fs-city">SEA</span>
+          </div>
+          <div class="fs-dist" id="fsDist"></div>
+          <div class="fs-board">
+            <div class="fs-label" id="fsLabel">SIDHYA ARRIVES IN</div>
+            <div class="fs-clock" id="fsClock"></div>
+          </div>
+          <div class="fs-since" id="fsSince"></div>
+          <button type="button" class="fs-land" id="fsLandBtn">I landed 💜</button>
         </div>
         <h2>hey sidhu, you get to pick our <span class="fancy">date!!</span></h2>
         <p class="sub" style="margin-top:10px">happy 8 months babu!! 💜 a whole lot of miles and time zones between us, and you flew across every one of them to be here ✈ a few days in seattle, and now the main event. so i turned our date into boarding passes, one for each stop. you just pick the fun (watch spot, snack, dinner) and i'll fly us there 🤩 let's gooo ‼️⚽</p>
@@ -1119,7 +1157,7 @@ function _swRenderGrid(stepKey, cont, items, animate){
     +'</div>';
   cont.innerHTML=html;
   cont.querySelectorAll('.pickcard').forEach(function(b){
-    b.onclick=function(){ _swApplyPick(stepKey, items[+b.getAttribute('data-i')]); };
+    b.onclick=function(){ if(window.burstConfetti)burstConfetti(b,{count:16}); if(window.buzz)buzz(); _swApplyPick(stepKey, items[+b.getAttribute('data-i')]); };
   });
   cont.querySelector('.sw-toggle-deck').onclick=function(){ _swMode[stepKey]='deck'; renderSwipeStep(stepKey, true); };
   if(animate)armReveals();
@@ -1385,6 +1423,8 @@ function reveal(){
   document.getElementById('reserveNote').innerHTML =
     '🗺️ <b>your whole night, mapped out babu.</b> 💜 i planned every train and every stop so there is nothing for you to figure out, just show up and we follow the plan together. '+pick.after.t+' is walk-in, so worst case we wait a few mins for a table, totally worth it. i got you. 💜';
   go(4);
+  if(window.burstConfetti)setTimeout(function(){burstConfetti(null,{count:42,emojis:['⚽','💜','❤️','🎡','✨','🎉','🎬']});},260);
+  if(window.buzz)buzz(24);
   if(window.initTimeline){requestAnimationFrame(window.initTimeline);setTimeout(window.initTimeline,140);}
   try{['.sharewrap','.iti-head','.twoplan','.merge','#diaryGate'].forEach(function(sel){var e=document.querySelector(sel);if(e&&!e.classList.contains('in'))e.classList.add('reveal-up');});
     document.querySelectorAll('#step4 .perks').forEach(function(e){if(!e.classList.contains('in'))e.classList.add('reveal-up');});
@@ -1397,6 +1437,81 @@ venueCards();
 function loadArrival(){var el=document.getElementById('apFrom');if(el){var v=localStorage.getItem('wc_arrival_from');if(v)el.textContent=v;}var b=document.querySelector('#arrivalPass .ap-bars');if(b&&window.bpBarcode&&!b.querySelector('.bc-row'))b.innerHTML=window.bpBarcode(706,{h:24,color:'#241733',target:300});}
 function editArrivalFrom(){var cur=localStorage.getItem('wc_arrival_from')||'';var v=prompt('where did you fly into seattle from, babu? ✈\n(city or airport code)',cur);if(v===null)return;v=v.trim().toUpperCase().slice(0,9)||'HOME';localStorage.setItem('wc_arrival_from',v);var el=document.getElementById('apFrom');if(el)el.textContent=v;}
 loadArrival();
+/* ============ LIVE FLIGHT STATUS: reunion countdown -> together counter -> since-we-met ============ */
+/* EDIT if any are off. metDate is my best guess from the site's "8 months" framing (Nov 6 2025). */
+var US = {
+  metDate: new Date(2025,10,6,0,0,0),   // when you two got together -> "8 months" on Jul 6 2026
+  landing: new Date(2026,6,2,22,5,0),   // Sidhya's DL 2016 arrival: Jul 2, 10:05 PM (Seattle)
+  home:    {lat:40.7608,lng:-111.8910}, // Salt Lake City
+  seattle: {lat:47.6062,lng:-122.3321}
+};
+function _haversineMi(a,b){var R=3958.8,dLa=(b.lat-a.lat)*Math.PI/180,dLo=(b.lng-a.lng)*Math.PI/180,la1=a.lat*Math.PI/180,la2=b.lat*Math.PI/180;var h=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(la1)*Math.cos(la2)*Math.sin(dLo/2)*Math.sin(dLo/2);return 2*R*Math.asin(Math.sqrt(h));}
+var US_MILES = Math.round(_haversineMi(US.home,US.seattle));
+function _p2(n){n=String(n);return n.length<2?'0'+n:n;}
+function buzz(ms){try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e){}}
+var _fsCells=[], _fsLanded=false, _fsLandAt=null;
+function _fsSince(now){
+  var m=(now.getFullYear()-US.metDate.getFullYear())*12+(now.getMonth()-US.metDate.getMonth());
+  var a=new Date(US.metDate); a.setMonth(a.getMonth()+m);
+  if(a>now){m--;a=new Date(US.metDate);a.setMonth(a.getMonth()+m);}
+  var d=Math.floor((now-a)/86400000);
+  return m+' month'+(m===1?'':'s')+(d?', '+d+' day'+(d===1?'':'s'):'');
+}
+function _fsSetClock(d,h,mi,s){
+  var digs=(_p2(d)+_p2(h)+_p2(mi)+_p2(s)).split('');
+  for(var i=0;i<_fsCells.length;i++){ if(_fsCells[i].textContent!==digs[i]){ _fsCells[i].textContent=digs[i]; _fsCells[i].classList.remove('flip'); void _fsCells[i].offsetWidth; _fsCells[i].classList.add('flip'); } }
+}
+function _fsTick(){
+  var el=document.getElementById('flightStatus'); if(!el) return;
+  var now=new Date(), landed=_fsLanded||now>=US.landing;
+  var dist=document.getElementById('fsDist'), label=document.getElementById('fsLabel'), plane=document.getElementById('fsPlane'), btn=document.getElementById('fsLandBtn');
+  if(!landed){
+    var ms=US.landing-now, s=Math.floor(ms/1000), d=Math.floor(s/86400); s-=d*86400; var h=Math.floor(s/3600); s-=h*3600; var m=Math.floor(s/60); s-=m*60;
+    _fsSetClock(d,h,m,s);
+    label.textContent='SIDHYA ARRIVES IN';
+    dist.innerHTML='<b>'+US_MILES.toLocaleString()+' mi</b> apart right now';
+    var win=1.5*86400000; if(plane)plane.style.left=(8+Math.max(0,Math.min(1,1-ms/win))*70)+'%';
+    el.classList.remove('landed'); if(btn)btn.style.display='';
+  }else{
+    var base=_fsLandAt||US.landing, ms2=Math.max(0,now-base), s2=Math.floor(ms2/1000), d2=Math.floor(s2/86400); s2-=d2*86400; var h2=Math.floor(s2/3600); s2-=h2*3600; var m2=Math.floor(s2/60); s2-=m2*60;
+    _fsSetClock(d2,h2,m2,s2);
+    label.textContent='💜 TOGETHER FOR';
+    dist.innerHTML='<b>0 mi</b> apart · you made it 💜';
+    if(plane)plane.style.left='50%'; el.classList.add('landed'); if(btn)btn.style.display='none';
+  }
+  var since=document.getElementById('fsSince'); if(since)since.textContent='together '+_fsSince(now)+' 💜';
+}
+function fsInit(){
+  var clock=document.getElementById('fsClock'); if(!clock) return;
+  clock.innerHTML=['d','h','m','s'].map(function(u){return '<span class="fs-cell"></span><span class="fs-cell"></span><span class="fs-unit">'+u+'</span>';}).join('');
+  _fsCells=Array.prototype.slice.call(clock.querySelectorAll('.fs-cell'));
+  try{ var stored=localStorage.getItem('wc_landed'); if(stored){ _fsLanded=true; _fsLandAt=new Date(+stored); } }catch(e){}
+  var btn=document.getElementById('fsLandBtn');
+  if(btn)btn.onclick=function(){ _fsLanded=true; _fsLandAt=new Date(); try{localStorage.setItem('wc_landed',String(_fsLandAt.getTime()));}catch(e){} _fsTick(); buzz(20); burstConfetti(this,{count:34}); };
+  _fsTick(); setInterval(_fsTick,1000);
+}
+/* ---------- self-contained emoji confetti (no CDN, transform/opacity only) ---------- */
+function burstConfetti(originEl,opts){
+  opts=opts||{};
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  var em=opts.emojis||['⚽','💜','❤️','🎡','✨','🎬'];
+  var r=(originEl&&originEl.getBoundingClientRect)?originEl.getBoundingClientRect():null;
+  var cx=r?r.left+r.width/2:window.innerWidth/2, cy=r?r.top+r.height/2:window.innerHeight*0.4, n=opts.count||20;
+  var layer=document.getElementById('confettiLayer');
+  if(!layer){layer=document.createElement('div');layer.id='confettiLayer';layer.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden';document.body.appendChild(layer);}
+  for(var i=0;i<n;i++){(function(){
+    var sp=document.createElement('span'); sp.textContent=em[(Math.random()*em.length)|0];
+    var ang=Math.random()*Math.PI*2, vel=70+Math.random()*150, dx=Math.cos(ang)*vel, dy=Math.sin(ang)*vel-(90+Math.random()*90);
+    sp.style.cssText='position:absolute;left:'+cx+'px;top:'+cy+'px;font-size:'+(16+Math.random()*14)+'px;will-change:transform,opacity;transform:translate(-50%,-50%)';
+    layer.appendChild(sp);
+    var t0=null,dur=950+Math.random()*550,rot=(Math.random()*2-1)*260;
+    function fr(t){ if(t0===null)t0=t; var p=(t-t0)/dur; if(p>=1){sp.remove();return;} var e=1-(1-p)*(1-p);
+      sp.style.transform='translate(-50%,-50%) translate('+(dx*e)+'px,'+(dy*e+280*p*p)+'px) rotate('+(rot*p)+'deg)'; sp.style.opacity=String(1-p*p);
+      requestAnimationFrame(fr); }
+    requestAnimationFrame(fr);
+  })();}
+}
+fsInit();
 /* temporary: hide the cheeky closing line for ~1 hour, then it comes back on its own */
 var CHEEKY_HIDE_UNTIL=1782457721986; /* Thu Jun 25 2026 ~00:08 PDT (1h from when this was set) */
 function applyCheekyGate(){var el=document.getElementById('cheekyLine');if(el)el.style.display=(Date.now()<CHEEKY_HIDE_UNTIL)?'none':'';}
