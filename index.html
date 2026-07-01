@@ -380,7 +380,7 @@
 
   /* Ganesh Air departure-board share card */
   /* shareable boarding pass (upright, lavender — matches the site's passes) */
-  .ticket{background:#fff;color:var(--ink);position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;cursor:pointer;width:640px}
+  .ticket{background:#fff;color:var(--ink);position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;width:640px}
   /* shadow + rounding live on the SCALER so the tight overflow:hidden can't clip the shadow into a square outline */
   .tk-scaler{position:relative;overflow:hidden;margin:0 auto;border-radius:16px;box-shadow:0 14px 34px rgba(53,28,94,.24)}
   .tk-head{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;padding:15px 16px;flex:none}
@@ -635,7 +635,7 @@
       <div class="sharewrap">
         <div class="sectlabel">📸 Your shareable card</div>
         <div class="tk-scaler" id="tkScaler">
-        <div class="ticket" id="shareCard" onclick="showEgg()" title="tap for a lil surprise 💜">
+        <div class="ticket" id="shareCard">
           <div class="tk-head">
             <div class="tk-cat"><span class="tk-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="10.8" cy="14" r="6" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="17.2" cy="14" r="6" fill="none" stroke="#7c4dca" stroke-width="4.4"/><circle cx="17.2" cy="14" r="6" fill="none" stroke="#fff" stroke-width="2.6"/></svg></span>GANESH AIR</div>
             <div class="tk-status">GOING <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#fff"/></svg></div>
@@ -658,7 +658,7 @@
             <div class="tk-steps" id="tkSteps"></div>
           </div>
           <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
-          <div class="tk-stub">
+          <div class="tk-stub" onclick="showEgg()" title="tap the barcode for a lil surprise 💜" style="cursor:pointer">
             <div class="tk-stubL">
               <div class="bc-row" id="tkBars" aria-hidden="true"></div>
             </div>
@@ -735,6 +735,24 @@
       <div class="note" id="reserveNote"></div>
 
       <div class="sectlabel">🎬 the world cup date diary</div>
+      <div class="endcard" style="display:block">
+        <div class="ec-big">🎬💜</div>
+        <div class="ec-title">our date diary</div>
+        <div class="ec-sub">every clip we film today gets stitched into our little movie tonight, and your flight home is waiting there too 💜</div>
+        <button class="ec-btn" type="button" onclick="go(5)">open the diary →</button>
+      </div>
+
+      <div class="cheeky" id="cheekyLine">Lotus sex in the car may or may not be included in this date. 😏💜</div>
+
+      <div class="printrow">
+        <button class="btn primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+        <button class="btn ghost" onclick="go(0)">↺ Start over</button>
+      </div>
+    </section>
+
+    <!-- STEP 5 — the date diary finale (locked until ~9:30 PM, then movie + flight home) -->
+    <section class="step" id="step5">
+      <div class="iti-head" style="margin-top:2px"><div class="big">🎬💜</div><h2 style="font-size:24px">the world cup date diary</h2><div class="venue">our whole day, cut into a movie tonight</div></div>
       <div id="diaryGate">
         <div class="diarylock" id="diaryLock">
           <div class="dl-ico">🔒</div>
@@ -766,17 +784,11 @@
           </div>
         </div>
       </div>
-
-      <div class="cheeky" id="cheekyLine">Lotus sex in the car may or may not be included in this date. 😏💜</div>
-
-      <div class="printrow">
-        <button class="btn primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
-        <button class="btn ghost" onclick="go(0)">↺ Start over</button>
-      </div>
+      <div class="printrow" style="margin-top:20px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
     </section>
 
-    <!-- STEP 5 — the completed date-diary movie, its own page -->
-    <section class="step" id="step5">
+    <!-- STEP 6 — the completed date-diary movie, its own page -->
+    <section class="step" id="step6">
       <div class="iti-head" style="margin-top:2px"><div class="big">🎬💜</div><h2 style="font-size:24px">our date movie</h2><div class="venue">every clip we caught, cut together</div></div>
       <div class="movie-stage" id="movieStage">
         <video id="movieVideo" class="movie-video" playsinline></video>
@@ -1515,7 +1527,7 @@ function reveal(){
   requestAnimationFrame(fitTicketBarcode); setTimeout(fitTicketBarcode,180);
   [400,900,1600].forEach(function(ms){setTimeout(fitTicketScale,ms);});   // re-fit once fonts/reveal-anim settle
   if(window.initTimeline){requestAnimationFrame(window.initTimeline);setTimeout(window.initTimeline,140);}
-  try{['.sharewrap','.iti-head','.twoplan','.merge','#diaryGate'].forEach(function(sel){var e=document.querySelector(sel);if(e&&!e.classList.contains('in'))e.classList.add('reveal-up');});
+  try{['.sharewrap','.iti-head','.twoplan','.merge'].forEach(function(sel){var e=document.querySelector(sel);if(e&&!e.classList.contains('in'))e.classList.add('reveal-up');});
     document.querySelectorAll('#step4 .perks').forEach(function(e){if(!e.classList.contains('in'))e.classList.add('reveal-up');});
     armReveals();}catch(e){}
   applyCheekyGate();
@@ -2230,7 +2242,7 @@ function gatherClips(){
   return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){all.push(c.value);c.continue();}else{all.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});res(all);}};cur.onerror=function(){res(all);};});});
 }
 function compileMovie(){gatherClips().then(function(all){if(!all.length){hint("record a few moments first, then i'll cut our movie 🎬💜");return;}movieClips=all;openMovie();});}
-function openMovie(){go(5);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
+function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
 function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
 function moviePlayClip(i){
@@ -2245,7 +2257,7 @@ function moviePlayClip(i){
   var p=vid.play();if(p&&p.catch)p.catch(function(){if(!movieAbort)moviePlayClip(i+1);});
 }
 function moviePlayOutro(){movieShowCard('<div class="mc-big">💜</div><div class="mc-title">the end</div><div class="mc-sub">'+_esc(MATCHUP)+'</div><div class="mc-sub2">made with love, by neal 💜</div>');}
-function closeMovie(){movieAbort=true;if(movieTimer)clearTimeout(movieTimer);var vid=document.getElementById('movieVideo');if(vid){try{vid.pause();}catch(e){}vid.removeAttribute('src');try{vid.load();}catch(e){}}go(4);if(_movieResumeMusic){try{startMusic();}catch(e){}_movieResumeMusic=false;}}
+function closeMovie(){movieAbort=true;if(movieTimer)clearTimeout(movieTimer);var vid=document.getElementById('movieVideo');if(vid){try{vid.pause();}catch(e){}vid.removeAttribute('src');try{vid.load();}catch(e){}}go(5);if(_movieResumeMusic){try{startMusic();}catch(e){}_movieResumeMusic=false;}}
 function exportMovie(){
   if(!movieClips.length){hint('nothing to export yet 💜');return;}
   var testc=document.createElement('canvas');
