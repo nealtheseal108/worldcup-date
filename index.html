@@ -1276,7 +1276,7 @@ function drawRoute(k,_n){
   LINK_STATIONS.forEach(function(st){L.circleMarker(st.ll,{radius:2.6,color:'#fff',weight:1.4,fillColor:'#6a4fe0',fillOpacity:1}).addTo(_routeLayer).bindTooltip(st.n+' Station',{direction:'top',className:'stationtip',offset:[0,-2]});});
   function tipOff(dir){return dir==='top'?[0,-4]:dir==='bottom'?[0,6]:dir==='left'?[-5,0]:[5,0];}
   function dot(ll,c,label,r,dir){dir=dir||'top';L.circleMarker(ll,{radius:r||7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:dir,className:'maptip',offset:tipOff(dir)});}
-  function foodDot(ll,c,label,dir){dir=dir||'bottom';L.circleMarker(ll,{radius:8,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{permanent:true,direction:dir,className:'maptip',offset:tipOff(dir)});}
+  function foodDot(ll,c,label,dir){dir=dir||'bottom';L.circleMarker(ll,{radius:7,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(_routeLayer).bindTooltip(label,{direction:dir,className:'maptip',offset:tipOff(dir)});}  /* label on tap/hover (name's already in the caption) */
   // staggered label directions so the tight downtown cluster fans out instead of stacking
   dot(START_NEAL,'#2f9e5e','Neal',7,'top');
   dot(START_SIDHYA,'#7c4dca','Sidhya',7,'bottom');
@@ -1284,7 +1284,7 @@ function drawRoute(k,_n){
   dot(v,'#ffd166','💜 '+VENUE_LABEL[k],9,'top');
   if(a)foodDot(a,'#c0398b',(pick.after.e||'🍽️')+' '+pick.after.t,'right');     // dinner, on the way home
   var fit=worm.concat(NEAL_LINK).concat(SIDHYA_LINK); if(a)fit.push(a);
-  _map.fitBounds(L.latLngBounds(fit),{padding:[58,42]});
+  _map.fitBounds(L.latLngBounds(fit),{padding:[34,22]});
   var cap=document.getElementById('mapCap');
   if(cap){
     var legs=['🚆 2 line in'];
