@@ -296,6 +296,7 @@
 
   /* shareable card */
   .sharewrap{margin:6px auto 0;max-width:430px}
+  @media(min-width:620px){.sharewrap{max-width:540px}}
   .sharecard{position:relative;border-radius:18px;padding:24px 20px 22px;color:#fff;text-align:center;overflow:hidden;
     background:linear-gradient(155deg,#7c4dca,#9b72e8 55%,#b57edc);box-shadow:0 12px 30px rgba(53,28,94,.35)}
   .sharecard .conf{position:absolute;inset:0;opacity:.18;font-size:22px;line-height:1.9;word-spacing:6px;pointer-events:none}
@@ -1302,7 +1303,9 @@ function reveal(){
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
-    return `<div class="bpass" style="--bpi:${Math.min(i,4)};z-index:${i+2}">`+
+    // first 4 legs peek at a full 36px; the rest compress to an 11px stacked edge (no hard collision on card 5/6)
+    var topOff = i<=3 ? (46 + i*36) : (154 + (i-3)*11);
+    return `<div class="bpass" style="top:${topOff}px;z-index:${i+2}">`+
       `<div class="bp-head" onclick="scrollToPass(${i})" title="jump to this leg">`+
         `<span class="bp-h-time">✈ ${r[0]}</span>`+
         `<span class="bp-h-plan">${plan}</span>`+
@@ -2036,11 +2039,11 @@ function hideEgg(){var o=document.getElementById('eggOverlay');if(o)o.style.disp
 var BP_PAIRS = [
   {n:{t:"you are my muse, my inspiration", d:"Apr 25, 2026"}, s:{t:"you're my world!!!!", d:"Mar 1, 2026"}},
   {n:{t:"i love your smile & you have the most beautiful eyes 👀", d:"May 14, 2026"}, s:{t:"i love your smile so much neal!!!!", d:"Jan 29, 2026"}},
-  {n:{t:"you are gloriously radiant", d:"May 30, 2026"}, s:{t:"i adore you", d:"Feb 21, 2026"}},
+  {n:{t:"you're so hot 🔥", d:"May 29, 2026"}, s:{t:"you're insanely hot 🔥", d:"Mar 4, 2026"}},
   {n:{t:"my favorite person in this whole world", d:"Apr 1, 2026"}, s:{t:"you're my favorite person ever", d:"Feb 11, 2026"}},
-  {n:{t:"you are stunning", d:"Mar 11, 2026"}, s:{t:"i love you the most", d:"Jan 30, 2026"}},
+  {n:{t:"you look so hot", d:"May 31, 2026"}, s:{t:"just the thought of you drives me crazy", d:"Feb 3, 2026"}},
   {n:{t:"you are my best friend", d:"Feb 11, 2026"}, s:{t:"you are my best friend too ❤️", d:"Feb 11, 2026"}},
-  {n:{t:"you are gorgeous", d:"Feb 6, 2026"}, s:{t:"i'm obsessed with you", d:"Feb 6, 2026"}},
+  {n:{t:"you're so hot", d:"Jun 4, 2026"}, s:{t:"i'm obsessed with you, every day you get hotter & prove me wrong", d:"May 20, 2026"}},
   {n:{t:"you are my wife 💜", d:"Feb 6, 2026"}, s:{t:"my husband 💜", d:"Feb 15, 2026"}},
   {n:{t:"so lucky to have you", d:"May 31, 2026"}, s:{t:"i am so grateful for you", d:"Jan 11, 2026"}},
   {n:{t:"i am so proud of you", d:"Jun 15, 2026"}, s:{t:"i'm so proud of you neal", d:"May 5, 2026"}}
