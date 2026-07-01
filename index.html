@@ -400,14 +400,11 @@
   .tk-grid b{display:block;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:800;color:#3a2a63;line-height:1;margin-top:4px;white-space:nowrap}
   .tk-comp{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;line-height:1.85;color:var(--muted);letter-spacing:.2px;margin-top:19px;padding-top:17px;border-top:1px dashed var(--line)}
   .tk-comp b{color:#3a2a63}
-  .tk-steps{margin-top:15px;padding-top:14px;border-top:1px dashed var(--line);font-family:'Courier Prime',ui-monospace,monospace}
-  .tk-steps-h{font-size:9px;letter-spacing:1.5px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:8px}
-  .tk-step{display:flex;gap:9px;font-size:10px;line-height:1.75}
-  .tk-step-t{color:var(--lav);font-weight:700;min-width:60px;flex:none}
+  .tk-steps{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-family:'Courier Prime',ui-monospace,monospace}
+  .tk-steps-h{font-size:8px;letter-spacing:1.1px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:5px}
+  .tk-step{display:flex;gap:6px;font-size:8px;line-height:1.5}
+  .tk-step-t{color:var(--lav);font-weight:700;min-width:46px;flex:none}
   .tk-step-n{color:#3a2a63;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ticket .tk-steps-h{font-size:16px}
-  .ticket .tk-step{font-size:17px;gap:16px;line-height:2}
-  .ticket .tk-step-t{min-width:120px}
   .tk-h{width:13px;height:13px;display:inline-block;vertical-align:-2px}
   .tk-flapwrap{flex:none;background:linear-gradient(90deg,var(--lav),var(--lav2));overflow:hidden}
   .tk-ticker{position:relative;height:30px;overflow:hidden;display:flex;align-items:center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
@@ -515,6 +512,10 @@
     .ticket .tk-grid span{font-size:14px}
     .ticket .tk-grid b{font-size:26px}
     .ticket .tk-comp{font-size:20px;line-height:2;padding-top:30px}
+    .ticket .tk-steps{padding-top:24px;margin-top:24px}
+    .ticket .tk-steps-h{font-size:15px}
+    .ticket .tk-step{font-size:16px;gap:16px;line-height:1.9}
+    .ticket .tk-step-t{min-width:118px}
     .ticket .tk-ticker{height:54px}
     .ticket .tk-track{font-size:22px}
     .ticket .tk-stub{padding:4vh 9vw}
@@ -1452,8 +1453,11 @@ function reveal(){
   ];
   window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
   var _tkSteps=document.getElementById('tkSteps');
-  if(_tkSteps)_tkSteps.innerHTML='<div class="tk-steps-h">THE DAY · ALL '+rows.length+' STOPS</div>'+
-    rows.map(function(r,i){ return '<div class="tk-step"><span class="tk-step-t">'+r[0]+'</span><span class="tk-step-n">'+(window.diaryLabels[i]||'')+'</span></div>'; }).join('');
+  if(_tkSteps){
+    var _plans=rows.map(function(r,i){return {t:r[0],n:window.diaryLabels[i]||''};}).filter(function(s){return !/stolen hour/i.test(s.n);});   // drop the stolen-hour leg on the shareable pass only
+    _tkSteps.innerHTML='<div class="tk-steps-h">THE DAY · '+_plans.length+' STOPS</div>'+
+      _plans.map(function(s){ return '<div class="tk-step"><span class="tk-step-t">'+s.t+'</span><span class="tk-step-n">'+s.n+'</span></div>'; }).join('');
+  }
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
