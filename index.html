@@ -269,7 +269,7 @@
 
   /* Ganesh Air departure-board share card */
   /* shareable SQUARE boarding pass (lavender — matches the site's passes) */
-  .ticket{background:#fff;color:var(--ink);position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 38px rgba(53,28,94,.3);display:flex;flex-direction:column}
+  .ticket{background:#fff;color:var(--ink);position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 38px rgba(53,28,94,.3);display:flex;flex-direction:column;cursor:pointer}
   .tk-head{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;padding:11px 16px;flex:none}
   .tk-cat{display:flex;align-items:center;gap:8px;font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:14px;letter-spacing:1.2px}
   .tk-mark{width:22px;height:22px;flex:none}
@@ -297,7 +297,8 @@
   .capturing .tk-track{animation:none!important;transform:none!important}
   .tk-stub{display:flex;align-items:center;gap:13px;padding:12px 17px 14px;flex:none}
   .tk-stubL{flex:1;min-width:0}
-  .tk-stubL .bc-row{height:58px}
+  .tk-stubL{text-align:center}
+  .tk-stubL .bc-row{height:60px;justify-content:center}
   .tk-scan{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:.2px;color:var(--lav);font-weight:700;margin-top:8px}
   .tk-qr{width:84px;height:84px;flex:none;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px;box-sizing:border-box}
   .tk-qr img{width:100%;height:100%;display:block;image-rendering:pixelated}
@@ -479,7 +480,7 @@
       <!-- shareable ticket card -->
       <div class="sharewrap">
         <div class="sectlabel">📸 Your shareable card</div>
-        <div class="ticket" id="shareCard">
+        <div class="ticket" id="shareCard" onclick="showEgg()" title="tap for a lil surprise 💜">
           <div class="tk-head">
             <div class="tk-cat"><span class="tk-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 22 L17 4 C20 0.5 27 1 25.5 6 L14 22 Z" fill="#fff" opacity=".95"/><circle cx="10.5" cy="15.5" r="4.1" fill="none" stroke="#fff" stroke-width="2"/><circle cx="15.5" cy="15.5" r="4.1" fill="none" stroke="#fff" stroke-width="2"/></svg></span>GANESH AIR</div>
             <div class="tk-status">GOING <svg class="tk-h" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1 7.4 3.1 4.6 6.2 4.6c1.8 0 3.1 1 3.8 2 .7-1 2-2 3.8-2 3.1 0 5.2 2.8 3.5 6.4C19 15.4 12 20 12 20Z" fill="#fff"/></svg></div>
@@ -504,9 +505,8 @@
           <div class="tk-stub">
             <div class="tk-stubL">
               <div class="bc-row" id="tkBars" aria-hidden="true"></div>
-              <div class="tk-scan">↓ scan for a lil surprise 💜</div>
+              <div class="tk-scan">👆 tap the pass for a lil surprise 💜</div>
             </div>
-            <div class="tk-qr" id="shareQR" aria-hidden="true"></div>
           </div>
         </div>
         <div class="sharerow">
@@ -1811,7 +1811,7 @@ function editReturn(){
 /* scannable QR on the shareable card -> opens the easter egg */
 var EGG_URL='https://worldcup-date.onrender.com/?egg=1';
 function makeQR(){
-  var bars=document.getElementById('tkBars'); if(bars&&window.bpBarcode&&!bars.querySelector('.bc-row'))bars.innerHTML=window.bpBarcode(70626,{h:58,color:'#241733',target:210});
+  var bars=document.getElementById('tkBars'); if(bars&&window.bpBarcode&&!bars.querySelector('.bc-row'))bars.innerHTML=window.bpBarcode(70626,{h:60,color:'#241733',target:300});
   var el=document.getElementById('shareQR'); if(!el||el.getAttribute('data-done')==='1')return;
   if(typeof qrcode==='undefined'){setTimeout(makeQR,400);return;}
   try{var qr=qrcode(0,'M');qr.addData(EGG_URL);qr.make();
