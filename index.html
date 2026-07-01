@@ -409,7 +409,7 @@
   .tk-step{display:flex;justify-content:flex-end;gap:7px;font-size:8px;line-height:1.55}
   .tk-step-n{color:#3a2a63;font-weight:600;flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .tk-step-t{color:var(--lav);font-weight:700;flex:none}
-  .tk-ride-note{margin-top:10px;font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:11px;line-height:1.3;color:var(--lav);text-align:right}
+  .tk-rides-btn{cursor:pointer;text-decoration:underline dotted rgba(124,77,202,.55);text-underline-offset:3px}
   .tk-h{width:13px;height:13px;display:inline-block;vertical-align:-2px}
   .tk-flapwrap{flex:none;background:linear-gradient(90deg,var(--lav),var(--lav2));overflow:hidden}
   .tk-ticker{position:relative;height:30px;overflow:hidden;display:flex;align-items:center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
@@ -1470,10 +1470,12 @@ function reveal(){
   var _tkSteps=document.getElementById('tkSteps');
   if(_tkSteps){
     var _train=/all aboard|arrive|ride home/i;   // shareable pass: keep ONLY the train rides
-    var _plans=rows.map(function(r,i){return {t:r[0],n:window.diaryLabels[i]||''};}).filter(function(s){return _train.test(s.n);});
-    _tkSteps.innerHTML='<div class="tk-steps-h">TRAIN RIDES 🚆</div>'+
-      _plans.map(function(s){ return '<div class="tk-step"><span class="tk-step-n">'+s.n+'</span><span class="tk-step-t">'+s.t+'</span></div>'; }).join('')+
-      '<div class="tk-ride-note">…or you can ride something else 😏💜</div>';
+    var _rides=rows.map(function(r,i){return {t:r[0],n:window.diaryLabels[i]||''};}).filter(function(s){return _train.test(s.n);});
+    var _toDinner={t:'~7:10 PM', n:'Ride to '+pick.after.t+' 🚆'};   // the 2 Line hop to the chosen dinner spot
+    var _hi=-1; for(var _k=0;_k<_rides.length;_k++){ if(/ride home/i.test(_rides[_k].n)){_hi=_k;break;} }
+    if(_hi>=0){ _rides.splice(_hi,0,_toDinner); } else { _rides.push(_toDinner); }
+    _tkSteps.innerHTML='<div class="tk-steps-h tk-rides-btn" role="button" tabindex="0" onclick="showRide(event)">TRAIN RIDES 🚆</div>'+
+      _rides.map(function(s){ return '<div class="tk-step"><span class="tk-step-n">'+s.n+'</span><span class="tk-step-t">'+s.t+'</span></div>'; }).join('');
   }
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
@@ -2357,6 +2359,9 @@ function spawnEggHearts(id){var h=document.getElementById(id||'eggHearts');if(!h
   h.innerHTML=s;}
 function showEgg(){var o=document.getElementById('eggOverlay');if(!o)return;spawnEggHearts();o.style.display='flex';}
 function hideEgg(){var o=document.getElementById('eggOverlay');if(o)o.style.display='none';}
+/* tap the TRAIN RIDES header -> cheeky overlay (kept off the pass face so the shared image stays clean) */
+function showRide(ev){ if(ev){ev.stopPropagation();} var o=document.getElementById('rideOverlay'); if(o)o.style.display='flex'; }
+function hideRide(){ var o=document.getElementById('rideOverlay'); if(o)o.style.display='none'; }
 /* tap a boarding-pass barcode -> reveal the real compliments you two traded (his line + her matching line back) */
 var BP_PAIRS = [
   {n:{t:"you're so hot", d:"Jun 4, 2026"}, s:{t:"you're my best friend and you're so hot???", d:"Jun 3, 2026"}},
@@ -2497,6 +2502,16 @@ window.initTimeline=function(){};
     <p class="egg-msg" id="eggMsg">8 months, a few thousand miles, and somehow always you. i'd take every flight and every long way home, as long as it ends with you. happy anniversary 💜 here's to the round of 16, and every round after.</p>
     <div class="egg-sig">💜 always, neal</div>
     <button class="btn primary" type="button" onclick="hideEgg()">back to our date ✨</button>
+  </div>
+</div>
+
+<div id="rideOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideRide()">
+  <div class="egg-card">
+    <div class="egg-emoji">😏</div>
+    <h2 class="egg-h">the train's not the only ride</h2>
+    <p class="egg-msg">you can ride something else 💜</p>
+    <div class="egg-sig">🚆 all aboard, neal</div>
+    <button class="btn primary" type="button" onclick="hideRide()">okok, back to the pass ✨</button>
   </div>
 </div>
 <div id="complimentOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideCompliment()">
