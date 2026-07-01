@@ -253,7 +253,7 @@
   .time .body b{font-size:14.5px}
   .time .body small{color:var(--muted);display:block;margin-top:2px}
   /* boarding-pass itinerary: native-scroll sticky-header deck (no JS scroll controller, no absolute positioning) */
-  #timeline{position:relative;margin:0 auto;max-width:430px}
+  #timeline{position:relative;margin:0 auto;max-width:430px;padding-bottom:200px}
   /* native sticky STACK: each card pins a bit lower than the last (top = 10 + i*40), so the deck piles up
      SMOOTHLY as you scroll (browser sticky = compositor, no JS) and earlier legs' header tops peek above */
   .bpass{position:-webkit-sticky;position:sticky;top:calc(10px + var(--bpi,0) * 36px);background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(53,28,94,.16),0 6px 16px rgba(53,28,94,.22),0 14px 30px rgba(53,28,94,.10);scroll-margin-top:12px}
@@ -1281,7 +1281,7 @@ function reveal(){
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
-    return `<div class="bpass" style="--bpi:${i};z-index:${i+2}">`+
+    return `<div class="bpass" style="--bpi:${Math.min(i,4)};z-index:${i+2}">`+
       `<div class="bp-head" onclick="scrollToPass(${i})" title="jump to this leg">`+
         `<span class="bp-h-time">✈ ${r[0]}</span>`+
         `<span class="bp-h-plan">${plan}</span>`+
