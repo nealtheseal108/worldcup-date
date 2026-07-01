@@ -308,11 +308,13 @@
   .time .body b{font-size:14.5px}
   .time .body small{color:var(--muted);display:block;margin-top:2px}
   /* boarding-pass itinerary: native-scroll sticky-header deck (no JS scroll controller, no absolute positioning) */
-  #timeline{position:relative;margin:0 auto;max-width:430px;padding-bottom:220px}
+  #timeline{position:relative;margin:0 auto 4px;max-width:430px;border:1px solid var(--line);border-radius:15px;overflow:hidden;box-shadow:0 6px 20px rgba(53,28,94,.14)}
   /* native sticky STACK: each card pins a bit lower than the last (top = 10 + i*40), so the deck piles up
      SMOOTHLY as you scroll (browser sticky = compositor, no JS) and earlier legs' header tops peek above */
-  .bpass{position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:16px;box-shadow:0 2px 5px rgba(53,28,94,.10),0 10px 24px rgba(53,28,94,.14);scroll-margin-top:12px}
-  .bp-head{display:flex;align-items:center;gap:9px;height:36px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border-radius:13px 13px 0 0;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;box-shadow:0 3px 7px rgba(53,28,94,.16)}
+  .bpass{position:relative;background:#fff;scroll-margin-top:12px}
+  .bpass:not(:last-child){border-bottom:1px solid rgba(53,28,94,.14)}
+  .bp-head{display:flex;align-items:center;gap:9px;height:38px;padding:0 14px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace}
+  .bpass.open .bp-head{box-shadow:0 3px 7px rgba(53,28,94,.14)}
   .bp-head:hover{filter:brightness(1.05)}
   .bp-h-time{font-weight:700;font-size:12.5px;white-space:nowrap;letter-spacing:.4px;padding-right:9px;border-right:1px solid rgba(255,255,255,.35)}
   .bp-h-plan{flex:1;min-width:0;font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.95}
@@ -327,8 +329,6 @@
   .bpass.open .bp-fold{max-height:820px}
   .bp-chev{margin-left:4px;flex:none;font-size:11px;color:#fff;opacity:.8;transition:transform .32s ease}
   .bpass.open .bp-chev{transform:rotate(180deg)}
-  .bpass:not(.open) .bp-head{border-radius:13px}
-  .bpass.open .bp-head{border-radius:13px 13px 0 0}
   @media(prefers-reduced-motion:reduce){.bp-fold{transition:none}}
   .bp-compliment{flex-basis:100%;width:100%;margin-top:2px;padding-top:10px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
   .bp-compliment i{font-family:'Inter',system-ui,sans-serif;font-style:italic;font-weight:600;font-size:12.5px;color:#4a3578;line-height:1.35}
