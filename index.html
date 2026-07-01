@@ -2103,7 +2103,7 @@ function closeStats(){var m=document.getElementById('statsModal');if(m)m.style.d
 /* ---------- date diary: a video clip + your location for each moment, saved on-device (IndexedDB) ---------- */
 var DIARY_DB=null, diaryGeo=null, diaryStream=null, diaryRec=null, diaryChunks=[], diaryCurSec=null;
 // recording allowance: 1 minute of footage per 20-minute window, lifted 6:00-7:15 PM (around full time)
-var REC_WIN_MS=20*60*1000, REC_CAP=60, recStopTimer=null, recTickTimer=null, recStartT=0, _recWaitIdx=null, recWaitTimer=null;
+var REC_WIN_MS=20*60*1000, REC_CAP=60, recStopTimer=null, recTickTimer=null, recStartT=0, _recWaitIdx=null, recWaitTimer=null, _recModalAt=0;
 function recFreeWindow(d){d=d||new Date();var t=d.getHours()*60+d.getMinutes();return t>=1080&&t<=1155;}  // 6:00 PM (1080) -> 7:15 PM (1155): record as much as you want
 function recWinKey(){return Math.floor(Date.now()/REC_WIN_MS);}
 function recUsed(){try{var o=JSON.parse(localStorage.getItem('wc_rec_budget')||'{}');return o.w===recWinKey()?(o.s||0):0;}catch(e){return 0;}}
@@ -2158,8 +2158,8 @@ function openRecord(i){
   if(note)note.textContent=recFreeWindow()?"🎉 end of the game, record as much as you want!":("⏱️ "+recFmtMMSS(recRemaining())+" of footage left this 20 min · saved on your phone 💜");
   var sb=document.getElementById('recStart'); sb.style.display=''; sb.disabled=true; document.getElementById('recStop').style.display='none';
   var tEl=document.getElementById('recTimer'); if(tEl){tEl.style.display='none';tEl.textContent='';}
-  document.getElementById('recModal').style.display='flex';
-  navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true}).then(function(stream){diaryStream=stream;var v=document.getElementById('recPreview');v.srcObject=stream;v.muted=true;v.play();sb.disabled=false;}).catch(function(){hint('camera + mic permission needed to record 💜');closeRecord();});
+  _recModalAt=Date.now(); document.getElementById('recModal').style.display='flex';
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true}).then(function(stream){diaryStream=stream;var v=document.getElementById('recPreview');v.srcObject=stream;v.muted=true;v.play();sb.disabled=false;}).catch(function(){var n=document.getElementById('recNote');if(n)n.textContent='📷 allow camera + mic for this site, then tap ● record again 💜';sb.style.display='none';var stp=document.getElementById('recStop');if(stp)stp.style.display='none';});   /* keep the modal OPEN with a message instead of flashing closed */
 }
 function startRec(){
   if(!diaryStream)return; diaryChunks=[];
@@ -2209,7 +2209,7 @@ function showRecWait(){
     if(go)go.style.display='none';
   }
   tick(); if(recWaitTimer)clearInterval(recWaitTimer); recWaitTimer=setInterval(tick,250);
-  m.style.display='flex';
+  _recModalAt=Date.now(); m.style.display='flex';
 }
 function closeRecWait(){var m=document.getElementById('recWaitModal');if(m)m.style.display='none';if(recWaitTimer){clearInterval(recWaitTimer);recWaitTimer=null;}}
 /* ---------- cloud diary sync: a shared backend so both phones see the same clips ---------- */
@@ -2544,7 +2544,7 @@ window.initTimeline=function(){};
     </div>
   </div>
 </div>
-<div id="recModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeRecord()">
+<div id="recModal" class="modal-bg" style="display:none" onclick="if(event.target===this&&Date.now()-_recModalAt>350)closeRecord()">
   <div class="modal-card">
     <div class="modal-title">🎥 record <span id="recLabel">this moment</span></div>
     <div class="modal-sub" id="recNote">a lil clip for our date diary, saved just on your phone 💜</div>
@@ -2557,7 +2557,7 @@ window.initTimeline=function(){};
     </div>
   </div>
 </div>
-<div id="recWaitModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeRecWait()">
+<div id="recWaitModal" class="modal-bg" style="display:none" onclick="if(event.target===this&&Date.now()-_recModalAt>350)closeRecWait()">
   <div class="modal-card" style="text-align:center">
     <div class="modal-title">⏱️ one clip every 20 min</div>
     <div class="modal-sub">you already caught this window's minute, babu 💜 (that way we actually stay in the moment). next clip in:</div>
