@@ -2131,11 +2131,11 @@ function renderDiary(sec){
 function renderAllDiary(){document.querySelectorAll('[id^="diary-s"]').forEach(function(b){renderDiary(b.id.replace('diary-',''));});}
 function openRecord(i){
   diaryCurSec='s'+i;
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){hint('recording needs a phone/browser with camera support 💜');return;}
-  if(!recFreeWindow() && recRemaining()<=0){            // used this 20-min window's minute -> countdown overlay
+  if(!recFreeWindow() && recRemaining()<=0){            // not your window yet -> countdown overlay FIRST, before any camera prompt
     _recWaitIdx=i; showRecWait();
     return;
   }
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){hint('recording needs a phone/browser with camera support 💜');return;}
   document.getElementById('recLabel').textContent=(window.diaryLabels&&window.diaryLabels[i])||'this moment';
   var note=document.getElementById('recNote');
   if(note)note.textContent=recFreeWindow()?"🎉 end of the game, record as much as you want!":("⏱️ "+recFmtMMSS(recRemaining())+" of footage left this 20 min · saved on your phone 💜");
