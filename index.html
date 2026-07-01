@@ -79,6 +79,8 @@
   .rec-timer{font-family:'Courier Prime',ui-monospace,monospace;font-weight:700;font-size:14px;color:#c0398b;text-align:center;margin:6px 0 2px;letter-spacing:.5px}
   .recwait-cd{font-family:'Courier Prime',ui-monospace,monospace;font-weight:800;font-size:46px;color:var(--lav);text-align:center;margin:12px 0 10px;letter-spacing:1px}
   .movie-bg{position:fixed;inset:0;z-index:200;background:rgba(18,12,34,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px}
+  .movie-stage{position:relative;width:100%;max-width:430px;margin:12px auto 16px;aspect-ratio:9/16;max-height:64vh;background:#000;border-radius:16px;overflow:hidden;box-shadow:0 16px 40px rgba(53,28,94,.34)}
+  .movie-ctrls{display:flex;gap:10px;justify-content:center;max-width:430px;margin:0 auto}
   .movie-stage{position:relative;width:min(90vw,400px);aspect-ratio:9/16;background:#000;border-radius:16px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.65)}
   .movie-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none}
   .movie-card{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;background:linear-gradient(160deg,#3a2566,#1f1438);padding:24px;gap:7px;animation:fadein .5s ease}
@@ -750,6 +752,20 @@
       <div class="printrow">
         <button class="btn primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
         <button class="btn ghost" onclick="go(0)">↺ Start over</button>
+      </div>
+    </section>
+
+    <!-- STEP 5 — the completed date-diary movie, its own page -->
+    <section class="step" id="step5">
+      <div class="iti-head" style="margin-top:2px"><div class="big">🎬💜</div><h2 style="font-size:24px">our date movie</h2><div class="venue">every clip we caught, cut together</div></div>
+      <div class="movie-stage" id="movieStage">
+        <video id="movieVideo" class="movie-video" playsinline></video>
+        <div class="movie-card" id="movieCard"></div>
+        <div class="movie-cap" id="movieCap"></div>
+      </div>
+      <div class="movie-ctrls">
+        <button class="btn ghost" onclick="closeMovie()">← back to our date</button>
+        <button class="btn primary" id="movieDownload" onclick="exportMovie()">⬇ save the movie</button>
       </div>
     </section>
 
@@ -2175,7 +2191,7 @@ function gatherClips(){
   return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){all.push(c.value);c.continue();}else{all.sort(function(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;});res(all);}};cur.onerror=function(){res(all);};});});
 }
 function compileMovie(){gatherClips().then(function(all){if(!all.length){hint("record a few moments first, then i'll cut our movie 🎬💜");return;}movieClips=all;openMovie();});}
-function openMovie(){document.getElementById('movieModal').style.display='flex';try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
+function openMovie(){go(5);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
 function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
 function moviePlayClip(i){
@@ -2190,7 +2206,7 @@ function moviePlayClip(i){
   var p=vid.play();if(p&&p.catch)p.catch(function(){if(!movieAbort)moviePlayClip(i+1);});
 }
 function moviePlayOutro(){movieShowCard('<div class="mc-big">💜</div><div class="mc-title">the end</div><div class="mc-sub">'+_esc(MATCHUP)+'</div><div class="mc-sub2">made with love, by neal 💜</div>');}
-function closeMovie(){movieAbort=true;if(movieTimer)clearTimeout(movieTimer);var vid=document.getElementById('movieVideo');if(vid){try{vid.pause();}catch(e){}vid.removeAttribute('src');try{vid.load();}catch(e){}}document.getElementById('movieModal').style.display='none';if(_movieResumeMusic){try{startMusic();}catch(e){}_movieResumeMusic=false;}}
+function closeMovie(){movieAbort=true;if(movieTimer)clearTimeout(movieTimer);var vid=document.getElementById('movieVideo');if(vid){try{vid.pause();}catch(e){}vid.removeAttribute('src');try{vid.load();}catch(e){}}go(4);if(_movieResumeMusic){try{startMusic();}catch(e){}_movieResumeMusic=false;}}
 function exportMovie(){
   if(!movieClips.length){hint('nothing to export yet 💜');return;}
   var testc=document.createElement('canvas');
@@ -2411,17 +2427,6 @@ window.initTimeline=function(){};
       <button class="btn ghost" onclick="closeRecWait()">ok babu 💜</button>
       <button class="btn primary" id="recWaitGo" style="display:none" onclick="var i=_recWaitIdx;closeRecWait();if(i!=null)openRecord(i);">● it's time, record!</button>
     </div>
-  </div>
-</div>
-<div id="movieModal" class="movie-bg" style="display:none">
-  <div class="movie-stage">
-    <video id="movieVideo" class="movie-video" playsinline></video>
-    <div class="movie-card" id="movieCard"></div>
-    <div class="movie-cap" id="movieCap"></div>
-  </div>
-  <div class="movie-ctrls">
-    <button class="btn ghost" onclick="closeMovie()">close</button>
-    <button class="btn primary" id="movieDownload" onclick="exportMovie()">⬇ save the movie</button>
   </div>
 </div>
 <div id="eggOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideEgg()">
