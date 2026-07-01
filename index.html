@@ -322,14 +322,14 @@
   .bp-desc b{color:#2e1f47}
   .bp-perf{position:relative;border-top:2px dashed #d8ccef;margin:12px 16px 0}
   .bp-stub{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:11px 16px 13px;background:#fff;border-radius:0 0 14px 14px}
-  /* "your whole day" recap (all 10 legs at a glance, after the passes) */
-  .dayrecap{max-width:430px;margin:6px auto 0;background:linear-gradient(160deg,#fff,#f7f2ff);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px rgba(53,28,94,.14);padding:15px 17px 16px;font-family:'Courier Prime',ui-monospace,monospace}
-  .dayrecap-h{font-size:11px;letter-spacing:2px;color:var(--lav);font-weight:700;text-transform:uppercase;text-align:center;margin-bottom:12px}
-  .dr-row{display:flex;align-items:baseline;gap:11px;padding:8px 0;border-bottom:1px dashed var(--line)}
-  .dr-row:last-child{border-bottom:none;padding-bottom:0}
-  .dr-time{color:var(--lav);font-weight:800;font-size:12.5px;min-width:76px;flex:none;letter-spacing:.5px}
-  .dr-title{font-size:13px;color:var(--ink);font-weight:600;line-height:1.3;font-family:'Inter',system-ui,sans-serif}
-  .dr-no{margin-left:auto;flex:none;font-size:9.5px;color:var(--muted);letter-spacing:1px;font-weight:700;align-self:center}
+  /* accordion: every leg header shows; tap to expand into the full pass (bp-fold collapses/expands) */
+  .bp-fold{max-height:0;overflow:hidden;transition:max-height .42s cubic-bezier(.4,0,.2,1)}
+  .bpass.open .bp-fold{max-height:820px}
+  .bp-chev{margin-left:4px;flex:none;font-size:11px;color:#fff;opacity:.8;transition:transform .32s ease}
+  .bpass.open .bp-chev{transform:rotate(180deg)}
+  .bpass:not(.open) .bp-head{border-radius:13px}
+  .bpass.open .bp-head{border-radius:13px 13px 0 0}
+  @media(prefers-reduced-motion:reduce){.bp-fold{transition:none}}
   .bp-compliment{flex-basis:100%;width:100%;margin-top:2px;padding-top:10px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
   .bp-compliment i{font-family:'Inter',system-ui,sans-serif;font-style:italic;font-weight:600;font-size:12.5px;color:#4a3578;line-height:1.35}
   .bp-compliment span{font-family:'Courier Prime',ui-monospace,monospace;font-size:8px;letter-spacing:.5px;color:var(--muted);white-space:nowrap;flex:none}
@@ -693,7 +693,6 @@
       <div class="sectlabel deck-label">🛫 your boarding passes · the whole day, leg by leg</div>
       <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild from 6:00-7:30 around full time, record as much as you want. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <span style="font-size:12px;color:var(--muted)">your movie unlocks at the end of the night 🎬</span></div>
       <div id="timeline"></div>
-      <div id="dayRecap"></div>
 
       <div class="perks">
         <div class="perk"><span class="pe">👕</span><div>Wear your <b>batch jersey</b>, babu! We're matching the World Cup energy. 💜</div></div>
@@ -1429,15 +1428,17 @@ function reveal(){
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
-    // Plain scrolling pass (NOT sticky): each pass shows fully in turn -> no overlap, no cram,
-    // no dead space. "All 10 headers" lives in the static #dayRecap card after the deck.
-    return `<div class="bpass">`+
-      `<div class="bp-head" onclick="scrollToPass(${i})" title="jump to this leg">`+
+    // ACCORDION: every leg header shows by default; tap one to expand into the full boarding pass.
+    // All 10 headers visible, static (no sticky) => nothing can collapse/overlap. First leg opens
+    // by default as a hint.
+    return `<div class="bpass${i===0?' open':''}" data-leg="${i}">`+
+      `<div class="bp-head" onclick="toggleLeg(this)" role="button" title="tap to open this leg">`+
         `<span class="bp-h-time">✈ ${r[0]}</span>`+
         `<span class="bp-h-plan">${plan}</span>`+
         `<span class="bp-h-no">${no}</span>`+
+        `<span class="bp-chev" aria-hidden="true">▾</span>`+
       `</div>`+
-      `<div class="bp-body">`+
+      `<div class="bp-fold"><div class="bp-body">`+
         `<div class="bp-desc">${r[2]}</div>`+
         `<button class="diarybtn" type="button" onclick="openRecord(${i})">📹 record this moment</button>`+
         `<a class="diarybtn gcalbtn" href="${legGcalUrl(i,rows)}" target="_blank" rel="noopener">📅 add to my calendar</a>`+
@@ -1454,11 +1455,9 @@ function reveal(){
           '<span class="bp-codeno">GA 0706 '+window.bpBarcodeNo((i+1)*7919+1373)+'</span>'+
         '</div>'+
       '</div>')+
+    `</div>`+
     `</div>`;
   }).join('');
-  document.getElementById('dayRecap').innerHTML='<div class="dayrecap"><div class="dayrecap-h">🎟️ your whole day · all '+rows.length+' stops</div>'+
-    rows.map(function(r,i){ var no='WC'+String(i+1).padStart(2,'0'); var plan=(window.diaryLabels&&window.diaryLabels[i])||''; return '<div class="dr-row"><span class="dr-time">'+r[0]+'</span><span class="dr-title">'+plan+'</span><span class="dr-no">'+no+'</span></div>'; }).join('')+
-    '</div>';
   if(window.renderAllDiary)renderAllDiary();
   document.getElementById('safetyBox').innerHTML='🛟 <b>Good to know:</b> '+v.safety+
     ' If the US is playing, expect the biggest crowds of the tournament, so we get there early and post up near an exit!';
@@ -1566,6 +1565,8 @@ function initStatement(){
   else run();
 }
 initStatement();
+/* ---------- accordion: tap a leg header to expand it into the full boarding pass ---------- */
+function toggleLeg(headEl){ var card=headEl&&headEl.closest?headEl.closest('.bpass'):null; if(card){ card.classList.toggle('open'); if(card.classList.contains('open')&&window.buzz)buzz(); } }
 /* temporary: hide the cheeky closing line for ~1 hour, then it comes back on its own */
 var CHEEKY_HIDE_UNTIL=1782457721986; /* Thu Jun 25 2026 ~00:08 PDT (1h from when this was set) */
 function applyCheekyGate(){var el=document.getElementById('cheekyLine');if(el)el.style.display=(Date.now()<CHEEKY_HIDE_UNTIL)?'none':'';}
