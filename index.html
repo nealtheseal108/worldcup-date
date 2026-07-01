@@ -491,6 +491,20 @@
   #lightbox{position:fixed;inset:0;z-index:210;background:rgba(20,10,35,.93);display:none;align-items:center;justify-content:center;padding:16px}
   #lightbox img{max-width:100%;max-height:86vh;border-radius:12px;box-shadow:0 20px 55px rgba(0,0,0,.55)}
   .lb-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.16);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:19px;cursor:pointer;line-height:1}
+  /* ticker round tag + custom bracket page (step8) */
+  .ft-round{display:inline-block;background:rgba(167,139,250,.22);color:#c4b5fd;font-size:8px;font-weight:700;letter-spacing:.6px;padding:2px 5px;border-radius:5px;margin-right:8px;vertical-align:1px}
+  .bracket-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 12px;margin:0 -4px}
+  .bracket{display:flex;gap:12px;align-items:flex-start;min-width:min-content}
+  .bracket-col{flex:none;width:148px}
+  .bracket-col-h{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--lav);font-weight:700;text-align:center;margin-bottom:9px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .bracket-cell{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:9px;cursor:pointer;box-shadow:0 3px 10px rgba(53,28,94,.09);font-family:'Courier Prime',ui-monospace,monospace;font-size:12.5px;transition:border-color .15s,transform .12s}
+  .bracket-cell:hover{border-color:var(--lav);transform:translateY(-1px)}
+  .bracket-cell.ours{border:2px solid var(--lav);box-shadow:0 5px 16px rgba(124,77,202,.28)}
+  .bc-team{display:flex;justify-content:space-between;gap:8px;padding:2px 0;color:#3a2a63}
+  .bc-team.win{font-weight:700}
+  .bc-team.lose{color:var(--muted)}
+  .bc-team .bc-sc{color:var(--lav);font-weight:700;flex:none}
+  .bc-meta{font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:.4px;text-transform:uppercase}
   #playerbar{position:fixed;left:0;right:0;bottom:calc(var(--tick) + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:9px 16px;background:#160e2b;
     border-top:1px solid rgba(167,139,250,.32);box-shadow:0 -6px 26px rgba(18,8,38,.45);color:#fff;
@@ -874,6 +888,14 @@
       <div class="trk-actions">
         <button class="btn lav2btn" type="button" onclick="go(5)">🎬 date diary &amp; movie</button>
       </div>
+      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+    </section>
+
+    <!-- STEP 8 — custom World Cup bracket (games link out to ESPN) -->
+    <section class="step" id="step8">
+      <div class="iti-head" style="margin-top:2px"><div class="big">🏆</div><h2 style="font-size:24px">the road to the cup</h2><div class="venue">the knockout bracket · tap a match for details on ESPN</div></div>
+      <div class="album-add-row" style="margin-bottom:10px"><button class="btn lav2btn" type="button" onclick="loadBracket(true)">↻ refresh scores</button></div>
+      <div class="bracket-scroll"><div class="bracket" id="bracketCols"><div class="album-empty">loading the bracket…</div></div></div>
       <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
     </section>
 
@@ -2545,6 +2567,39 @@ if(/[?&]egg/.test(location.search)||/egg/.test(location.hash)){setTimeout(showEg
 /* TEST: open the site with ?end=1 to force the 9:30 state on a sample reveal */
 if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
 
+/* ---------- World Cup round labels + custom bracket page (step8) ---------- */
+var ROUND_LBL={'group-stage':['GRP','Group Stage'],'round-of-32':['R32','Round of 32'],'round-of-16':['R16','Round of 16'],'quarterfinals':['QF','Quarters'],'semifinals':['SF','Semis'],'3rd-place-match':['3RD','3rd Place'],'final':['FIN','Final']};
+function roundShort(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][0])||(sl?sl.replace(/[^a-z0-9]/gi,'').slice(0,3).toUpperCase():''); }
+function roundLong(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][1])||(sl?sl.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}):''); }
+function _escB(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+var _bracketCache=null, _bracketAt=0;
+function openBracket(){ go(8); loadBracket(); }
+function loadBracket(force){
+  var box=document.getElementById('bracketCols'); if(!box)return;
+  if(!box._wired){ box.addEventListener('click',function(e){ var c=e.target.closest&&e.target.closest('.bracket-cell'); if(c&&c.getAttribute('data-href')) window.open(c.getAttribute('data-href'),'_blank','noopener'); }); box._wired=true; }
+  if(_bracketCache && !force && Date.now()-_bracketAt<60000){ renderBracket(_bracketCache); return; }
+  fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260628-20260720&limit=200',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    var evs=((j&&j.events)||[]).map(function(ev){ var c=ev.competitions&&ev.competitions[0]; if(!c)return null; var cs=c.competitors||[]; var h=cs.filter(function(x){return x.homeAway==='home';})[0]||cs[0], a=cs.filter(function(x){return x.homeAway==='away';})[0]||cs[1]; if(!h||!a)return null; var st=(ev.status&&ev.status.type)||{}; return { round:(ev.season&&ev.season.slug)||'', ms:Date.parse(ev.date)||0, h:(h.team&&h.team.abbreviation)||'', a:(a.team&&a.team.abbreviation)||'', hs:h.score, as:a.score, hw:h.winner===true, aw:a.winner===true, state:st.state||'pre', detail:st.shortDetail||'', href:(ev.links&&ev.links[0]&&ev.links[0].href)||('https://www.google.com/search?q='+encodeURIComponent((ev.shortName||'')+' world cup')) }; }).filter(Boolean);
+    _bracketCache=evs; _bracketAt=Date.now(); renderBracket(evs);
+  }).catch(function(){ if(!box.querySelector('.bracket-col')) box.innerHTML='<div class="album-empty">could not load the bracket right now — tap ↻ 💜</div>'; });
+}
+function renderBracket(evs){
+  var box=document.getElementById('bracketCols'); if(!box)return;
+  var order=['round-of-32','round-of-16','quarterfinals','semifinals','final','3rd-place-match'];
+  var our=(typeof MATCHUP!=='undefined')?MATCHUP.split('🆚').map(function(x){return x.trim();}):[];
+  var present=order.filter(function(sl){return evs.some(function(e){return e.round===sl;});});
+  var html=present.map(function(sl){
+    var games=evs.filter(function(e){return e.round===sl;}).sort(function(a,b){return a.ms-b.ms;});
+    var cells=games.map(function(g){
+      var ours = our.length===2 && our[0].indexOf('/')<0 && our[1].indexOf('/')<0 && [g.h,g.a].indexOf(our[0])>=0 && [g.h,g.a].indexOf(our[1])>=0;
+      var scored=g.state!=='pre';
+      function row(ab,sc,win){ return '<div class="bc-team '+(scored?(win?'win':'lose'):'')+'"><span>'+_escB(ab||'TBD')+'</span>'+(scored?'<span class="bc-sc">'+_escB(sc)+'</span>':'')+'</div>'; }
+      return '<div class="bracket-cell'+(ours?' ours':'')+'" data-href="'+_escB(g.href)+'" role="button" title="open on ESPN">'+row(g.h,g.hs,g.hw)+row(g.a,g.as,g.aw)+'<div class="bc-meta">'+(g.state==='in'?'🔴 ':'')+_escB(g.detail||'vs')+'</div></div>';
+    }).join('');
+    return '<div class="bracket-col"><div class="bracket-col-h">'+_escB(roundLong(sl))+'</div>'+cells+'</div>';
+  }).join('');
+  box.innerHTML=html||'<div class="album-empty">bracket coming soon 💜</div>';
+}
 /* ---------- FIFA World Cup live score ticker (bottom strip, every page) ---------- */
 (function(){
   function boot(){
@@ -2561,7 +2616,7 @@ if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function
       var st=(ev.status&&ev.status.type)||{};
       var href=(ev.links&&ev.links[0]&&ev.links[0].href)||('https://www.google.com/search?q='+encodeURIComponent((ev.shortName||'')+' world cup'));
       var _hab=(home.team&&(home.team.abbreviation||home.team.shortDisplayName))||'', _aab=(away.team&&(away.team.abbreviation||away.team.shortDisplayName))||'';
-      return { id:ev.id||((ev.shortName||'')+ev.date), ms:Date.parse(ev.date)||0, h:_hab, a:_aab,
+      return { id:ev.id||((ev.shortName||'')+ev.date), ms:Date.parse(ev.date)||0, h:_hab, a:_aab, round:(ev.season&&ev.season.slug)||'',
         win:(home.winner===true?_hab:(away.winner===true?_aab:null)),   // ESPN sets .winner on the advancing side (handles penalties)
         hs:home.score, as:away.score, state:st.state||'pre', detail:st.shortDetail||'', href:href };
     }).filter(Boolean);
@@ -2570,7 +2625,8 @@ if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function
     var mid, stat;
     if(g.state==='pre'){ mid='<span class="ft-vs">vs</span>'; stat='<span class="ft-status">'+esc(g.detail)+'</span>'; }
     else { var live=g.state==='in'; mid='<span class="ft-score">'+esc(g.hs)+'&nbsp;-&nbsp;'+esc(g.as)+'</span>'; stat='<span class="ft-status'+(live?' ft-live':'')+'">'+(live?'🔴 ':'')+esc(g.detail)+'</span>'; }
-    return '<span class="ft-game" data-href="'+esc(g.href)+'"><span class="ft-team">'+esc(g.h)+'</span> '+mid+' <span class="ft-team">'+esc(g.a)+'</span> '+stat+'</span>';
+    var rnd=(typeof roundShort==='function'&&g.round)?('<span class="ft-round">'+esc(roundShort(g.round))+'</span>'):'';
+    return '<span class="ft-game" data-href="'+esc(g.href)+'">'+rnd+'<span class="ft-team">'+esc(g.h)+'</span> '+mid+' <span class="ft-team">'+esc(g.a)+'</span> '+stat+'</span>';
   }
   function render(games){
     if(!games.length){ track.innerHTML='<span class="ft-empty">⚽ no recent World Cup games — check back at kickoff 💜</span>'; track.style.animation='none'; return; }
@@ -2616,7 +2672,7 @@ if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function
       if(games.length){ render(games); } else if(!track.querySelector('.ft-game')){ render([]); }
     }).catch(function(){ if(!track.querySelector('.ft-game')){ track.innerHTML='<span class="ft-empty">⚽ World Cup scores unavailable right now 💜</span>'; } });
   }
-  track.addEventListener('click',function(e){ var g=e.target.closest&&e.target.closest('.ft-game'); if(g&&g.getAttribute('data-href')) window.open(g.getAttribute('data-href'),'_blank','noopener'); });
+  track.addEventListener('click',function(e){ var g=e.target.closest&&e.target.closest('.ft-game'); if(g&&typeof openBracket==='function') openBracket(); });   // tap a game -> our custom bracket page (which links out to ESPN)
   var ft=document.getElementById('fifatick'), rt=null;   // touch: pause while touched (mouse uses :hover in CSS)
   if(ft){ ft.addEventListener('touchstart',function(){ if(rt)clearTimeout(rt); track.classList.add('ft-paused'); },{passive:true});
     ft.addEventListener('touchend',function(){ if(rt)clearTimeout(rt); rt=setTimeout(function(){track.classList.remove('ft-paused');},3500); },{passive:true}); }
@@ -2637,7 +2693,7 @@ window.initTimeline=function(){};
 </script>
 <div id="ythost"></div>
 <div id="fifatick" aria-label="World Cup scores" title="World Cup scores · hover to pause, tap a game">
-  <div class="ft-badge">⚽ WORLD&nbsp;CUP</div>
+  <div class="ft-badge" onclick="if(window.openBracket)openBracket()" style="cursor:pointer" title="see the full bracket">⚽ WORLD&nbsp;CUP</div>
   <div class="ft-view"><div class="ft-track" id="ftTrack"><span class="ft-empty">⚽ loading World Cup scores…</span></div></div>
 </div>
 <div id="playerbar" role="region" aria-label="Music player">
