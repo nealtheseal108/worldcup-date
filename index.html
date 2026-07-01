@@ -355,6 +355,17 @@
   .egg-h{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:32px;color:var(--lav);margin:8px 0 14px}
   .egg-msg{color:var(--ink);font-size:15px;line-height:1.6;margin:0}
   .egg-sig{font-family:'Courier Prime',ui-monospace,monospace;color:var(--muted);letter-spacing:1px;margin:16px 0 20px;font-size:12.5px}
+  /* barcode-tap compliment reveal (his line + her matching line) */
+  .cmp-card{max-width:380px}
+  .cmp-card .egg-h{margin-bottom:16px}
+  .cmp-line{width:100%;background:#f7f2ff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;text-align:left}
+  .cmp-neal{border-left:4px solid var(--lav)}
+  .cmp-sid{border-left:4px solid #e0679b}
+  .cmp-who{font-family:'Courier Prime',ui-monospace,monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+  .cmp-txt{font-family:'Inter',system-ui,sans-serif;font-style:italic;font-weight:600;font-size:15.5px;color:var(--ink);line-height:1.4}
+  .cmp-date{font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;letter-spacing:.5px;color:var(--muted);margin-top:6px}
+  .cmp-amp{font-size:18px;margin:9px 0}
+  .cmp-card .btn.primary{margin-top:18px}
   .sharerow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
   .sharerow .btn{flex:1;min-width:104px}
   .lav2btn{background:#efe7fb;color:#5e3aa6}
@@ -1288,19 +1299,6 @@ function reveal(){
     ['~9:45 PM','<b>Easy ride home.</b>','Back on the 2 Line, which runs until midnight, so there is never a rush home.']
   ];
   window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
-  // real compliments Neal sent Sidhya (from their messages) — one per leg's barcode
-  var BP_COMPLIMENTS = [
-    {t:"you are my muse, my inspiration", d:"Apr 25, 2026"},
-    {t:"i love your smile & you have the most beautiful eyes 👀", d:"May 14, 2026"},
-    {t:"you are gloriously radiant", d:"May 30, 2026"},
-    {t:"my favorite person in this whole world", d:"Apr 1, 2026"},
-    {t:"you are stunning", d:"Mar 11, 2026"},
-    {t:"you are my best friend", d:"Feb 11, 2026"},
-    {t:"you are gorgeous", d:"Feb 6, 2026"},
-    {t:"you are my wife 💜", d:"Feb 6, 2026"},
-    {t:"so lucky to have you", d:"May 31, 2026"},
-    {t:"i am so proud of you", d:"Jun 15, 2026"}
-  ];
   document.getElementById('timeline').innerHTML = rows.map((r,i)=>{
     var no='WC'+String(i+1).padStart(2,'0');
     var plan=(window.diaryLabels&&window.diaryLabels[i])||'';
@@ -1321,11 +1319,11 @@ function reveal(){
           '<span class="bp-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="10.8" cy="14" r="6" fill="none" stroke="#7c4dca" stroke-width="2.6"></circle><circle cx="17.2" cy="14" r="6" fill="none" stroke="#fff" stroke-width="4.4"></circle><circle cx="17.2" cy="14" r="6" fill="none" stroke="#7c4dca" stroke-width="2.6"></circle></svg></span>'+
           '<span class="bp-wm"><b>GANESH</b><i>AIR</i></span>'+
         '</div>'+
-        '<div class="bp-code">'+
+        '<div class="bp-code" role="button" title="tap to scan 💜" onclick="showCompliment('+i+')">'+
           window.bpBarcode((i+1)*7919+1373,{h:28,color:"#241733",target:150})+
           '<span class="bp-codeno">GA 0706 '+window.bpBarcodeNo((i+1)*7919+1373)+'</span>'+
+          '<span class="bp-scan">👆 tap to scan 💜</span>'+
         '</div>'+
-        (BP_COMPLIMENTS[i]?'<div class="bp-compliment"><i>💜 “'+BP_COMPLIMENTS[i].t+'”</i><span>'+BP_COMPLIMENTS[i].d+'</span></div>':'')+
       '</div>')+
     `</div>`;
   }).join('');
@@ -2029,11 +2027,34 @@ function makeQR(){
   }catch(e){}
 }
 /* the easter egg itself */
-function spawnEggHearts(){var h=document.getElementById('eggHearts');if(!h||h.children.length)return;var e=['💜','💛','🤍','💜','💚'],s='';
+function spawnEggHearts(id){var h=document.getElementById(id||'eggHearts');if(!h||h.children.length)return;var e=['💜','💛','🤍','💜','💚'],s='';
   for(var i=0;i<18;i++){var l=(i*5.6+2)%100;s+='<i style="left:'+l.toFixed(1)+'%;font-size:'+(16+(i%4)*5)+'px;animation-duration:'+(4+(i%5))+'s;animation-delay:'+((i*0.33)%5).toFixed(2)+'s">'+e[i%e.length]+'</i>';}
   h.innerHTML=s;}
 function showEgg(){var o=document.getElementById('eggOverlay');if(!o)return;spawnEggHearts();o.style.display='flex';}
 function hideEgg(){var o=document.getElementById('eggOverlay');if(o)o.style.display='none';}
+/* tap a boarding-pass barcode -> reveal the real compliments you two traded (his line + her matching line back) */
+var BP_PAIRS = [
+  {n:{t:"you are my muse, my inspiration", d:"Apr 25, 2026"}, s:{t:"you're my world!!!!", d:"Mar 1, 2026"}},
+  {n:{t:"i love your smile & you have the most beautiful eyes 👀", d:"May 14, 2026"}, s:{t:"i love your smile so much neal!!!!", d:"Jan 29, 2026"}},
+  {n:{t:"you are gloriously radiant", d:"May 30, 2026"}, s:{t:"i adore you", d:"Feb 21, 2026"}},
+  {n:{t:"my favorite person in this whole world", d:"Apr 1, 2026"}, s:{t:"you're my favorite person ever", d:"Feb 11, 2026"}},
+  {n:{t:"you are stunning", d:"Mar 11, 2026"}, s:{t:"i love you the most", d:"Jan 30, 2026"}},
+  {n:{t:"you are my best friend", d:"Feb 11, 2026"}, s:{t:"you are my best friend too ❤️", d:"Feb 11, 2026"}},
+  {n:{t:"you are gorgeous", d:"Feb 6, 2026"}, s:{t:"i'm obsessed with you", d:"Feb 6, 2026"}},
+  {n:{t:"you are my wife 💜", d:"Feb 6, 2026"}, s:{t:"my husband 💜", d:"Feb 15, 2026"}},
+  {n:{t:"so lucky to have you", d:"May 31, 2026"}, s:{t:"i am so grateful for you", d:"Jan 11, 2026"}},
+  {n:{t:"i am so proud of you", d:"Jun 15, 2026"}, s:{t:"i'm so proud of you neal", d:"May 5, 2026"}}
+];
+function showCompliment(i){
+  var p=BP_PAIRS[i], o=document.getElementById('complimentOverlay'); if(!p||!o)return;
+  document.getElementById('cmpNtxt').textContent='“'+p.n.t+'”';
+  document.getElementById('cmpNdate').textContent=p.n.d;
+  document.getElementById('cmpStxt').textContent='“'+p.s.t+'”';
+  document.getElementById('cmpSdate').textContent=p.s.d;
+  spawnEggHearts('compHearts');
+  o.style.display='flex';
+}
+function hideCompliment(){var o=document.getElementById('complimentOverlay');if(o)o.style.display='none';}
 if(/[?&]egg/.test(location.search)||/egg/.test(location.hash)){setTimeout(showEgg,350);}
 /* TEST: open the site with ?end=1 to force the 9:30 state on a sample reveal */
 if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
@@ -2134,6 +2155,25 @@ window.initTimeline=function(){};
     <p class="egg-msg" id="eggMsg">8 months, a few thousand miles, and somehow always you. i'd take every flight and every long way home, as long as it ends with you. happy anniversary 💜 here's to the round of 16, and every round after.</p>
     <div class="egg-sig">💜 always, neal</div>
     <button class="btn primary" type="button" onclick="hideEgg()">back to our date ✨</button>
+  </div>
+</div>
+<div id="complimentOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideCompliment()">
+  <div class="egg-hearts" id="compHearts" aria-hidden="true"></div>
+  <div class="egg-card cmp-card">
+    <div class="egg-emoji">💜</div>
+    <h2 class="egg-h">what we said</h2>
+    <div class="cmp-line cmp-neal">
+      <div class="cmp-who">🧑 neal → sidhya</div>
+      <div class="cmp-txt" id="cmpNtxt"></div>
+      <div class="cmp-date" id="cmpNdate"></div>
+    </div>
+    <div class="cmp-amp">💜</div>
+    <div class="cmp-line cmp-sid">
+      <div class="cmp-who">👩 sidhya → neal</div>
+      <div class="cmp-txt" id="cmpStxt"></div>
+      <div class="cmp-date" id="cmpSdate"></div>
+    </div>
+    <button class="btn primary" type="button" onclick="hideCompliment()">back to our date ✨</button>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
