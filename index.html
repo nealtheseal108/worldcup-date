@@ -33,6 +33,9 @@
   .wrap{max-width:680px;margin:0 auto}
   .layout{display:block}
   .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
+  .spice-toggle{position:fixed;top:10px;right:10px;z-index:130;background:rgba(36,23,51,.82);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:6px 12px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;font-weight:700;letter-spacing:.5px;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 3px 10px rgba(0,0,0,.2)}
+  .spice-toggle.pg{background:rgba(63,168,92,.85)}
+  @media print{.spice-toggle{display:none!important}}
   .topbar .ball{font-size:22px}
   .topbar h1{font-family:'Courier Prime',ui-monospace,monospace;font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
   .matchup{text-align:center;margin:0 0 16px}
@@ -696,6 +699,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
+<button type="button" id="spiceToggle" class="spice-toggle" onclick="toggleSpice()" title="switch between PG and R content site-wide">🔞 R</button>
 <div class="wrap">
   <div class="topbar"><span class="ball">⚽</span><h1>Sidhya & Neal · World Cup Date · July 6</h1></div>
   <div class="matchup"><span class="chip">🏆 Round of 16 · <b id="muText">TBD 🆚 TBD</b> · <span class="mu-note" id="muNote">🇺🇸 could be us!</span></span></div>
@@ -1857,6 +1861,25 @@ function _liveStat(key){
 function _p2(n){n=String(n);return n.length<2?'0'+n:n;}
 function _p3(n){n=String(n);while(n.length<3)n='0'+n;return n;}
 function buzz(ms){try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e){}}
+/* ---------- PG / R content switch: default R, tap to go PG (hides/replaces spicier content site-wide) ---------- */
+function _spiceMode(){ try{ return localStorage.getItem('wc_spice')==='pg' ? 'pg' : 'r'; }catch(e){ return 'r'; } }
+function _applySpiceUI(){
+  var b=document.getElementById('spiceToggle'); if(!b)return;
+  var m=_spiceMode();
+  b.textContent = m==='pg' ? '🟢 PG' : '🔞 R';
+  b.classList.toggle('pg', m==='pg');
+}
+function toggleSpice(){
+  var next = _spiceMode()==='pg' ? 'r' : 'pg';
+  try{ localStorage.setItem('wc_spice', next); }catch(e){}
+  _applySpiceUI();
+  if(window.buzz)buzz(next==='pg'?10:20);
+  if(window.toast)toast(next==='pg' ? 'PG mode, keeping it sweet 💜' : 'R mode, back to spicy 😏');
+  if(window.resetQuiz)resetQuiz();     // deck length can change between modes, restart clean rather than risk a mismatched index
+  if(window.renderKit)renderKit();
+  if(window.renderDepartures)renderDepartures();
+}
+_applySpiceUI();
 var _fsCells=[], _fsLanded=false, _fsLandAt=null;
 function _fsSince(now){
   var m=(now.getFullYear()-US.metDate.getFullYear())*12+(now.getMonth()-US.metDate.getMonth());
@@ -2755,8 +2778,8 @@ var QUIZ=[
   {q:'our single most-texted emoji of all time is...', opts:['😭','❤️','😂','💜'], correct:0, receipt:'😭 lol. over 380 times and still climbing. we are certified criers'},
   {q:'how many times has 😈 shown up in our texts?', opts:['32','5','58','12'], correct:0, receipt:'32. counted it myself. no further comment 😏'},
   {q:'which of these is a REAL text I sent you, word for word?', opts:['"I love you so much I\'m going to explodeee"','"you make my heart do backflips"','"i love you to infinity and beyond"','"you\'re my whole world fr fr"'], correct:0, receipt:'yep, May 30 2026, word for word. still true every single day'},
-  {q:'and THIS one, which text did I actually send?', opts:['"I want you to rip my clothes off"','"i can\'t wait to hold you all night"','"you\'re the only one for me"','"i think about you 24/7"'], correct:0, receipt:'that\'s the one. June 3 2026. no notes from me on this one 😏'},
-  {q:'now flip it, which text did YOU actually send ME?', opts:['"I wanna give you infinite hickeys"','"you\'re my whole heart"','"i can\'t stop smiling because of you"','"forever isn\'t long enough"'], correct:0, receipt:'that was you, Jan 24 2026. still collecting on that one 😏💜'},
+  {q:'and THIS one, which text did I actually send?', opts:['"I want you to rip my clothes off"','"i can\'t wait to hold you all night"','"you\'re the only one for me"','"i think about you 24/7"'], correct:0, r:true, receipt:'that\'s the one. June 3 2026. no notes from me on this one 😏'},
+  {q:'now flip it, which text did YOU actually send ME?', opts:['"I wanna give you infinite hickeys"','"you\'re my whole heart"','"i can\'t stop smiling because of you"','"forever isn\'t long enough"'], correct:0, r:true, receipt:'that was you, Jan 24 2026. still collecting on that one 😏💜'},
   {q:'what do I text you the SECOND you land somewhere?', opts:['landed, lil bongo','touchdown babe','we\'re home!','made it 🛬'], correct:0, receipt:'"landed lil bongo." March 23 2026, exact words. the nickname just stuck after that'},
   {q:'what time did you say yes to being mine?', opts:['10 PM','9 PM','midnight','8 PM'], correct:0, receipt:'10pm, Oct 25 2025. don\'t need a screenshot for this one, i was there 💜'},
   {q:'which of these compliments did I actually send you, word for word?', opts:['"you are gorgeous"','"you\'re breathtaking"','"you\'re a whole vibe"','"you\'re unreal"'], correct:0, receipt:'yep, Feb 6 2026, said completely out of nowhere. still mean it'},
@@ -2764,30 +2787,35 @@ var QUIZ=[
   {q:'okay a spicier one, which text did I actually send?', opts:['"You\'re so hot"','"you\'re breathtaking tonight"','"you look incredible"','"you\'re a whole snack"'], correct:0, receipt:'lol yes. May 29 2026, then i immediately followed up with "like actually" just in case it wasn\'t clear'},
   {q:'which nickname did I actually call you, word for word?', opts:['"my sexy girl"','"my whole world"','"my favorite person"','"my entire heart"'], correct:0, receipt:'guilty. May 20 2026, right after you told me i get hotter every day'},
   {q:'last one of these, which line is REAL?', opts:['"your body is my home"','"you\'re my safe place"','"home is wherever you are"','"you complete me"'], correct:0, receipt:'that\'s real. May 28 2026, and right after i said "i would live in you and hold you forever" too. certified real one 💜'},
-  {q:'okay actually spicy now, which text did I really send out of nowhere?', opts:['"I got so horny at yk thinking of you"','"you\'ve been on my mind all day"','"i can\'t focus because of you"','"i keep thinking about us"'], correct:0, receipt:'yeah that\'s me. Jan 19 2026, mid conversation about something totally unrelated. no shame 😈'},
-  {q:'and one more, which is the real receipt?', opts:['"got so horny thinking on you at 7am"','"woke up thinking about you"','"dreamt about you all night"','"can\'t start my day without you"'], correct:0, receipt:'that one\'s real, Feb 5 2026, 7:22am. you even Loved it when i sent it, so it\'s extra verified 😏💜'},
-  {q:'flip it again, which text did YOU actually send ME?', opts:['"ugh I want you so bad"','"i can\'t wait to see you"','"you\'re all I think about"','"come home to me already"'], correct:0, receipt:'that was you, June 17 2026. straight up, no lead in, just that 😏'},
-  {q:'one more from you, which is real?', opts:['"ughhhhhh wanna touch your body"','"i miss holding you"','"i need your hugs"','"come cuddle me"'], correct:0, receipt:'yep, June 4 2026. you really said "ughhhhhh" and everything'},
-  {q:'okay the spiciest one yet, which text did you actually send?', opts:['"wish I could cuddle up next to you right now, kiss you, bury my head in your neck, breathe you in, and make love with you and ride you into oblivion"','"i wish you were here to hold me all night"','"i just want to fall asleep in your arms tonight"','"i miss every part of being close to you"'], correct:0, receipt:'all real, word for word, June 24 2026, 11:17pm. right after you said you wanted to do something special for our anniversary. you followed it up with "ugh I\'m horny" two minutes later lol'},
+  {q:'okay actually spicy now, which text did I really send out of nowhere?', opts:['"I got so horny at yk thinking of you"','"you\'ve been on my mind all day"','"i can\'t focus because of you"','"i keep thinking about us"'], correct:0, r:true, receipt:'yeah that\'s me. Jan 19 2026, mid conversation about something totally unrelated. no shame 😈'},
+  {q:'and one more, which is the real receipt?', opts:['"got so horny thinking on you at 7am"','"woke up thinking about you"','"dreamt about you all night"','"can\'t start my day without you"'], correct:0, r:true, receipt:'that one\'s real, Feb 5 2026, 7:22am. you even Loved it when i sent it, so it\'s extra verified 😏💜'},
+  {q:'flip it again, which text did YOU actually send ME?', opts:['"ugh I want you so bad"','"i can\'t wait to see you"','"you\'re all I think about"','"come home to me already"'], correct:0, r:true, receipt:'that was you, June 17 2026. straight up, no lead in, just that 😏'},
+  {q:'one more from you, which is real?', opts:['"ughhhhhh wanna touch your body"','"i miss holding you"','"i need your hugs"','"come cuddle me"'], correct:0, r:true, receipt:'yep, June 4 2026. you really said "ughhhhhh" and everything'},
+  {q:'okay the spiciest one yet, which text did you actually send?', opts:['"wish I could cuddle up next to you right now, kiss you, bury my head in your neck, breathe you in, and make love with you and ride you into oblivion"','"i wish you were here to hold me all night"','"i just want to fall asleep in your arms tonight"','"i miss every part of being close to you"'], correct:0, r:true, receipt:'all real, word for word, June 24 2026, 11:17pm. right after you said you wanted to do something special for our anniversary. you followed it up with "ugh I\'m horny" two minutes later lol'},
+  {q:'we did one of those couples "quiz" things once and answered in third person. which two did I name as the either or?', opts:['"missionary or cowgirl"','"cuddling or holding hands"','"movie night or dinner date"','"beach or mountains"'], correct:0, r:true, receipt:'yep, March 17 2026, mid quiz. real answer, verbatim'},
+  {q:'in that same quiz, what did I say you loved?', opts:['"missionary"','"slow dancing"','"long drives"','"morning cuddles"'], correct:0, r:true, receipt:'"and she loooves missionary," 3 o\'s and all, March 17 2026, verbatim'},
+  {q:'which real text mixes something sweet with something spicy?', opts:['"I feel butterflies when you giggle when you\'re horny and when you ride me slow"','"you make me laugh and you make me weak"','"you\'re cute and you\'re trouble"','"i love your laugh and your everything"'], correct:0, r:true, receipt:'that\'s a real one, May 28 2026. butterflies AND that, in the same text lol'},
   {q:'roughly how many texts have we actually sent each other, all-time?', opts:['over 30,000','about 5,000','under 1,000','around 12,000'], correct:0, receipt:'over 30k and still going. check the number on our boarding pass, it\'s live 👀'},
   {q:'how many "love you"s have actually been sent between us?', opts:['over 700','around 100','just 12','over 5,000'], correct:0, receipt:'700+ and counting. we clearly never get tired of saying it'}
 ];
 var _quizIdx=0, _quizScore=0, _quizAnswered=false;
+function _quizDeck(){ return _spiceMode()==='r' ? QUIZ : QUIZ.filter(function(q){return !q.r;}); }
 function renderQuiz(){
   var wrap=document.getElementById('quizCard'); if(!wrap)return;
+  var deck=_quizDeck();
   var bar=document.getElementById('quizBar'), num=document.getElementById('quizNum');
-  if(_quizIdx>=QUIZ.length){
+  if(_quizIdx>=deck.length){
     if(bar)bar.style.width='100%';
     if(num)num.textContent='done!';
-    var pct=Math.round(_quizScore/QUIZ.length*100);
+    var pct=deck.length?Math.round(_quizScore/deck.length*100):0;
     var line = pct===100 ? "perfect score. obviously. you're literally me at this point 💜" : pct>=70 ? "okay certified expert on us 😌💜" : "a few misses but you know the important stuff, that i'm obsessed with you 💜";
-    wrap.innerHTML='<div class="quiz-done"><div class="qd-score">'+_quizScore+' / '+QUIZ.length+'</div><div class="qd-line">'+line+'</div>'+
+    wrap.innerHTML='<div class="quiz-done"><div class="qd-score">'+_quizScore+' / '+deck.length+'</div><div class="qd-line">'+line+'</div>'+
       '<button type="button" class="btn primary" style="margin-top:16px" onclick="resetQuiz()">↺ play again</button></div>';
     return;
   }
-  var item=QUIZ[_quizIdx];
-  if(bar)bar.style.width=(_quizIdx/QUIZ.length*100)+'%';
-  if(num)num.textContent='Q '+(_quizIdx+1)+' / '+QUIZ.length;
+  var item=deck[_quizIdx];
+  if(bar)bar.style.width=(_quizIdx/deck.length*100)+'%';
+  if(num)num.textContent='Q '+(_quizIdx+1)+' / '+deck.length;
   _quizAnswered=false;
   wrap.innerHTML='<div class="quiz-q">'+_escB(item.q)+'</div>'+
     '<div class="quiz-opts">'+item.opts.map(function(o,i){return '<button type="button" class="quiz-opt" data-i="'+i+'" onclick="answerQuiz('+i+')">'+_escB(o)+'</button>';}).join('')+'</div>'+
@@ -2796,7 +2824,7 @@ function renderQuiz(){
 }
 function answerQuiz(i){
   if(_quizAnswered)return; _quizAnswered=true;
-  var item=QUIZ[_quizIdx];
+  var item=_quizDeck()[_quizIdx];
   Array.prototype.forEach.call(document.querySelectorAll('.quiz-opt'),function(b){
     b.disabled=true;
     var idx=+b.getAttribute('data-i');
@@ -2825,7 +2853,8 @@ var KIT=[
   {ico:'🚆', lbl:"open when you're on a train",
    txt:"a train. our thing, except technically it isn't yet, not until today.\nwindow seat, headphones in, first song of the playlist.\nnow pretend i'm in the seat next to you, doing the thing where i just stare at you.\nyou can feel it, can't you 💜 by the time you read this we'll already have a real one to remember."},
   {ico:'💜', lbl:'open when you need to hear it',
-   txt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so fucking beautiful, and i still want you to rip my clothes off. so.\ni love you more than anyone.\n- neal"}
+   txt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so fucking beautiful, and i still want you to rip my clothes off. so.\ni love you more than anyone.\n- neal",
+   pgTxt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so beautiful it's unfair. so.\ni love you more than anyone.\n- neal"}
 ];
 function _kitUnlockedByDate(){ return /[?&]kit=1/.test(location.search) || new Date()>=new Date(2026,6,7); }   // sealed until July 7 (?kit=1 to preview)
 function _kitOk(){ try{return localStorage.getItem('wc_kit_ok')==='1';}catch(e){return false;} }
@@ -2836,11 +2865,13 @@ function renderKit(){
   var note=document.getElementById('kitNote'), gate=document.getElementById('kitGate');
   if(note)note.textContent = !dateOk ? 'sealed until after our date, babu 💜 no peeking.' : (ok ? 'tap one when its moment comes 💜 no rush.' : 'they\'re ready for you, one security question first 💜');
   if(gate)gate.style.display = (dateOk&&!ok)?'':'none';
+  var pg=_spiceMode()==='pg';
   rack.innerHTML=KIT.map(function(k,i){
     var open=opened.indexOf(i)>=0&&ok&&dateOk;
+    var txt=(pg&&k.pgTxt)?k.pgTxt:k.txt;
     return '<button type="button" class="kit-env'+(open?' open':'')+((!dateOk||!ok)?' locked':'')+'" onclick="tapKit('+i+')">'+
       '<span class="kit-env-head"><span class="kit-env-ico">'+k.ico+'</span><span class="kit-env-lbl">'+k.lbl+'</span><span class="kit-seal">💜</span></span>'+
-      '<span class="kit-letter"><span class="kit-letter-in">'+k.txt+'</span></span></button>';
+      '<span class="kit-letter"><span class="kit-letter-in">'+txt+'</span></span></button>';
   }).join('');
 }
 function tapKit(i){
@@ -2876,26 +2907,27 @@ var DEPARTURES=[
    note:"one time, you said. we'll let them take the credit AND the blame 😂💜"},
   {date:'SOMEDAY', lbl:'baby girl, pink bow, non negotiable', at:null,
    note:"you already picked her outfit. i already know we're doomed 💜"},
-  {date:'SOMEDAY', lbl:'infinite hickeys · rain check', at:null,
-   note:"you called it, babu. i'm still collecting on that one 😏💜"}
+  {date:'SOMEDAY', lbl:'infinite hickeys · rain check', at:null, pgLbl:'movie marathon · rain check',
+   note:"you called it, babu. i'm still collecting on that one 😏💜", pgNote:"you called it, babu. i'm still holding you to it 💜"}
 ];
 function _depOpenList(){ try{return JSON.parse(localStorage.getItem('wc_dep_open')||'[]');}catch(e){return [];} }
 function renderDepartures(){
   var b=document.getElementById('depBoard'); if(!b)return;
-  var force=/[?&]dep=1/.test(location.search), now=new Date(), opened=_depOpenList();
+  var force=/[?&]dep=1/.test(location.search), now=new Date(), opened=_depOpenList(), pg=_spiceMode()==='pg';
   b.innerHTML=DEPARTURES.map(function(d,i){
     var boarding = d.at ? (force||now>=d.at) : false;
     var standby = !d.at;
     var open = boarding && opened.indexOf(i)>=0;
     var status = standby ? '<span class="dep-status closed">STANDBY</span>' : (boarding ? '<span class="dep-status boarding">● NOW BOARDING</span>' : '<span class="dep-status closed">GATE CLOSED</span>');
+    var lbl=(pg&&d.pgLbl)?d.pgLbl:d.lbl, note=(pg&&d.pgNote)?d.pgNote:d.note;
     return '<button type="button" class="dep-row'+(open?' open':'')+'" onclick="tapDep('+i+')">'+
-      '<span class="dep-head"><span class="dep-date">'+d.date+'</span><span class="dep-lbl">'+d.lbl+'</span>'+status+'</span>'+
-      '<span class="dep-note"><span class="dep-note-in">'+d.note+'</span></span></button>';
+      '<span class="dep-head"><span class="dep-date">'+d.date+'</span><span class="dep-lbl">'+lbl+'</span>'+status+'</span>'+
+      '<span class="dep-note"><span class="dep-note-in">'+note+'</span></span></button>';
   }).join('');
 }
 function tapDep(i){
   var d=DEPARTURES[i], force=/[?&]dep=1/.test(location.search);
-  if(!d.at){ toast(d.note||'standby forever, never cancelled 💜'); if(window.buzz)buzz(10); return; }
+  if(!d.at){ var n=(_spiceMode()==='pg'&&d.pgNote)?d.pgNote:d.note; toast(n||'standby forever, never cancelled 💜'); if(window.buzz)buzz(10); return; }
   if(!force && new Date()<d.at){ toast('gate opens '+d.date.toLowerCase()+' babu 💜 no early boarding'); if(window.buzz)buzz(10); return; }
   var opened=_depOpenList();
   if(opened.indexOf(i)<0){ opened.push(i); try{localStorage.setItem('wc_dep_open',JSON.stringify(opened));}catch(e){} if(window.burstConfetti)burstConfetti(document.getElementById('depBoard'),{emojis:['🛫','💜','✨'],count:16}); if(window.buzz)buzz(24); }
