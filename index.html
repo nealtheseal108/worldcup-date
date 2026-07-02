@@ -814,7 +814,7 @@
             </div>
               <div class="tk-summary">
                 <div class="tk-comp" id="tkComp"></div>
-                <div class="tk-steps" id="tkSteps"></div>
+                <div class="tk-steps" id="tkSteps" onclick="showRide(event)"></div>
               </div>
           </div>
           <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
@@ -3054,6 +3054,9 @@ function spawnEggHearts(id){var h=document.getElementById(id||'eggHearts');if(!h
   h.innerHTML=s;}
 function showEgg(){var o=document.getElementById('eggOverlay');if(!o)return;spawnEggHearts();o.style.display='flex';}
 function hideEgg(){var o=document.getElementById('eggOverlay');if(o)o.style.display='none';}
+/* tap the TRAIN RIDES header -> cheeky overlay, R mode only (kept off the pass face so the shared image stays clean) */
+function showRide(ev){ if(ev){ev.stopPropagation();} if(_spiceMode()!=='r')return; var o=document.getElementById('rideOverlay'); if(o)o.style.display='flex'; }
+function hideRide(){ var o=document.getElementById('rideOverlay'); if(o)o.style.display='none'; }
 /* tap a boarding-pass barcode -> reveal the real compliments you two traded (his line + her matching line back) */
 var BP_PAIRS = [
   {n:{t:"you're so hot", d:"Jun 4, 2026"}, s:{t:"you're my best friend and you're so hot???", d:"Jun 3, 2026"}},
@@ -3507,6 +3510,15 @@ window.initTimeline=function(){};
   </div>
 </div>
 
+<div id="rideOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideRide()">
+  <div class="egg-card">
+    <div class="egg-emoji">😏</div>
+    <h2 class="egg-h">the train's not the only ride</h2>
+    <p class="egg-msg">you can ride something else 💜</p>
+    <div class="egg-sig">🚆 all aboard, neal</div>
+    <button class="btn primary" type="button" onclick="hideRide()">okok, back to the pass ✨</button>
+  </div>
+</div>
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
 
 <!-- ARRIVALS HALL — July 2, the moment she lands: the site holds a sign for her -->
