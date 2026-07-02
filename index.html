@@ -551,6 +551,38 @@
   .mission-tag .mt-stamp{position:absolute;right:7px;top:34px;border:2.5px solid #16a34a;color:#16a34a;font-weight:800;font-size:9.5px;letter-spacing:1.6px;padding:3px 7px;border-radius:5px;transform:rotate(-14deg);background:rgba(255,255,255,.86);display:none}
   .mission-tag.done{border-color:#bfe8cd}
   .mission-tag.done .mt-stamp{display:block}
+  /* comfort kit: sealed open-when envelopes (step11) */
+  .kit-note{font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;color:var(--muted);text-align:center;margin:0 0 14px}
+  .kit-gate-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;box-shadow:0 8px 20px rgba(53,28,94,.12)}
+  .kit-gate-q{font-family:'Courier Prime',ui-monospace,monospace;font-size:13px;font-weight:700;color:#3a2a63;margin-bottom:10px;text-align:center}
+  .kit-rack{display:flex;flex-direction:column;gap:10px}
+  .kit-env{background:linear-gradient(150deg,#fff,#f7f1ff);border:1px solid var(--line);border-radius:13px;padding:0;overflow:hidden;text-align:left;cursor:pointer;box-shadow:0 4px 12px rgba(53,28,94,.1);width:100%;font-family:inherit}
+  .kit-env-head{display:flex;align-items:center;gap:11px;padding:13px 14px}
+  .kit-env-ico{font-size:21px;flex:none}
+  .kit-env-lbl{flex:1;font-family:'Courier Prime',ui-monospace,monospace;font-size:12.5px;font-weight:700;color:#3a2a63;line-height:1.35}
+  .kit-seal{flex:none;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#a678e8,#6a3fc0);display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 6px rgba(53,28,94,.35);transition:transform .35s,opacity .35s}
+  .kit-env.locked{opacity:.62;cursor:not-allowed}
+  .kit-env.open .kit-seal{transform:scale(.4) rotate(40deg);opacity:0}
+  .kit-letter{display:block;max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.3,.7,.3,1)}
+  .kit-env.open .kit-letter{max-height:460px}
+  .kit-letter-in{display:block;border-top:1px dashed var(--line);margin:0 14px;padding:13px 2px 15px;font-family:'Instrument Serif',Georgia,serif;font-size:16px;line-height:1.55;color:#3a2a63;white-space:pre-line}
+  /* future departures board (step12) */
+  .dep-board{background:#120a26;border-radius:15px;padding:13px 12px;box-shadow:0 10px 26px rgba(18,8,38,.4)}
+  .dep-row{width:100%;background:none;border:none;border-bottom:1px solid rgba(167,139,250,.16);padding:0;cursor:pointer;text-align:left;font-family:'Courier Prime',ui-monospace,monospace;overflow:hidden}
+  .dep-row:last-child{border-bottom:none}
+  .dep-head{display:flex;align-items:baseline;gap:10px;padding:11px 4px}
+  .dep-date{flex:none;color:#ffcf6b;font-weight:700;font-size:13px;letter-spacing:1px;min-width:74px}
+  .dep-lbl{flex:1;color:#cdbcf2;font-size:11.5px;letter-spacing:.6px;text-transform:uppercase}
+  .dep-status{flex:none;font-size:10px;font-weight:700;letter-spacing:1.2px}
+  .dep-status.closed{color:#8f7fb8}
+  .dep-status.boarding{color:#7cffb0;animation:depblink 1.6s ease-in-out infinite}
+  @keyframes depblink{50%{opacity:.45}}
+  @media(prefers-reduced-motion:reduce){.dep-status.boarding{animation:none}}
+  .dep-note{display:block;max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.3,.7,.3,1)}
+  .dep-row.open .dep-note{max-height:300px}
+  .dep-note-in{display:block;margin:0 4px;padding:4px 2px 13px;font-family:'Instrument Serif',Georgia,serif;font-size:15.5px;line-height:1.55;color:#e9dffc;white-space:pre-line}
+  .dep-head{display:flex}
+  .kit-env-head{display:flex}
   #playerbar{position:fixed;left:0;right:0;bottom:calc(var(--tick) + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:9px 16px;background:#160e2b;
     border-top:1px solid rgba(167,139,250,.32);box-shadow:0 -6px 26px rgba(18,8,38,.45);color:#fff;
@@ -851,6 +883,10 @@
         <div class="ec-sub">every clip we film today gets stitched into our little movie tonight, and your flight home is waiting there too 💜</div>
         <button class="ec-btn" type="button" onclick="go(5)">open the diary →</button>
       </div>
+      <div class="album-add-row" style="margin-top:10px">
+        <button class="btn lav2btn" type="button" onclick="go(11)">💌 your comfort kit</button>
+        <button class="btn lav2btn" type="button" onclick="go(12)">🛫 future departures</button>
+      </div>
 
       <div class="cheeky" id="cheekyLine">Lotus sex in the car may or may not be included in this date. 😏💜</div>
 
@@ -979,6 +1015,29 @@
       <div class="album-add-row" style="margin-top:12px">
         <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
       </div>
+      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+    </section>
+
+    <!-- STEP 11 — RETURN-FLIGHT COMFORT KIT (open-when letters, sealed until after the date) -->
+    <section class="step" id="step11">
+      <div class="iti-head" style="margin-top:2px"><div class="big">💌✈</div><h2 style="font-size:24px">your comfort kit</h2><div class="venue">GANESH AIR amenity kit · for the flight home &amp; after</div></div>
+      <div class="kit-note" id="kitNote">sealed until after our date, babu 💜 no peeking.</div>
+      <div id="kitGate" style="display:none">
+        <div class="kit-gate-card">
+          <div class="kit-gate-q">security check 🛃 — what do you call me?</div>
+          <input class="modal-input" id="kitAnswer" type="text" placeholder="one word, you know it" autocomplete="off">
+          <button class="btn primary" type="button" style="margin-top:10px;width:100%" onclick="kitTry()">unlock my kit 💜</button>
+        </div>
+      </div>
+      <div class="kit-rack" id="kitRack"></div>
+      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+    </section>
+
+    <!-- STEP 12 — FUTURE DEPARTURES (monthiversary auto-unlocks, zero backend) -->
+    <section class="step" id="step12">
+      <div class="iti-head" style="margin-top:2px"><div class="big">🛫💜</div><h2 style="font-size:24px">future departures</h2><div class="venue">a new gate opens on the 25th of every month</div></div>
+      <div class="dep-board" id="depBoard"></div>
+      <div class="kit-note" style="margin-top:12px">every 25th, come back — a gate will be boarding 💜</div>
       <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
     </section>
 
@@ -2615,7 +2674,87 @@ function onMissionPicked(ev){
     fr.readAsDataURL(small);
   }).catch(function(){ hint('could not stamp that one, try again 💜'); });
 }
-renderBingo(); renderQDeck(); renderMissions();
+/* ---------- COMFORT KIT (step11): open-when letters, sealed until after the date ----------
+   NEAL: EDIT THE LETTERS BELOW — these are drafts in your voice from real details; make them yours. */
+var KIT=[
+  {ico:'🛫', lbl:'open when you board your flight back to SLC',
+   txt:"flight's boarded babu 💜\nwindow seat if you got it. when you take off, look down — somewhere in those little lights is me, already missing you, already planning the next one.\ntext me when you land. i'll be up. i'm always up for you.\n— neal"},
+  {ico:'🌙', lbl:'open on your first night home missing me',
+   txt:"i know. the room's too quiet and the phone feels heavy.\nso: open our album. watch our movie. we really did all of that — the train, the match, the ice cream, the park.\n700 miles is just geography, babu. i'm not going anywhere.\nsleep well. dream the cuddling dream 💜"},
+  {ico:'🌧️', lbl:'open on a rough day',
+   txt:"hey. come here.\ndeep breath.\nyou are the strongest, smartest, hottest person i know, and one bad day doesn't get to touch any of that.\ncall me. i don't care what time it is.\n— your biggest fan, forever"},
+  {ico:'💃', lbl:'open when you want to dance',
+   txt:"permission to be extra: GRANTED.\nput our playlist on. full volume. shotput first, obviously.\ndance like the photoshoot queen you are and send me a video or it didn't happen 😏💜"},
+  {ico:'🚆', lbl:"open when you're on a train",
+   txt:"A TRAIN. our thing!!\nok here's what you do: window seat, headphones in, first song of the playlist.\nnow pretend i'm in the seat next to you, doing the thing where i just stare at you.\nyou can feel it, can't you 💜"},
+  {ico:'💜', lbl:'open when you need to hear it',
+   txt:"you are so loved, sidhya ganesh.\nnot the instagram kind — the boring tuesday kind. the kind that texts you 4,441 times in one june. the kind that builds you a whole airline.\n8 months down. all of them to go.\ni love you more than anyone. — neal"}
+];
+function _kitUnlockedByDate(){ return /[?&]kit=1/.test(location.search) || new Date()>=new Date(2026,6,7); }   // sealed until July 7 (?kit=1 to preview)
+function _kitOk(){ try{return localStorage.getItem('wc_kit_ok')==='1';}catch(e){return false;} }
+function _kitOpened(){ try{return JSON.parse(localStorage.getItem('wc_kit_open')||'[]');}catch(e){return [];} }
+function renderKit(){
+  var rack=document.getElementById('kitRack'); if(!rack)return;
+  var dateOk=_kitUnlockedByDate(), ok=_kitOk(), opened=_kitOpened();
+  var note=document.getElementById('kitNote'), gate=document.getElementById('kitGate');
+  if(note)note.textContent = !dateOk ? 'sealed until after our date, babu 💜 no peeking.' : (ok ? 'tap one when its moment comes 💜 no rush.' : 'they\'re ready for you — one security question first 💜');
+  if(gate)gate.style.display = (dateOk&&!ok)?'':'none';
+  rack.innerHTML=KIT.map(function(k,i){
+    var open=opened.indexOf(i)>=0&&ok&&dateOk;
+    return '<button type="button" class="kit-env'+(open?' open':'')+((!dateOk||!ok)?' locked':'')+'" onclick="tapKit('+i+')">'+
+      '<span class="kit-env-head"><span class="kit-env-ico">'+k.ico+'</span><span class="kit-env-lbl">'+k.lbl+'</span><span class="kit-seal">💜</span></span>'+
+      '<span class="kit-letter"><span class="kit-letter-in">'+k.txt+'</span></span></button>';
+  }).join('');
+}
+function tapKit(i){
+  if(!_kitUnlockedByDate()){ hint('sealed until after our date babu 💜'); if(window.buzz)buzz(10); return; }
+  if(!_kitOk()){ var inp=document.getElementById('kitAnswer'); if(inp)inp.focus(); hint('security check first 😌'); return; }
+  var opened=_kitOpened();
+  if(opened.indexOf(i)<0){ opened.push(i); try{localStorage.setItem('wc_kit_open',JSON.stringify(opened));}catch(e){} if(window.buzz)buzz(22); }
+  renderKit();
+}
+function kitTry(){
+  var inp=document.getElementById('kitAnswer'), v=(inp&&inp.value||'').trim().toLowerCase();
+  if(v.indexOf('babu')>=0){ try{localStorage.setItem('wc_kit_ok','1');}catch(e){} if(window.burstConfetti)burstConfetti(document.getElementById('kitGate'),{emojis:['💌','💜'],count:16}); hint('cleared security 💜 welcome aboard'); renderKit(); }
+  else { hint('hmm, that\'s not it babu 😌 try again'); if(inp)inp.value=''; }
+}
+/* ---------- FUTURE DEPARTURES (step12): monthiversary auto-unlocks, zero backend ----------
+   NEAL: EDIT THE NOTES — drafts in your voice; the Oct 25 one is the big 1-year letter. */
+var DEPARTURES=[
+  {date:'JUL 25', lbl:'monthiversary no. 9', at:new Date(2026,6,25),
+   note:"nine months, babu.\nthree weeks ago you were HERE — same train, same city, same me staring at you.\nre-watch our movie tonight. i'll do the same at the same time. 9pm? it's a date 💜"},
+  {date:'AUG 25', lbl:'monthiversary no. 10', at:new Date(2026,7,25),
+   note:"double digits!! ten months.\nfun fact: the World Cup ended a month ago and i still think about you in that jersey every single day.\ngo get yourself something sweet today. tell them babu sent you 💜"},
+  {date:'SEP 25', lbl:'monthiversary no. 11', at:new Date(2026,8,25),
+   note:"eleven. ELEVEN.\none month from the biggest one. i'm already planning it and no, you can't have hints.\nyou are my favorite notification, my best decision, my whole starting XI 💜"},
+  {date:'OCT 25', lbl:'★ ONE YEAR ★', at:new Date('2026-10-25T22:00:00-07:00'),
+   note:"one year ago, 10pm, you said yes to being mine.\n365 days. two cities. one airline that only flies one route.\nevery mile between us just proved how far i'd go for you.\nhappy anniversary, sidhya. i love you more than anyone, and next year i'm saying it from closer.\n— your captain, always 💜"},
+  {date:'SOMEDAY', lbl:'disneyland · the tea cups', at:null,
+   note:"standby forever, never cancelled 💜"}
+];
+function _depOpenList(){ try{return JSON.parse(localStorage.getItem('wc_dep_open')||'[]');}catch(e){return [];} }
+function renderDepartures(){
+  var b=document.getElementById('depBoard'); if(!b)return;
+  var force=/[?&]dep=1/.test(location.search), now=new Date(), opened=_depOpenList();
+  b.innerHTML=DEPARTURES.map(function(d,i){
+    var boarding = d.at ? (force||now>=d.at) : false;
+    var standby = !d.at;
+    var open = boarding && opened.indexOf(i)>=0;
+    var status = standby ? '<span class="dep-status closed">STANDBY</span>' : (boarding ? '<span class="dep-status boarding">● NOW BOARDING</span>' : '<span class="dep-status closed">GATE CLOSED</span>');
+    return '<button type="button" class="dep-row'+(open?' open':'')+'" onclick="tapDep('+i+')">'+
+      '<span class="dep-head"><span class="dep-date">'+d.date+'</span><span class="dep-lbl">'+d.lbl+'</span>'+status+'</span>'+
+      '<span class="dep-note"><span class="dep-note-in">'+d.note+'</span></span></button>';
+  }).join('');
+}
+function tapDep(i){
+  var d=DEPARTURES[i], force=/[?&]dep=1/.test(location.search);
+  if(!d.at){ hint('standby forever, never cancelled 💜'); if(window.buzz)buzz(10); return; }
+  if(!force && new Date()<d.at){ hint('gate opens '+d.date.toLowerCase()+' babu 💜 no early boarding'); if(window.buzz)buzz(10); return; }
+  var opened=_depOpenList();
+  if(opened.indexOf(i)<0){ opened.push(i); try{localStorage.setItem('wc_dep_open',JSON.stringify(opened));}catch(e){} if(window.burstConfetti)burstConfetti(document.getElementById('depBoard'),{emojis:['🛫','💜','✨'],count:16}); if(window.buzz)buzz(24); }
+  renderDepartures();
+}
+renderBingo(); renderQDeck(); renderMissions(); renderKit(); renderDepartures();
 function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
 function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
