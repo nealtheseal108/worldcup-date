@@ -491,6 +491,20 @@
   #lightbox{position:fixed;inset:0;z-index:210;background:rgba(20,10,35,.93);display:none;align-items:center;justify-content:center;padding:16px}
   #lightbox img{max-width:100%;max-height:86vh;border-radius:12px;box-shadow:0 20px 55px rgba(0,0,0,.55)}
   .lb-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.16);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:19px;cursor:pointer;line-height:1}
+  /* arrivals hall — July 2 landing takeover */
+  #arrivalsHall{position:fixed;inset:0;z-index:220;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;background:linear-gradient(168deg,#160b2e,#2c1854 55%,#3a1f63);padding:26px 18px;text-align:center}
+  #arrivalsHall.on{display:flex}
+  .ah-sub{font-family:'Courier Prime',ui-monospace,monospace;color:#b79bf0;font-size:10.5px;letter-spacing:2.4px;text-transform:uppercase}
+  .ah-row{display:flex;gap:3px 12px;justify-content:center;flex-wrap:wrap;max-width:560px}
+  .ah-word{display:flex;gap:3px;flex-wrap:nowrap;flex:none}
+  .ah-cell{font-size:clamp(15px,4.6vw,24px);min-width:.95em;padding:6px 3px}
+  .ah-name{align-items:center;gap:8px}
+  .ah-heart{font-size:clamp(18px,5vw,28px)}
+  .ah-flight{font-family:'Courier Prime',ui-monospace,monospace;color:#cdbcf2;font-size:12.5px;letter-spacing:1.4px;margin-top:4px}
+  .ah-flight b{color:#7cffb0}
+  .ah-gate{font-family:'Courier Prime',ui-monospace,monospace;color:#ffcf6b;font-weight:700;font-size:14px;letter-spacing:1.8px}
+  .ah-miles{font-family:'Courier Prime',ui-monospace,monospace;color:#7cffb0;font-weight:700;font-size:14px;letter-spacing:.8px}
+  .ah-btn{margin-top:10px}
   /* ticker round tag + custom bracket page (step8) */
   .ft-round{display:inline-block;background:rgba(167,139,250,.22);color:#c4b5fd;font-size:8px;font-weight:700;letter-spacing:.6px;padding:2px 5px;border-radius:5px;margin-right:8px;vertical-align:1px}
   .bracket-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 12px;margin:0 -4px}
@@ -1713,6 +1727,43 @@ function burstConfetti(originEl,opts){
   })();}
 }
 fsInit();
+/* ---------- ARRIVALS HALL: July 2 landing takeover (the site holds a sign for her) ---------- */
+function _ahFlipRow(el,text){
+  if(!el)return; el.innerHTML='';
+  var CH='ABCDEFGHIJKLMNOPQRSTUVWXYZ', tiles=[];
+  text.split(' ').forEach(function(word){
+    var w=document.createElement('span'); w.className='ah-word';
+    word.split('').forEach(function(ch){
+      var s=document.createElement('span'); s.className='fs-cell ah-cell'; s.textContent=CH[(Math.random()*26)|0]; w.appendChild(s); tiles.push({s:s,ch:ch});
+    });
+    el.appendChild(w);
+  });
+  tiles.forEach(function(t,i){
+    var settle=380+i*95;
+    var iv=setInterval(function(){ t.s.textContent=CH[(Math.random()*26)|0]; t.s.classList.remove('flip'); },70);
+    setTimeout(function(){ clearInterval(iv); t.s.textContent=t.ch; t.s.classList.add('flip'); },settle);
+    setTimeout(function(){ clearInterval(iv); t.s.textContent=t.ch; },settle+400);   // fail-safe (throttled rAF/timers)
+  });
+}
+function showArrivalsHall(){
+  var o=document.getElementById('arrivalsHall'); if(!o)return;
+  o.classList.add('on');
+  _ahFlipRow(document.getElementById('ahRow1'),'WELCOME TO SEATTLE');
+  _ahFlipRow(document.getElementById('ahRow2'),'SIDHYA');
+  var mi=document.getElementById('ahMiles'), t0=null;
+  function fr(t){ if(t0===null)t0=t; var p=Math.min(1,(t-t0)/2300); var v=Math.round(700*(1-p*p)); mi.textContent=v>0?(v+' mi'):'0 mi 💜'; if(p<1)requestAnimationFrame(fr); }
+  if(mi){ requestAnimationFrame(fr); setTimeout(function(){ mi.textContent='0 mi 💜'; },2800); }   // fail-safe
+  setTimeout(function(){ if(window.burstConfetti)burstConfetti(null,{emojis:['💜','💜','✈','✨','💜'],count:28}); },1000);
+  if(window.buzz)buzz(30);
+}
+function hideArrivalsHall(){ var o=document.getElementById('arrivalsHall'); if(o)o.classList.remove('on'); try{localStorage.setItem('wc_arrhall','1');}catch(e){} }
+(function(){
+  var force=/[?&]arrive=1/.test(location.search);
+  var now=new Date();
+  var inWindow = now>=US.landing && now<new Date(2026,6,4);   // from her 8:05 PM Jul 2 touchdown through July 3 (truthful: only once she's actually landed)
+  var seen=false; try{seen=localStorage.getItem('wc_arrhall')==='1';}catch(e){}
+  if(force||(inWindow&&!seen)) setTimeout(showArrivalsHall,750);
+})();
 /* ---------- GANESH AIR statement count-up (real stats, fires when scrolled into view) ---------- */
 function _countUp(el,to,suf,dur){ suf=suf||''; dur=dur||1100; var t0=null,raf=0; function fr(t){ if(t0===null)t0=t; var p=Math.min(1,(t-t0)/dur); var e=1-Math.pow(1-p,3); el.textContent=Math.round(to*e).toLocaleString()+suf; if(p<1)raf=requestAnimationFrame(fr); } raf=requestAnimationFrame(fr); setTimeout(function(){ if(raf)cancelAnimationFrame(raf); el.textContent=to.toLocaleString()+suf; }, dur+500); }
 function initStatement(){
@@ -2795,6 +2846,17 @@ window.initTimeline=function(){};
   </div>
 </div>
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
+
+<!-- ARRIVALS HALL — July 2, the moment she lands: the site holds a sign for her -->
+<div id="arrivalsHall" role="dialog" aria-label="Welcome to Seattle">
+  <div class="ah-sub">✈ ARRIVALS · SEATTLE–TACOMA INTL</div>
+  <div class="ah-row" id="ahRow1"></div>
+  <div class="ah-row ah-name"><span id="ahRow2" class="ah-row" style="display:contents"></span><span class="ah-heart">💜</span></div>
+  <div class="ah-flight">DL 2016 · SLC → SEA · <b>LANDED</b></div>
+  <div class="ah-gate">GATE: NEAL'S ARMS</div>
+  <div class="ah-miles"><span id="ahMiles">700 mi</span> apart</div>
+  <button class="btn primary ah-btn" type="button" onclick="hideArrivalsHall()">let's gooo babu 💜</button>
+</div>
 <div id="complimentOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideCompliment()">
   <div class="egg-hearts" id="compHearts" aria-hidden="true"></div>
   <div class="egg-card cmp-card">
