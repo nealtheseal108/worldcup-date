@@ -712,9 +712,9 @@
         <div class="arrivalpass" id="arrivalPass">
           <div class="ap-head"><span class="ap-air"><span class="ap-mark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 4 L21.5 20 L2.5 20 Z" fill="#fff"/><path d="M12 4 L21.5 20 L12 20 Z" fill="rgba(255,255,255,.6)"/></svg></span>DELTA</span><span class="ap-status">LANDED 💜</span></div>
           <div class="ap-route">
-            <div class="ap-port"><b>SLC</b><span>dep 6:45 PM</span></div>
+            <div class="ap-port"><b>SLC</b><span>dep 8:45 PM</span></div>
             <div class="ap-plane"><i>✈</i></div>
-            <div class="ap-port"><b>SEA</b><span>arr 8:05 PM</span></div>
+            <div class="ap-port"><b>SEA</b><span>arr 10:05 PM</span></div>
           </div>
           <div class="ap-meta">
             <div><span>PASSENGER</span><b>SIDHYA 💜</b></div>
@@ -814,7 +814,7 @@
             </div>
               <div class="tk-summary">
                 <div class="tk-comp" id="tkComp"></div>
-                <div class="tk-steps" id="tkSteps" onclick="showRide(event)"></div>
+                <div class="tk-steps" id="tkSteps"></div>
               </div>
           </div>
           <div class="tk-flapwrap"><div class="tk-ticker"><div class="tk-track" id="tkTicker"></div></div></div>
@@ -1836,7 +1836,7 @@ loadArrival();
 /* EDIT if any are off. metDate is my best guess from the site's "8 months" framing (Nov 6 2025). */
 var US = {
   metDate: new Date('2025-10-25T22:00:00-07:00'), // you two got together: Oct 25 2025, 10 PM PT
-  landing: new Date(2026,6,2,20,5,0),   // Sidhya's arrival: Jul 2, ~8:05 PM PT (est. from 6:45 PM SLC dep) — confirm exact time
+  landing: new Date(2026,6,2,22,5,0),   // Sidhya's arrival: Jul 2, 10:05 PM PT (flight ran 2hr late, originally 8:05 PM)
   home:    {lat:40.7608,lng:-111.8910}, // Salt Lake City
   seattle: {lat:47.6062,lng:-122.3321}
 };
@@ -1968,7 +1968,7 @@ function hideArrivalsHall(){ var o=document.getElementById('arrivalsHall'); if(o
 (function(){
   var force=/[?&]arrive=1/.test(location.search);
   var now=new Date();
-  var inWindow = now>=US.landing && now<new Date(2026,6,4);   // from her 8:05 PM Jul 2 touchdown through July 3 (truthful: only once she's actually landed)
+  var inWindow = now>=US.landing && now<new Date(2026,6,4);   // from her 10:05 PM Jul 2 touchdown through July 3 (truthful: only once she's actually landed)
   var seen=false; try{seen=localStorage.getItem('wc_arrhall')==='1';}catch(e){}
   if(force||(inWindow&&!seen)) setTimeout(showArrivalsHall,750);
 })();
@@ -2763,19 +2763,19 @@ function onMissionPicked(ev){
 /* ---------- HOW WELL DO YOU KNOW US (step13): interactive quiz, every "receipt" is a verbatim line from our real thread ----------
    sourced from a fresh grep of the actual export -- verified sender + date on every real quote before it went in here. */
 var QUIZ=[
-  {q:'the very first thing you ever texted me, word for word, was...', opts:['"Heyy"','"Hi!!"','"omg hii"','"hey you 👋"'], correct:0, receipt:'lol yep. Nov 16 2024, 10:15am, "Heyy" then "Sidhya here" two texts later in case i didn\'t have you saved yet'},
+  {q:'the very first thing you ever texted me was one word. how many letters was it?', opts:['4','2','3','7'], correct:0, receipt:'"heyy," four letters. Nov 16 2024, 10:15am, then "sidhya here" 4 seconds later in case i didn\'t have you saved yet'},
   {q:'what do I actually call you the most, by the numbers?', opts:['sidhu','babu','baabu','bongo'], correct:0, receipt:'ngl sidhu wins by a mile. babu\'s a solid second. "bongo" happened ONE time and i regret nothing'},
   {q:'our single most-texted emoji of all time is...', opts:['😭','❤️','😂','💜'], correct:0, receipt:'😭 lol. over 380 times and still climbing. we are certified criers'},
   {q:'how many times has 😈 shown up in our texts?', opts:['32','5','58','12'], correct:0, receipt:'32. counted it myself. no further comment 😏'},
-  {q:'which of these is a REAL text I sent you, word for word?', opts:['"I love you so much I\'m going to explodeee"','"you make my heart do backflips"','"i love you to infinity and beyond"','"you\'re my whole world fr fr"'], correct:0, receipt:'yep, May 30 2026, word for word. still true every single day'},
+  {q:'finish the real text, word for word: "I love you so much I\'m going to ___"', opts:['explodeee','scream','cry','melt'], correct:0, receipt:'yep, May 30 2026, word for word: "i love you so much i\'m going to explodeee." still true every single day'},
   {q:'and THIS one, which text did I actually send?', opts:['"I want you to rip my clothes off"','"i can\'t wait to hold you all night"','"you\'re the only one for me"','"i think about you 24/7"'], correct:0, r:true, receipt:'that\'s the one. June 3 2026. no notes from me on this one 😏'},
   {q:'now flip it, which text did YOU actually send ME?', opts:['"I wanna give you infinite hickeys"','"you\'re my whole heart"','"i can\'t stop smiling because of you"','"forever isn\'t long enough"'], correct:0, r:true, receipt:'that was you, Jan 24 2026. still collecting on that one 😏💜'},
   {q:'what time did you say yes to being mine?', opts:['10 PM','9 PM','midnight','8 PM'], correct:0, receipt:'10pm, Oct 25 2025. don\'t need a screenshot for this one, i was there 💜'},
-  {q:'which of these compliments did I actually send you, word for word?', opts:['"you are gorgeous"','"you\'re breathtaking"','"you\'re a whole vibe"','"you\'re unreal"'], correct:0, receipt:'yep, Feb 6 2026, said completely out of nowhere. still mean it'},
-  {q:'and this compliment, which one is real?', opts:['"you are stunning"','"you\'re a whole mood"','"you glow different"','"you\'re ethereal"'], correct:0, receipt:'that one\'s real. March 11 2026, sent a 😋 right after for good measure'},
-  {q:'okay a spicier one, which text did I actually send?', opts:['"You\'re so hot"','"you\'re breathtaking tonight"','"you look incredible"','"you\'re a whole snack"'], correct:0, receipt:'lol yes. May 29 2026, then i immediately followed up with "like actually" just in case it wasn\'t clear'},
-  {q:'which nickname did I actually call you, word for word?', opts:['"my sexy girl"','"my whole world"','"my favorite person"','"my entire heart"'], correct:0, receipt:'guilty. May 20 2026, right after you told me i get hotter every day'},
-  {q:'last one of these, which line is REAL?', opts:['"your body is my home"','"you\'re my safe place"','"home is wherever you are"','"you complete me"'], correct:0, receipt:'that\'s real. May 28 2026, and right after i said "i would live in you and hold you forever" too. certified real one 💜'},
+  {q:'finish the real compliment, word for word: "you are ___"', opts:['gorgeous','stunning','perfect','beautiful'], correct:0, receipt:'yep, Feb 6 2026, said completely out of nowhere. still mean it'},
+  {q:'and this one, finish it: "you are ___" (sent a 😋 right after for good measure)', opts:['stunning','gorgeous','perfect','glowing'], correct:0, receipt:'that one\'s real. March 11 2026, sent a 😋 right after for good measure'},
+  {q:'okay a spicier one, finish it: "you\'re so ___" (then I followed up with "like actually" just in case)', opts:['hot','pretty','cute','fine'], correct:0, receipt:'lol yes. May 29 2026, then i immediately followed up with "like actually" just in case it wasn\'t clear'},
+  {q:'finish the nickname, word for word: "my ___ girl"', opts:['sexy','favorite','pretty','perfect'], correct:0, receipt:'guilty. May 20 2026, right after you told me i get hotter every day'},
+  {q:'last one, finish the real line: "your body is my ___"', opts:['home','world','everything','universe'], correct:0, receipt:'that\'s real. May 28 2026, and right after i said "i would live in you and hold you forever" too. certified real one 💜'},
   {q:'okay actually spicy now, which text did I really send out of nowhere?', opts:['"I got so horny at yk thinking of you"','"you\'ve been on my mind all day"','"i can\'t focus because of you"','"i keep thinking about us"'], correct:0, r:true, receipt:'yeah that\'s me. Jan 19 2026, mid conversation about something totally unrelated. no shame 😈'},
   {q:'and one more, which is the real receipt?', opts:['"got so horny thinking on you at 7am"','"woke up thinking about you"','"dreamt about you all night"','"can\'t start my day without you"'], correct:0, r:true, receipt:'that one\'s real, Feb 5 2026, 7:22am. you even Loved it when i sent it, so it\'s extra verified 😏💜'},
   {q:'flip it again, which text did YOU actually send ME?', opts:['"ugh I want you so bad"','"i can\'t wait to see you"','"you\'re all I think about"','"come home to me already"'], correct:0, r:true, receipt:'that was you, June 17 2026. straight up, no lead in, just that 😏'},
@@ -2784,7 +2784,7 @@ var QUIZ=[
   {q:'we did one of those couples "quiz" things once and answered in third person. which two did I name as the either or?', opts:['"missionary or cowgirl"','"cuddling or holding hands"','"movie night or dinner date"','"beach or mountains"'], correct:0, r:true, receipt:'yep, March 17 2026, mid quiz. real answer, verbatim'},
   {q:'in that same quiz, what did I say you loved?', opts:['"missionary"','"slow dancing"','"long drives"','"morning cuddles"'], correct:0, r:true, receipt:'"and she loooves missionary," 3 o\'s and all, March 17 2026, verbatim'},
   {q:'which real text mixes something sweet with something spicy?', opts:['"I feel butterflies when you giggle when you\'re horny and when you ride me slow"','"you make me laugh and you make me weak"','"you\'re cute and you\'re trouble"','"i love your laugh and your everything"'], correct:0, r:true, receipt:'that\'s a real one, May 28 2026. butterflies AND that, in the same text lol'},
-  {q:'which sex position do we actually mention most in our texts?', opts:['missionary','cowgirl','doggy','reverse cowgirl'], correct:0, r:true, receipt:'missionary, by a mile. counted it myself, 9 mentions vs cowgirl\'s 4 and doggy\'s 1'},
+  {q:'which sex position do we actually mention most in our texts?', opts:['riding','missionary','cowgirl','doggy'], correct:0, r:true, receipt:'ngl it\'s riding, not missionary. recounted it properly this time: riding hits 15 ("ride" + "riding", minus the car-ride and "ride or die" texts that obviously don\'t count), missionary\'s at 9, cowgirl\'s at 4, doggy only shows up once'},
   {q:'roughly how many texts have we actually sent each other, all-time?', opts:['over 30,000','about 5,000','under 1,000','around 12,000'], correct:0, receipt:'over 30k and still going. check the number on our boarding pass, it\'s live 👀'},
   {q:'how many "love you"s have actually been sent between us?', opts:['over 700','around 100','just 12','over 5,000'], correct:0, receipt:'700+ and counting. we clearly never get tired of saying it'}
 ];
@@ -3054,9 +3054,6 @@ function spawnEggHearts(id){var h=document.getElementById(id||'eggHearts');if(!h
   h.innerHTML=s;}
 function showEgg(){var o=document.getElementById('eggOverlay');if(!o)return;spawnEggHearts();o.style.display='flex';}
 function hideEgg(){var o=document.getElementById('eggOverlay');if(o)o.style.display='none';}
-/* tap the TRAIN RIDES header -> cheeky overlay (kept off the pass face so the shared image stays clean) */
-function showRide(ev){ if(ev){ev.stopPropagation();} var o=document.getElementById('rideOverlay'); if(o)o.style.display='flex'; }
-function hideRide(){ var o=document.getElementById('rideOverlay'); if(o)o.style.display='none'; }
 /* tap a boarding-pass barcode -> reveal the real compliments you two traded (his line + her matching line back) */
 var BP_PAIRS = [
   {n:{t:"you're so hot", d:"Jun 4, 2026"}, s:{t:"you're my best friend and you're so hot???", d:"Jun 3, 2026"}},
@@ -3510,15 +3507,6 @@ window.initTimeline=function(){};
   </div>
 </div>
 
-<div id="rideOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideRide()">
-  <div class="egg-card">
-    <div class="egg-emoji">😏</div>
-    <h2 class="egg-h">the train's not the only ride</h2>
-    <p class="egg-msg">you can ride something else 💜</p>
-    <div class="egg-sig">🚆 all aboard, neal</div>
-    <button class="btn primary" type="button" onclick="hideRide()">okok, back to the pass ✨</button>
-  </div>
-</div>
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
 
 <!-- ARRIVALS HALL — July 2, the moment she lands: the site holds a sign for her -->
@@ -3526,7 +3514,7 @@ window.initTimeline=function(){};
   <div class="ah-sub">✈ ARRIVALS · SEATTLE–TACOMA INTL</div>
   <div class="ah-row" id="ahRow1"></div>
   <div class="ah-row ah-name"><span id="ahRow2" class="ah-row" style="display:contents"></span><span class="ah-heart">💜</span></div>
-  <div class="ah-flight">DL 2016 · SLC → SEA · <b>LANDED</b></div>
+  <div class="ah-flight">DL 2016 · SLC → SEA · <b>LANDED</b><br><span style="font-size:10px;opacity:.75">2 hrs late, worth every minute 💜</span></div>
   <div class="ah-gate">GATE: NEAL'S ARMS</div>
   <div class="ah-miles"><span id="ahMiles">700 mi</span> apart</div>
   <button class="btn primary ah-btn" type="button" onclick="hideArrivalsHall()">let's gooo babu 💜</button>
