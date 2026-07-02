@@ -519,6 +519,26 @@
   .bc-team.lose{color:var(--muted)}
   .bc-team .bc-sc{color:var(--lav);font-weight:700;flex:none}
   .bc-meta{font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:.4px;text-transform:uppercase}
+  /* babu bingo (step9) */
+  .bingo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  .bingo-sq{position:relative;border:1.5px solid var(--line);background:#fff;border-radius:11px;aspect-ratio:1;padding:5px 4px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;line-height:1.25;color:#3a2a63;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;box-shadow:0 3px 9px rgba(53,28,94,.09);transition:transform .12s}
+  .bingo-sq:active{transform:scale(.94)}
+  .bingo-sq .bs-stamp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;opacity:0;transform:scale(2.2) rotate(-24deg);pointer-events:none;transition:opacity .18s,transform .22s cubic-bezier(.2,.9,.3,1.4)}
+  .bingo-sq.on{border-color:var(--lav);background:#f3ecfe}
+  .bingo-sq.on span:first-child{opacity:.38}
+  .bingo-sq.on .bs-stamp{opacity:.92;transform:scale(1) rotate(-14deg)}
+  .bingo-stat{font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;color:var(--muted);text-align:center;margin-top:11px}
+  .bingo-stat b{color:var(--lav)}
+  /* halftime question deck (step10) */
+  .q-progress{height:5px;background:#e9e1f8;border-radius:4px;overflow:hidden;margin:2px 0 6px}
+  .q-bar{display:block;height:100%;width:7%;background:linear-gradient(90deg,var(--lav),var(--lav2));border-radius:4px;transition:width .25s ease}
+  .q-num{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:1.6px;color:var(--lav);font-weight:700;text-align:center;margin-bottom:9px}
+  .q-deck{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 2px 14px;scrollbar-width:none}
+  .q-deck::-webkit-scrollbar{display:none}
+  .q-card{flex:none;width:85%;scroll-snap-align:center;background:linear-gradient(155deg,#fff,#f6f0ff);border:1px solid var(--line);border-radius:17px;box-shadow:0 10px 26px rgba(53,28,94,.14);padding:26px 20px;min-height:230px;display:flex;flex-direction:column;justify-content:center;text-align:center}
+  .q-card .q-tag{font-family:'Courier Prime',ui-monospace,monospace;font-size:9px;letter-spacing:1.8px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:13px}
+  .q-card .q-text{font-family:'Inter',system-ui,sans-serif;font-size:19px;font-weight:800;line-height:1.35;color:var(--ink);letter-spacing:-.01em}
+  .q-hint{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;color:var(--muted);text-align:center}
   #playerbar{position:fixed;left:0;right:0;bottom:calc(var(--tick) + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:9px 16px;background:#160e2b;
     border-top:1px solid rgba(167,139,250,.32);box-shadow:0 -6px 26px rgba(18,8,38,.45);color:#fff;
@@ -772,6 +792,10 @@
       </div>
 
       <button class="btn primary trk-cta" type="button" onclick="openTracker()">📸 our live date tracker<span>photos, the score & where we're at, live 💜</span></button>
+      <div class="album-add-row" style="margin:-8px 0 18px">
+        <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
+        <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime Qs</button>
+      </div>
 
       <!-- the date diary lives at the end now, locked until ~9:30 PM -->
       <div class="sectlabel">Step 1 · two routes that cross 🚆</div>
@@ -902,6 +926,10 @@
       <div class="trk-actions">
         <button class="btn lav2btn" type="button" onclick="go(5)">🎬 date diary &amp; movie</button>
       </div>
+      <div class="album-add-row" style="margin-top:10px">
+        <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
+        <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime Qs</button>
+      </div>
       <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
     </section>
 
@@ -911,6 +939,31 @@
       <div class="album-add-row" style="margin-bottom:10px"><button class="btn lav2btn" type="button" onclick="loadBracket(true)">↻ refresh scores</button></div>
       <div class="bracket-scroll"><div class="bracket" id="bracketCols"><div class="album-empty">loading the bracket…</div></div></div>
       <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+    </section>
+
+    <!-- STEP 9 — BABU BINGO (offline in-flight match bingo) -->
+    <section class="step" id="step9">
+      <div class="iti-head" style="margin-top:2px"><div class="big">🎲💜</div><h2 style="font-size:24px">babu bingo</h2><div class="venue">match stuff + us stuff · first to a row wins a kiss</div></div>
+      <div class="bingo-grid" id="bingoGrid"></div>
+      <div class="bingo-stat" id="bingoStat"></div>
+      <div class="album-add-row" style="margin-top:12px">
+        <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime questions</button>
+        <button class="btn ghost" type="button" onclick="resetBingo()">↺ new card</button>
+      </div>
+      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+    </section>
+
+    <!-- STEP 10 — ROW 25, SEATS A & B (halftime question deck) -->
+    <section class="step" id="step10">
+      <div class="iti-head" style="margin-top:2px"><div class="big">🪑💜</div><h2 style="font-size:24px">row 25, seats A &amp; B</h2><div class="venue">seatback entertainment for exactly one halftime</div></div>
+      <div class="q-progress"><span class="q-bar" id="qBar"></span></div>
+      <div class="q-num" id="qNum">Q 1 / 15</div>
+      <div class="q-deck" id="qDeck"></div>
+      <div class="q-hint">swipe → · one each, no skipping babu 💜</div>
+      <div class="album-add-row" style="margin-top:12px">
+        <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
+      </div>
+      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
     </section>
 
   </div>
@@ -2448,6 +2501,64 @@ function updateTracker(){
   var info=document.getElementById('trkMatchInfo');
   if(info){ var g=_ourMatch(); if(g){ info.innerHTML=(g.state==='in'?'🔴 LIVE · ':'')+((g.state!=='pre')?(_esc7(g.h)+' '+_esc7(g.hs)+' - '+_esc7(g.as)+' '+_esc7(g.a)+' · '):'')+_esc7(g.detail); } else { info.textContent='Round of 16 · Kickoff 5:00 PM'; } }
 }
+
+/* ---------- BABU BINGO (step9): offline, localStorage, confetti on a new line ---------- */
+var BINGO_POOL=[
+  'GOOOAL ⚽','yellow card 🟨','VAR check 📺','corner kick 🚩','keeper save 🧤','offside flag 🚫','free kick ☄️','sub comes on 🔁','crowd does the wave 🌊','header on target 🎯',
+  'someone says "babu" 💜','she calls him hot 🔥','purple thing spotted 💜','dance to stadium music 💃','share a snack 🍕','kiss on a goal 😚','hold hands a whole attack 🤝','selfie with the pitch 🤳','jersey compliment 👕','explain offside wrong on purpose 😤'
+];
+function _bingoRnd(seed){ var s=(seed>>>0)||1; return function(){ s=(s*1103515245+12345)&0x7fffffff; return s/0x7fffffff; }; }
+function _bingoSeed(){ var s=null; try{s=localStorage.getItem('wc_bingo_seed');}catch(e){} if(!s){ s=String((Date.now()%997)*7919+13); try{localStorage.setItem('wc_bingo_seed',s);}catch(e){} } return +s; }
+function _bingoCells(){ var rnd=_bingoRnd(_bingoSeed()), a=BINGO_POOL.slice(); for(var i=a.length-1;i>0;i--){ var j=(rnd()*(i+1))|0, t=a[i]; a[i]=a[j]; a[j]=t; } return a.slice(0,16); }
+function _bingoOn(){ try{return JSON.parse(localStorage.getItem('wc_bingo')||'[]');}catch(e){return [];} }
+function _bingoLines(on){ var L=[[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]]; return L.filter(function(l){ return l.every(function(i){return on.indexOf(i)>=0;}); }).length; }
+function renderBingo(){
+  var g=document.getElementById('bingoGrid'); if(!g)return;
+  var cells=_bingoCells(), on=_bingoOn();
+  g.innerHTML=cells.map(function(c,i){ return '<button type="button" class="bingo-sq'+(on.indexOf(i)>=0?' on':'')+'" onclick="tapBingo('+i+')"><span>'+c+'</span><span class="bs-stamp">💜</span></button>'; }).join('');
+  var lines=_bingoLines(on), st=document.getElementById('bingoStat');
+  if(st)st.innerHTML=on.length+'/16 stamped · <b>'+lines+' bingo'+(lines===1?'':'s')+'</b>'+(lines>0?' · that\'s '+lines+' kiss'+(lines===1?'':'es')+' owed 😚':'');
+}
+function tapBingo(i){
+  var on=_bingoOn(), was=_bingoLines(on), k=on.indexOf(i);
+  if(k>=0)on.splice(k,1); else on.push(i);
+  try{localStorage.setItem('wc_bingo',JSON.stringify(on));}catch(e){}
+  if(window.buzz)buzz(12);
+  renderBingo();
+  var now=_bingoLines(on);
+  if(now>was){ if(window.burstConfetti)burstConfetti(document.getElementById('bingoGrid'),{emojis:['💜','⚽','✨'],count:24}); if(window.buzz)buzz(40); hint('BINGO babu!! 💜 collect your kiss'); }
+}
+function resetBingo(){ try{localStorage.removeItem('wc_bingo');localStorage.removeItem('wc_bingo_seed');}catch(e){} renderBingo(); hint('fresh card dealt 🎲💜'); }
+
+/* ---------- ROW 25 halftime question deck (step10): static, offline, scroll-snap ---------- */
+var Q_DECK=[
+  'window seat or aisle? defend your answer.',
+  'first thing you noticed about me. be honest 😏',
+  'what did you ACTUALLY think the night of Oct 25?',
+  'if we could teleport anywhere for the next 24 hours, where are we?',
+  "what's your favorite text i've ever sent you?",
+  'which of us cries first at the final whistle?',
+  'describe our Disneyland day in 2036. every detail, babu.',
+  'where are WE during the next World Cup (2030)?',
+  'one thing i do that makes you feel the most loved?',
+  'if our story was a movie, what is its title?',
+  "something you've never told me you want us to try together?",
+  'who fell first? (there is a correct answer)',
+  'invent our own stadium chant. right now. out loud.',
+  'one word for how today feels so far.',
+  'no question. just look at me for ten whole seconds. 💜'
+];
+function renderQDeck(){
+  var d=document.getElementById('qDeck'); if(!d||d.children.length)return;
+  d.innerHTML=Q_DECK.map(function(q,i){ return '<div class="q-card"><div class="q-tag">GANESH AIR · SEATBACK CARD '+(i+1)+' OF '+Q_DECK.length+'</div><div class="q-text">'+q+'</div></div>'; }).join('');
+  var bar=document.getElementById('qBar'), num=document.getElementById('qNum'), tick=false;
+  d.addEventListener('scroll',function(){ if(tick)return; tick=true; requestAnimationFrame(function(){ tick=false;
+    var i=Math.min(Q_DECK.length-1,Math.max(0,Math.round(d.scrollLeft/(d.scrollWidth/Q_DECK.length))));
+    if(num)num.textContent='Q '+(i+1)+' / '+Q_DECK.length;
+    if(bar)bar.style.width=(((i+1)/Q_DECK.length)*100)+'%';
+  }); },{passive:true});
+}
+renderBingo(); renderQDeck();
 function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
 function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
