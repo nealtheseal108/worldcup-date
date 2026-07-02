@@ -520,8 +520,8 @@
   .bracket-lines path.ours-line{stroke:var(--lav);stroke-width:2.4}
   .bracket-col{flex:none;width:148px;display:flex;flex-direction:column;position:relative;z-index:1}
   .bracket-col-h{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--lav);font-weight:700;text-align:center;margin-bottom:9px;padding-bottom:6px;border-bottom:2px solid var(--line)}
-  .bracket-col-cells{flex:1;display:flex;flex-direction:column;justify-content:center;gap:9px}   /* fewer cells each round -> centers vertically, converging toward the middle instead of hugging the top */
-  .bracket-cell{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;box-shadow:0 3px 10px rgba(53,28,94,.09);font-family:'Courier Prime',ui-monospace,monospace;font-size:12.5px;transition:border-color .15s,transform .12s}
+  .bracket-col-cells{position:relative}   /* each .bracket-cell inside is absolutely positioned by _layoutBracketCells() at the real midpoint of its two feeders -- NOT flex centering, which only centers the group and ignores which cell actually feeds which */
+  .bracket-cell{position:absolute;left:0;right:0;box-sizing:border-box;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;box-shadow:0 3px 10px rgba(53,28,94,.09);font-family:'Courier Prime',ui-monospace,monospace;font-size:12.5px;transition:top .4s cubic-bezier(.22,.8,.25,1),border-color .15s,transform .12s}
   .bracket-cell:hover{border-color:var(--lav);transform:translateY(-1px)}
   .bracket-cell.ours{border:2px solid var(--lav);box-shadow:0 5px 16px rgba(124,77,202,.28)}
   .bc-team .bc-pct{color:var(--muted);font-weight:600;flex:none;font-size:11px}
@@ -529,7 +529,9 @@
   .bc-team{display:flex;justify-content:space-between;gap:8px;padding:2px 0;color:#3a2a63}
   .bc-team.win{font-weight:700}
   .bc-team.lose{color:var(--muted)}
+  .bc-team.bc-pending{color:var(--muted);font-style:italic}
   .bc-team .bc-sc{color:var(--lav);font-weight:700;flex:none}
+  .bc-tbd{letter-spacing:.6px}
   .bc-meta{font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:.4px;text-transform:uppercase}
   /* babu bingo (step9) */
   .bingo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
@@ -830,10 +832,11 @@
         <div class="stmt-rows">
           <div class="stmt-row"><span class="stmt-n" data-days="1" data-to="242">0</span><span class="stmt-l">days together, and counting 💜</span></div>
           <div class="stmt-row"><span class="stmt-n" data-to="700" data-suf=" mi">0</span><span class="stmt-l">you crossed to be here ✈</span></div>
-          <div class="stmt-row"><span class="stmt-n" data-to="32560">0</span><span class="stmt-l">texts, all-time 📱</span></div>
+          <div class="stmt-row"><span class="stmt-n" data-to="33975">0</span><span class="stmt-l">texts, all-time 📱</span></div>
           <div class="stmt-row"><span class="stmt-n" data-to="4441">0</span><span class="stmt-l">texts in June alone 🔥</span></div>
-          <div class="stmt-row"><span class="stmt-n" data-to="987">0</span><span class="stmt-l">"i love you"s sent 💌</span></div>
+          <div class="stmt-row"><span class="stmt-n" data-to="702">0</span><span class="stmt-l">"love you"s sent 💌</span></div>
           <div class="stmt-row"><span class="stmt-emoji">😭</span><span class="stmt-l">our most-texted emoji (382×, lol)</span></div>
+          <div class="stmt-row"><span class="stmt-emoji">😈</span><span class="stmt-l">devil horns sent (32×, no comment 😏)</span></div>
         </div>
         <div class="stmt-foot">STATUS: BOARDING · destination — every round after 💜</div>
       </div>
@@ -2214,7 +2217,7 @@ async function saveGif(){
 }
 
 /* ---------- background music: looping playlist with fade transitions ----------
-   Shotput -> Flight's Booked -> Link Up -> Passionfruit(@1:12) -> Heat Waves(8D) -> Babydoll -> Kiss Me More -> Ay No Puedo -> No One Noticed -> loop  */
+   Shotput -> Flight's Booked -> Link Up -> Passionfruit(@1:12) -> Heat Waves(8D) -> Babydoll -> Kiss Me More -> Ay No Puedo -> No One Noticed -> tv off -> loop  */
 var MUSIC=[
   {id:'K4Fk9Clc12w', title:'Shotput (slowed + reverb)', artist:'Still Woozy'},
   {id:'hb24kZ0fiEA', title:"Flight's Booked", artist:'Drake', start:55},
@@ -2224,7 +2227,8 @@ var MUSIC=[
   {id:'l8KS5HiMXn4', title:'Babydoll (slowed + reverb)', artist:'Dominic Fike'},
   {id:'ISsxv6i9f_k', title:'Kiss Me More (slowed + reverb)', artist:'Doja Cat & SZA'},
   {id:'y9NPx6NDA6M', title:'Ay No Puedo', artist:'The Marías'},
-  {id:'_9hkXCYiEjc', title:'No One Noticed', artist:'The Marías'}
+  {id:'_9hkXCYiEjc', title:'No One Noticed', artist:'The Marías'},
+  {id:'U8F5G5wR1mk', title:'tv off', artist:'Kendrick Lamar'}
 ];
 /* ---------- add-a-song: paste a YouTube link to drop a track into the playlist ---------- */
 function parseYouTubeId(u){
@@ -2609,7 +2613,7 @@ function updateTracker(){
 
 /* ---------- BABU BINGO (step9): offline, localStorage, confetti on a new line ---------- */
 var BINGO_POOL=[
-  'GOOOAL ⚽','yellow card 🟨','VAR check 📺','corner kick 🚩','keeper save 🧤','offside flag 🚫','free kick ☄️','sub comes on 🔁','crowd does the wave 🌊','header on target 🎯',
+  'yell GOOOAL louder than everyone around us ⚽','argue a yellow card was way too harsh 🟨','give dramatic slow-mo commentary on a VAR check 📺','celebrate a corner kick like it\'s a goal 🚩','give the keeper a standing ovation for a save 🧤','call the free kick result before it happens 🔮','guess the next substitution before it\'s made 🔁','reenact a header in extreme slow motion 🎯',
   'someone says "babu" 💜','she calls him hot 🔥','purple thing spotted 💜','dance to the watch party music 💃','share a snack 🍕','kiss on a goal 😚','hold hands a whole attack 🤝','selfie with the big screen 🤳','jersey compliment 👕','explain offside wrong on purpose 😤',
   'start the wave and get it all the way around 🌊','trade jerseys with a stranger for a photo 👕','get 3 total strangers to high five you ✋','teach a stranger the chant 🎤','convince a stranger we\'re soccer influencers 😏',
   'full goal celebration even if we don\'t score 🕺','get featured in a stranger\'s Instagram story 📸','start a chant that actually catches on 📣','recreate our first photo together, right here 📸','slow dance during a stoppage in play, no matter how dumb it looks 💃',
@@ -2972,6 +2976,7 @@ if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function
 
 /* ---------- World Cup round labels + custom bracket page (step8) ---------- */
 var ROUND_LBL={'group-stage':['GRP','Group Stage'],'round-of-32':['R32','Round of 32'],'round-of-16':['R16','Round of 16'],'quarterfinals':['QF','Quarters'],'semifinals':['SF','Semis'],'3rd-place-match':['3RD','3rd Place'],'final':['FIN','Final']};
+var TEAM_FLAG={USA:'🇺🇸',CAN:'🇨🇦',MEX:'🇲🇽',BRA:'🇧🇷',ARG:'🇦🇷',FRA:'🇫🇷',GER:'🇩🇪',ESP:'🇪🇸',POR:'🇵🇹',NED:'🇳🇱',BEL:'🇧🇪',ENG:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',CRO:'🇭🇷',SUI:'🇨🇭',AUT:'🇦🇹',SWE:'🇸🇪',NOR:'🇳🇴',POL:'🇵🇱',DEN:'🇩🇰',ITA:'🇮🇹',IRL:'🇮🇪',UKR:'🇺🇦',SRB:'🇷🇸',TUR:'🇹🇷',ROU:'🇷🇴',HUN:'🇭🇺',CZE:'🇨🇿',SVK:'🇸🇰',SVN:'🇸🇮',JPN:'🇯🇵',KOR:'🇰🇷',AUS:'🇦🇺',IRN:'🇮🇷',KSA:'🇸🇦',QAT:'🇶🇦',UZB:'🇺🇿',JOR:'🇯🇴',IRQ:'🇮🇶',NZL:'🇳🇿',RSA:'🇿🇦',MAR:'🇲🇦',SEN:'🇸🇳',CIV:'🇨🇮',COD:'🇨🇩',EGY:'🇪🇬',ALG:'🇩🇿',TUN:'🇹🇳',GHA:'🇬🇭',CMR:'🇨🇲',CPV:'🇨🇻',COL:'🇨🇴',ECU:'🇪🇨',URU:'🇺🇾',CHI:'🇨🇱',PER:'🇵🇪',PAR:'🇵🇾',BOL:'🇧🇴',VEN:'🇻🇪',PAN:'🇵🇦',CRC:'🇨🇷',JAM:'🇯🇲',HAI:'🇭🇹',CUW:'🇨🇼',BIH:'🇧🇦'};
 function roundShort(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][0])||(sl?sl.replace(/[^a-z0-9]/gi,'').slice(0,3).toUpperCase():''); }
 function roundLong(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][1])||(sl?sl.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}):''); }
 function _escB(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -3038,7 +3043,13 @@ function _loadBracketProbs(evs){
       var pc=(j&&j.pickcenter&&j.pickcenter[0])||null;
       var ph=pc&&_mlProb(pc.homeTeamOdds&&pc.homeTeamOdds.moneyLine), pa=pc&&_mlProb(pc.awayTeamOdds&&pc.awayTeamOdds.moneyLine), pd=pc&&_mlProb(pc.drawOdds&&pc.drawOdds.moneyLine);
       var p=null;
-      if(ph!=null&&pa!=null&&pd!=null){ var tot=ph+pa+pd; if(tot>0) p={h:ph/tot,a:pa/tot,d:pd/tot}; }   // normalize away the bookmaker's vig
+      if(ph!=null&&pa!=null&&pd!=null){
+        var tot=ph+pa+pd;
+        if(tot>0){
+          var nh=ph/tot, na=pa/tot, nd=pd/tot, denom=nh+na;   // this is a KNOCKOUT match -- a draw isn't a real outcome, it just means extra time/penalties, so split the draw's share between the two teams (proportional to their regulation-win odds) to get a genuine two-way chance to ADVANCE
+          p={h:nh+nd*(denom>0?nh/denom:0.5), a:na+nd*(denom>0?na/denom:0.5)};
+        }
+      }
       _probCache[g.id]={at:reqAt,p:p}; _applyProb(box,g,p);   // stamp with the REQUEST time, not resolution time, so staleness can't be masked
     }).catch(function(){});
   });
@@ -3046,14 +3057,52 @@ function _loadBracketProbs(evs){
 function _applyProb(box,g,p){
   if(!p) return;
   var cell=box.querySelector('.bracket-cell[data-id="'+g.id+'"]'); if(!cell) return;
-  var rows=cell.querySelectorAll('.bc-team'), pcts=cell.querySelectorAll('.bc-pct'), meta=cell.querySelector('.bc-meta');
-  if(pcts[0])pcts[0].textContent=Math.round(p.h*100)+'%';
-  if(pcts[1])pcts[1].textContent=Math.round(p.a*100)+'%';
+  var rows=cell.querySelectorAll('.bc-team'), pcts=cell.querySelectorAll('.bc-pct');
+  var hPct=Math.round(p.h*100);   // derive the other side as the complement so the two displayed %s always sum to exactly 100, never 99/101 on a half-percent rounding boundary
+  if(pcts[0])pcts[0].textContent=hPct+'%';
+  if(pcts[1])pcts[1].textContent=(100-hPct)+'%';
   if(rows[0])rows[0].classList.toggle('fav',p.h>=p.a);
   if(rows[1])rows[1].classList.toggle('fav',p.a>p.h);
-  if(meta)meta.textContent=Math.round(p.d*100)+'% draw · odds';
 }
 var _bracketLinks=[], _bracketBox=null;
+function _layoutBracketCells(){
+  // Position each cell at the REAL midpoint of its two specific feeders (recursively, from round-of-32 up), instead of
+  // CSS group-centering -- which only centers the column as a whole and has no idea which cell feeds which, producing
+  // connector lines that wander far from a cell's actual feeders (verified: was drawing a line from y=65 to y=403 for
+  // a pair whose real feeders sit at y=65 and y=147).
+  var box=_bracketBox; if(!box) return;
+  var cols=Array.prototype.slice.call(box.querySelectorAll('.bracket-col')); if(!cols.length) return;
+  var byRoundEl={}; cols.forEach(function(c){ byRoundEl[c.getAttribute('data-round')]=c; });
+  var order=['round-of-32','round-of-16','quarterfinals','semifinals','final','3rd-place-match'];
+  var present=order.filter(function(sl){return !!byRoundEl[sl];}); if(!present.length) return;
+  var GAP=9, baseRound=present[0];
+  var baseCellsEl=byRoundEl[baseRound].querySelectorAll('.bracket-cell'); if(!baseCellsEl.length) return;
+  var baseH=baseCellsEl[0].getBoundingClientRect().height || 78;
+  var n0=baseCellsEl.length, totalH=n0*baseH+(n0-1)*GAP;
+  var centers={}; centers[baseRound]=[]; for(var i=0;i<n0;i++)centers[baseRound].push(i*(baseH+GAP)+baseH/2);
+  present.forEach(function(sl){
+    if(sl===baseRound)return;
+    var prevSl=PREV_ROUND[sl], prevCenters=centers[prevSl]||[];
+    var nCells=byRoundEl[sl].querySelectorAll('.bracket-cell').length, c=[];
+    for(var i=0;i<nCells;i++){
+      var a=prevCenters[2*i], b=prevCenters[2*i+1];
+      if(a!=null&&b!=null)c.push((a+b)/2);
+      else if(a!=null)c.push(a);
+      else c.push(i*(baseH+GAP)+baseH/2);   // fallback, shouldn't normally hit given every round has a full feeder set
+    }
+    centers[sl]=c;
+  });
+  present.forEach(function(sl){
+    var wrap=byRoundEl[sl].querySelector('.bracket-col-cells'); if(!wrap)return;
+    wrap.style.height=totalH+'px';
+    var cellsEl=wrap.querySelectorAll('.bracket-cell'), c=centers[sl]||[];
+    var ownH=(cellsEl[0]&&cellsEl[0].getBoundingClientRect().height)||baseH;
+    cellsEl.forEach(function(cellEl,i){
+      var top=(c[i]!=null?c[i]:i*(baseH+GAP)+baseH/2)-ownH/2;
+      cellEl.style.top=top+'px';
+    });
+  });
+}
 function _drawBracketLines(){
   var box=_bracketBox; if(!box)return;
   var svg=box.querySelector('.bracket-lines'); if(!svg)return;
@@ -3111,7 +3160,7 @@ function _applyZoom(){
     box.style.transform='scale('+scale.toFixed(3)+')';
   },30);
 }
-if(typeof window!=='undefined')window.addEventListener('resize',function(){ var s=document.getElementById('step8'); if(s&&s.classList.contains('active')){_drawBracketLines();_applyZoom();} });
+if(typeof window!=='undefined')window.addEventListener('resize',function(){ var s=document.getElementById('step8'); if(s&&s.classList.contains('active')){_layoutBracketCells();_drawBracketLines();_applyZoom();} });
 function renderBracket(evs){
   var box=document.getElementById('bracketCols'); if(!box)return;
   var order=['round-of-32','round-of-16','quarterfinals','semifinals','final','3rd-place-match'];
@@ -3133,15 +3182,20 @@ function renderBracket(evs){
       }
       var ours = our.length===2 && our[0].indexOf('/')<0 && our[1].indexOf('/')<0 && [g.h,g.a].indexOf(our[0])>=0 && [g.h,g.a].indexOf(our[1])>=0;
       var scored=g.state!=='pre';
-      function row(ab,sc,win){ return '<div class="bc-team '+(scored?(win?'win':'lose'):'')+'"><span>'+_escB(ab||'TBD')+'</span>'+(scored?'<span class="bc-sc">'+_escB(sc)+'</span>':'<span class="bc-pct"></span>')+'</div>'; }
-      return '<div class="bracket-cell'+(ours?' ours':'')+'" data-slot="'+sl+':'+i+'" data-id="'+_escB(g.id)+'" data-href="'+_escB(g.href)+'" role="button" title="open on ESPN">'+row(g.h,g.hs,g.hw)+row(g.a,g.as,g.aw)+'<div class="bc-meta">'+(g.state==='in'?'🔴 ':'')+_escB(g.detail||'vs')+'</div></div>';
+      function row(ab,sc,win,sdn){
+        var tbd=_isSlotPlaceholder(sdn);
+        var label=tbd ? '<span class="bc-tbd">TBD</span>' : (TEAM_FLAG[ab]?TEAM_FLAG[ab]+' ':'')+_escB(ab||'TBD');
+        return '<div class="bc-team '+(scored?(win?'win':'lose'):'')+(tbd?' bc-pending':'')+'"><span>'+label+'</span>'+(scored?'<span class="bc-sc">'+_escB(sc)+'</span>':(tbd?'':'<span class="bc-pct"></span>'))+'</div>';
+      }
+      return '<div class="bracket-cell'+(ours?' ours':'')+'" data-slot="'+sl+':'+i+'" data-id="'+_escB(g.id)+'" data-href="'+_escB(g.href)+'" role="button" title="open on ESPN">'+row(g.h,g.hs,g.hw,g.hsdn)+row(g.a,g.as,g.aw,g.asdn)+'<div class="bc-meta">'+(g.state==='in'?'🔴 ':'')+_escB(g.detail||'vs')+'</div></div>';
     }).join('');
     return '<div class="bracket-col" data-round="'+sl+'"><div class="bracket-col-h">'+_escB(roundLong(sl))+'</div><div class="bracket-col-cells">'+cells+'</div></div>';
   }).join('');
   box.style.transform='none';   // always rebuild the connectors in natural (unscaled) coordinates; any active zoom is reapplied below
   box.innerHTML = html ? ('<svg class="bracket-lines"></svg>'+html) : '<div class="album-empty">bracket coming soon 💜</div>';
   _bracketLinks=links; _bracketBox=box; _bracketPresent=present;
-  if(html){ requestAnimationFrame(_drawBracketLines); setTimeout(_drawBracketLines,150); setTimeout(_drawBracketLines,500); setTimeout(_applyZoom,520); }   // fonts/layout settle, same pattern as fitTicketScale
+  function _settleBracket(){ _layoutBracketCells(); _drawBracketLines(); }
+  if(html){ requestAnimationFrame(_settleBracket); setTimeout(_settleBracket,150); setTimeout(_settleBracket,500); setTimeout(_applyZoom,520); }   // fonts/layout settle, same pattern as fitTicketScale
   else { _applyZoom(); }
   _loadBracketProbs(evs);
 }
