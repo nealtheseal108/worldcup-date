@@ -2610,7 +2610,12 @@ function updateTracker(){
 /* ---------- BABU BINGO (step9): offline, localStorage, confetti on a new line ---------- */
 var BINGO_POOL=[
   'GOOOAL ⚽','yellow card 🟨','VAR check 📺','corner kick 🚩','keeper save 🧤','offside flag 🚫','free kick ☄️','sub comes on 🔁','crowd does the wave 🌊','header on target 🎯',
-  'someone says "babu" 💜','she calls him hot 🔥','purple thing spotted 💜','dance to stadium music 💃','share a snack 🍕','kiss on a goal 😚','hold hands a whole attack 🤝','selfie with the pitch 🤳','jersey compliment 👕','explain offside wrong on purpose 😤'
+  'someone says "babu" 💜','she calls him hot 🔥','purple thing spotted 💜','dance to stadium music 💃','share a snack 🍕','kiss on a goal 😚','hold hands a whole attack 🤝','selfie with the pitch 🤳','jersey compliment 👕','explain offside wrong on purpose 😤',
+  'start the wave and get it all the way around 🌊','trade jerseys with a stranger for a photo 👕','get 3 total strangers to high five you ✋','teach a stranger the chant 🎤','convince someone we\'re on the broadcast 📺',
+  'full goal celebration even if we don\'t score 🕺','get on the jumbotron 📸','start a chant that actually catches on 📣','recreate our first photo together, right here 📸','slow dance during a stoppage in play, no matter how dumb it looks 💃',
+  'give a genuine compliment to a total stranger 💜','record a 10-second message to future us 🎥','get a stranger to guess how long we\'ve been together 🤔','staring contest, loser buys the next snack 😂','write our score prediction, hand it to a stranger to hold 📝',
+  'find the most extra fan in the crowd and copy their energy 🔥','get a photo with someone in the opposing jersey 🤝','cheesy couple pose, full effort, no laughing 📷','whisper something that actually makes her blush 😳','let her make every call for the next 20 minutes, no vetoes 💜',
+  'trade seats with a stranger for a few minutes, just because 🔀','get a stranger to teach us a word in their language 🗣️','ask a stranger who they think wins it all this year 🏆','get a stranger to rate our couple energy out of 10 💯'
 ];
 function _bingoRnd(seed){ var s=(seed>>>0)||1; return function(){ s=(s*1103515245+12345)&0x7fffffff; return s/0x7fffffff; }; }
 function _bingoSeed(){ var s=null; try{s=localStorage.getItem('wc_bingo_seed');}catch(e){} if(!s){ s=String((Date.now()%997)*7919+13); try{localStorage.setItem('wc_bingo_seed',s);}catch(e){} } return +s; }
