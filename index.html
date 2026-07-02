@@ -2989,18 +2989,20 @@ function _findSrcIdx(ab,sdn,prevGames){   // which game (index) in the previous 
   return null;
 }
 function _mlProb(ml){ ml=Number(ml); return isFinite(ml)&&ml!==0 ? (ml<0?(-ml)/(-ml+100):100/(ml+100)) : null; }
-var _probCache={};
+var _probCache={}, _probReqTok={};
 function _loadBracketProbs(evs){
   var box=document.getElementById('bracketCols'); if(!box)return;
   evs.filter(function(g){ return g.state==='pre' && g.id && !_isSlotPlaceholder(g.hsdn) && !_isSlotPlaceholder(g.asdn); }).forEach(function(g){
     var c=_probCache[g.id];
     if(c && Date.now()-c.at<300000){ _applyProb(box,g,c.p); return; }
+    var reqAt=Date.now(), tok=(_probReqTok[g.id]||0)+1; _probReqTok[g.id]=tok;   // request-generation guard: an older, slower-resolving fetch must not clobber a newer one
     fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event='+encodeURIComponent(g.id),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+      if(_probReqTok[g.id]!==tok) return;   // a newer request for this same match already superseded this one
       var pc=(j&&j.pickcenter&&j.pickcenter[0])||null;
       var ph=pc&&_mlProb(pc.homeTeamOdds&&pc.homeTeamOdds.moneyLine), pa=pc&&_mlProb(pc.awayTeamOdds&&pc.awayTeamOdds.moneyLine), pd=pc&&_mlProb(pc.drawOdds&&pc.drawOdds.moneyLine);
       var p=null;
       if(ph!=null&&pa!=null&&pd!=null){ var tot=ph+pa+pd; if(tot>0) p={h:ph/tot,a:pa/tot,d:pd/tot}; }   // normalize away the bookmaker's vig
-      _probCache[g.id]={at:Date.now(),p:p}; _applyProb(box,g,p);
+      _probCache[g.id]={at:reqAt,p:p}; _applyProb(box,g,p);   // stamp with the REQUEST time, not resolution time, so staleness can't be masked
     }).catch(function(){});
   });
 }
@@ -3026,7 +3028,7 @@ function _drawBracketLines(){
     if(!fromEl||!toEl)return;
     var fr=fromEl.getBoundingClientRect(), tr=toEl.getBoundingClientRect();
     var x0=fr.right-br.left, y0=fr.top+fr.height/2-br.top, x2=tr.left-br.left, y1=tr.top+tr.height/2-br.top, midX=(x0+x2)/2;
-    var ours=fromEl.classList.contains('ours')&&toEl.classList.contains('ours');
+    var ours=fromEl.classList.contains('ours')||toEl.classList.contains('ours');   // OR, not AND: a connector touches exactly ONE 'ours' cell at a time (its two endpoints are always different games), so AND could never light up
     out+='<path class="'+(ours?'ours-line':'')+'" d="M'+x0.toFixed(1)+','+y0.toFixed(1)+' H'+midX.toFixed(1)+' V'+y1.toFixed(1)+' H'+x2.toFixed(1)+'"/>';
   });
   svg.innerHTML=out;
