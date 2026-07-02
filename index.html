@@ -2996,6 +2996,30 @@ function _findSrcIdx(ab,sdn,prevGames){   // which game (index) in the previous 
   for(var i=0;i<prevGames.length;i++){ if(prevGames[i].h===ab||prevGames[i].a===ab) return i; }   // already decided: match by the team that actually played
   return null;
 }
+function _bracketVisualOrder(byRound){
+  // Real bracket UIs (ESPN, Google) lay out each round so that adjacent pairs feed the SAME next-round slot,
+  // giving short, non-crossing connectors. Plain kickoff-time order does NOT do this (verified earlier: R16 game 5
+  // is fed by R32 games 11 & 12, not 9 & 10) -- so walk the tree from the final backward, expanding each slot into
+  // its two actual feeders, to get a genuine "bracket order" permutation of each round's chronological indices.
+  var order={}, chain=['final','semifinals','quarterfinals','round-of-16','round-of-32'];
+  order[chain[0]] = byRound[chain[0]] ? byRound[chain[0]].map(function(_,i){return i;}) : [];
+  for(var k=0;k<chain.length-1;k++){
+    var sl=chain[k], prevSl=chain[k+1];
+    if(!byRound[prevSl]) continue;
+    if(!byRound[sl]){ order[prevSl]=byRound[prevSl].map(function(_,i){return i;}); continue; }
+    var prevOrder=[];
+    (order[sl]||[]).forEach(function(idx){
+      var g=byRound[sl][idx]; if(!g)return;
+      var srcH=_findSrcIdx(g.h,g.hsdn,byRound[prevSl]), srcA=_findSrcIdx(g.a,g.asdn,byRound[prevSl]);
+      if(srcH!=null&&prevOrder.indexOf(srcH)<0)prevOrder.push(srcH);
+      if(srcA!=null&&prevOrder.indexOf(srcA)<0)prevOrder.push(srcA);
+    });
+    byRound[prevSl].forEach(function(_,i){ if(prevOrder.indexOf(i)<0)prevOrder.push(i); });   // safety net: anything the tree-walk missed still gets a slot, appended chronologically
+    order[prevSl]=prevOrder;
+  }
+  if(byRound['3rd-place-match']) order['3rd-place-match']=[0];   // single slot; fed by semifinals, whose order is already fixed via the 'final' chain above
+  return order;
+}
 function _mlProb(ml){ ml=Number(ml); return isFinite(ml)&&ml!==0 ? (ml<0?(-ml)/(-ml+100):100/(ml+100)) : null; }
 var _probCache={}, _probReqTok={};
 function _loadBracketProbs(evs){
@@ -3088,15 +3112,19 @@ function renderBracket(evs){
   var order=['round-of-32','round-of-16','quarterfinals','semifinals','final','3rd-place-match'];
   var our=(typeof MATCHUP!=='undefined')?MATCHUP.split('🆚').map(function(x){return x.trim();}):[];
   var present=order.filter(function(sl){return evs.some(function(e){return e.round===sl;});});
-  var byRound={}; present.forEach(function(sl){ byRound[sl]=evs.filter(function(e){return e.round===sl;}).sort(function(a,b){return a.ms-b.ms;}); });
-  var links=[];   // {from:'round:idx', to:'round:idx'} — which two earlier slots feed each later slot, derived from ESPN's own bracket data (never assumed from kickoff order)
+  var byRound={}; present.forEach(function(sl){ byRound[sl]=evs.filter(function(e){return e.round===sl;}).sort(function(a,b){return a.ms-b.ms;}); });   // chronological base arrays -- _findSrcIdx's placeholder-index math is defined relative to THIS order
+  var visOrder=_bracketVisualOrder(byRound);   // {round: [chronoIdx,...]} in bracket-tree order, so adjacent slots always feed the same next match
+  var chronoToVisual={}; present.forEach(function(sl){ chronoToVisual[sl]={}; (visOrder[sl]||[]).forEach(function(ci,vi){ chronoToVisual[sl][ci]=vi; }); });
+  var links=[];   // {from:'round:idx', to:'round:idx'} (idx = VISUAL position) — which two earlier slots feed each later slot, derived from ESPN's own bracket data (never assumed from kickoff order)
   var html=present.map(function(sl){
-    var games=byRound[sl], prevGames=byRound[PREV_ROUND[sl]];
-    var cells=games.map(function(g,i){
+    var chronoGames=byRound[sl], prevGames=byRound[PREV_ROUND[sl]], psl=PREV_ROUND[sl], pMap=chronoToVisual[psl]||{};
+    var vOrder=visOrder[sl]||chronoGames.map(function(_,i){return i;});
+    var cells=vOrder.map(function(ci,i){
+      var g=chronoGames[ci];
       if(prevGames){
         var si=_findSrcIdx(g.h,g.hsdn,prevGames), sj=_findSrcIdx(g.a,g.asdn,prevGames);
-        if(si!=null)links.push({from:PREV_ROUND[sl]+':'+si,to:sl+':'+i});
-        if(sj!=null)links.push({from:PREV_ROUND[sl]+':'+sj,to:sl+':'+i});
+        if(si!=null&&pMap[si]!=null)links.push({from:psl+':'+pMap[si],to:sl+':'+i});
+        if(sj!=null&&pMap[sj]!=null)links.push({from:psl+':'+pMap[sj],to:sl+':'+i});
       }
       var ours = our.length===2 && our[0].indexOf('/')<0 && our[1].indexOf('/')<0 && [g.h,g.a].indexOf(our[0])>=0 && [g.h,g.a].indexOf(our[1])>=0;
       var scored=g.state!=='pre';
