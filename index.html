@@ -554,6 +554,18 @@
   .q-card .q-tag{font-family:'Courier Prime',ui-monospace,monospace;font-size:9px;letter-spacing:1.8px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:13px}
   .q-card .q-text{font-family:'Inter',system-ui,sans-serif;font-size:19px;font-weight:800;line-height:1.35;color:var(--ink);letter-spacing:-.01em}
   .q-hint{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;color:var(--muted);text-align:center}
+  /* how well do you know us (step13): interactive quiz w/ real-text receipts */
+  .quiz-q{font-family:'Inter',system-ui,sans-serif;font-size:19px;font-weight:800;line-height:1.35;color:var(--ink);letter-spacing:-.01em;text-align:center;padding:6px 4px 18px}
+  .quiz-opts{display:grid;gap:9px}
+  .quiz-opt{background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:13px 16px;font-family:'Inter',system-ui,sans-serif;font-size:14.5px;font-weight:700;color:var(--ink);text-align:left;cursor:pointer;box-shadow:0 3px 9px rgba(53,28,94,.08);transition:transform .12s,border-color .15s}
+  .quiz-opt:active{transform:scale(.97)}
+  .quiz-opt:disabled{cursor:default}
+  .quiz-opt.right{border-color:#3fa85c;background:#eefbf1;color:#276b3a}
+  .quiz-opt.wrong{border-color:#d3546b;background:#fdeef1;color:#8a2f42}
+  .quiz-receipt{margin-top:14px;background:#f6f0ff;border:1px solid var(--line);border-radius:13px;padding:13px 15px;font-size:13px;line-height:1.5;color:#3a2a63}
+  .quiz-done{text-align:center;padding:20px 8px}
+  .quiz-done .qd-score{font-family:'Inter',system-ui,sans-serif;font-size:38px;font-weight:800;color:var(--lav);letter-spacing:-.02em}
+  .quiz-done .qd-line{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.5}
   /* photo missions: baggage tags on the live tracker */
   .mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
   .mission-tag{position:relative;border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 11px 10px 20px;cursor:pointer;text-align:left;box-shadow:0 3px 10px rgba(53,28,94,.1);font-family:'Courier Prime',ui-monospace,monospace;overflow:hidden}
@@ -855,6 +867,7 @@
       <div class="album-add-row" style="margin:-8px 0 18px">
         <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
         <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime Qs</button>
+        <button class="btn lav2btn" type="button" onclick="go(13)">🧠 how well do you know us</button>
       </div>
 
       <!-- the date diary lives at the end now, locked until ~9:30 PM -->
@@ -1018,6 +1031,7 @@
       <div class="bingo-stat" id="bingoStat"></div>
       <div class="album-add-row" style="margin-top:12px">
         <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime questions</button>
+        <button class="btn lav2btn" type="button" onclick="go(13)">🧠 know us quiz</button>
         <button class="btn ghost" type="button" onclick="resetBingo()">↺ new card</button>
       </div>
       <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
@@ -1032,6 +1046,7 @@
       <div class="q-hint">swipe → · one each, no skipping babu 💜</div>
       <div class="album-add-row" style="margin-top:12px">
         <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
+        <button class="btn lav2btn" type="button" onclick="go(13)">🧠 know us quiz</button>
       </div>
       <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
@@ -1057,6 +1072,15 @@
       <div class="dep-board" id="depBoard"></div>
       <div class="kit-note" style="margin-top:12px">every 25th, come back — a gate will be boarding 💜</div>
       <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
+    </section>
+
+    <!-- STEP 13 — HOW WELL DO YOU KNOW US (interactive quiz, real receipts pulled from our actual texts) -->
+    <section class="step" id="step13">
+      <div class="iti-head" style="margin-top:2px"><div class="big">🧠💜</div><h2 style="font-size:24px">how well do you know us</h2><div class="venue">real questions, real receipts from our actual texts</div></div>
+      <div class="q-progress"><span class="q-bar" id="quizBar"></span></div>
+      <div class="q-num" id="quizNum">Q 1 / 1</div>
+      <div id="quizCard"></div>
+      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
   </div>
@@ -2723,6 +2747,62 @@ function onMissionPicked(ev){
     fr.readAsDataURL(small);
   }).catch(function(){ hint('could not stamp that one, try again 💜'); });
 }
+/* ---------- HOW WELL DO YOU KNOW US (step13): interactive quiz, every "receipt" is a verbatim line from our real thread ----------
+   sourced from a fresh grep of the actual export -- verified sender + date on every real quote before it went in here. */
+var QUIZ=[
+  {q:'the very first thing you ever texted me, word for word, was...', opts:['"Heyy"','"Hi!!"','"omg hii"','"hey you 👋"'], correct:0, receipt:'Nov 16, 2024, 10:15am. "Heyy" then "Sidhya here" two texts later, in case I didn\'t have you saved 😂'},
+  {q:'what do I actually call you the most, by the numbers?', opts:['sidhu','babu','baabu','bongo'], correct:0, receipt:'sidhu wins by a mile in the real thread. babu\'s a strong second. "bongo" only happened once and I stand by it'},
+  {q:'who said "love you" first, and when?', opts:['I did, New Year\'s Eve','you did, New Year\'s Eve','we said it at the exact same time','neither of us has said it yet 👀'], correct:0, receipt:'Dec 31, 2025, 7:08pm, "love you 😍" — you said it back less than 2 hours later, then again right before midnight'},
+  {q:'our single most-texted emoji of all time is...', opts:['😭','❤️','😂','💜'], correct:0, receipt:'😭, well over 380 times and climbing. we are certified criers'},
+  {q:'how many times has 😈 shown up in our texts?', opts:['32','5','58','12'], correct:0, receipt:'32 times, verified. no further comment 😏'},
+  {q:'which of these is a REAL text I sent you, word for word?', opts:['"I love you so much I\'m going to explodeee"','"you make my heart do backflips"','"i love you to infinity and beyond"','"you\'re my whole world fr fr"'], correct:0, receipt:'verbatim, May 30, 2026. still true every day'},
+  {q:'and THIS one — which text did I actually send?', opts:['"I want you to rip my clothes off"','"i can\'t wait to hold you all night"','"you\'re the only one for me"','"i think about you 24/7"'], correct:0, receipt:'verbatim, June 3, 2026. no notes 😏'},
+  {q:'now flip it — which text did YOU actually send ME?', opts:['"I wanna give you infinite hickeys"','"you\'re my whole heart"','"i can\'t stop smiling because of you"','"forever isn\'t long enough"'], correct:0, receipt:'verbatim, Jan 24, 2026. still collecting on that one 😏💜'},
+  {q:'what do I text you the SECOND you land somewhere?', opts:['landed, lil bongo','touchdown babe','we\'re home!','made it 🛬'], correct:0, receipt:'"Landed lil bongo." — March 23, 2026, verbatim. the nickname stuck'},
+  {q:'what time did you say yes to being mine?', opts:['10 PM','9 PM','midnight','8 PM'], correct:0, receipt:'Oct 25, 2025, 10:00 PM. straight from you two, no receipt needed for this one 💜'},
+  {q:'what did I call myself once, completely unprompted?', opts:['ganesh flightaraman','captain sidhu','airport neal','flight risk'], correct:0, receipt:'"ganesh flightaraman must focus up" — May 9, 2026. you Emphasized it, so it\'s canon now'},
+  {q:'roughly how many texts have we actually sent each other, all-time?', opts:['over 30,000','about 5,000','under 1,000','around 12,000'], correct:0, receipt:'verified from the real thread and still climbing (check the statement on our boarding pass 👀)'},
+  {q:'how many "love you"s have actually been sent between us?', opts:['over 700','around 100','just 12','over 5,000'], correct:0, receipt:'700+ and counting, verified. we clearly never get tired of saying it'}
+];
+var _quizIdx=0, _quizScore=0, _quizAnswered=false;
+function renderQuiz(){
+  var wrap=document.getElementById('quizCard'); if(!wrap)return;
+  var bar=document.getElementById('quizBar'), num=document.getElementById('quizNum');
+  if(_quizIdx>=QUIZ.length){
+    if(bar)bar.style.width='100%';
+    if(num)num.textContent='done!';
+    var pct=Math.round(_quizScore/QUIZ.length*100);
+    var line = pct===100 ? "perfect score. obviously. you're literally me at this point 💜" : pct>=70 ? "okay certified expert on us 😌💜" : "a few misses but you know the important stuff — that i'm obsessed with you 💜";
+    wrap.innerHTML='<div class="quiz-done"><div class="qd-score">'+_quizScore+' / '+QUIZ.length+'</div><div class="qd-line">'+line+'</div>'+
+      '<button type="button" class="btn primary" style="margin-top:16px" onclick="resetQuiz()">↺ play again</button></div>';
+    return;
+  }
+  var item=QUIZ[_quizIdx];
+  if(bar)bar.style.width=(_quizIdx/QUIZ.length*100)+'%';
+  if(num)num.textContent='Q '+(_quizIdx+1)+' / '+QUIZ.length;
+  _quizAnswered=false;
+  wrap.innerHTML='<div class="quiz-q">'+_escB(item.q)+'</div>'+
+    '<div class="quiz-opts">'+item.opts.map(function(o,i){return '<button type="button" class="quiz-opt" data-i="'+i+'" onclick="answerQuiz('+i+')">'+_escB(o)+'</button>';}).join('')+'</div>'+
+    '<div class="quiz-receipt" id="quizReceipt" style="display:none"></div>'+
+    '<button type="button" class="btn primary" id="quizNextBtn" style="display:none;margin-top:14px;width:100%" onclick="nextQuiz()">next question →</button>';
+}
+function answerQuiz(i){
+  if(_quizAnswered)return; _quizAnswered=true;
+  var item=QUIZ[_quizIdx];
+  Array.prototype.forEach.call(document.querySelectorAll('.quiz-opt'),function(b){
+    b.disabled=true;
+    var idx=+b.getAttribute('data-i');
+    if(idx===item.correct)b.classList.add('right');
+    else if(idx===i)b.classList.add('wrong');
+  });
+  var right=(i===item.correct);
+  if(right){ _quizScore++; if(window.burstConfetti)burstConfetti(document.getElementById('quizCard'),{emojis:['💜','✨'],count:14}); if(window.buzz)buzz(24); }
+  else if(window.buzz)buzz(10);
+  var r=document.getElementById('quizReceipt'); if(r){ r.style.display='block'; r.innerHTML=(right?'✅ ':'❌ ')+_escB(item.receipt); }
+  var nb=document.getElementById('quizNextBtn'); if(nb)nb.style.display='';
+}
+function nextQuiz(){ _quizIdx++; renderQuiz(); }
+function resetQuiz(){ _quizIdx=0; _quizScore=0; renderQuiz(); }
 /* ---------- COMFORT KIT (step11): open-when letters, sealed until after the date ----------
    sourced from real texts to her (grepped from the actual thread), still yours to tweak, babu. */
 var KIT=[
@@ -2813,7 +2893,7 @@ function tapDep(i){
   if(opened.indexOf(i)<0){ opened.push(i); try{localStorage.setItem('wc_dep_open',JSON.stringify(opened));}catch(e){} if(window.burstConfetti)burstConfetti(document.getElementById('depBoard'),{emojis:['🛫','💜','✨'],count:16}); if(window.buzz)buzz(24); }
   renderDepartures();
 }
-renderBingo(); renderQDeck(); renderMissions(); renderKit(); renderDepartures();
+renderBingo(); renderQDeck(); renderMissions(); renderKit(); renderDepartures(); renderQuiz();
 function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
 function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
