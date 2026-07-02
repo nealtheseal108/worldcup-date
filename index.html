@@ -539,6 +539,18 @@
   .q-card .q-tag{font-family:'Courier Prime',ui-monospace,monospace;font-size:9px;letter-spacing:1.8px;color:var(--lav);font-weight:700;text-transform:uppercase;margin-bottom:13px}
   .q-card .q-text{font-family:'Inter',system-ui,sans-serif;font-size:19px;font-weight:800;line-height:1.35;color:var(--ink);letter-spacing:-.01em}
   .q-hint{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;color:var(--muted);text-align:center}
+  /* photo missions: baggage tags on the live tracker */
+  .mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .mission-tag{position:relative;border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 11px 10px 20px;cursor:pointer;text-align:left;box-shadow:0 3px 10px rgba(53,28,94,.1);font-family:'Courier Prime',ui-monospace,monospace;overflow:hidden}
+  .mission-tag::before{content:'';position:absolute;left:7px;top:0;bottom:0;border-left:1.5px dashed var(--line)}
+  .mission-tag::after{content:'';position:absolute;left:1.5px;top:50%;width:7px;height:7px;border-radius:50%;background:var(--paper);border:1px solid var(--line);transform:translateY(-50%)}
+  .mission-tag .mt-air{font-size:7.5px;letter-spacing:1.2px;color:var(--lav);font-weight:700}
+  .mission-tag .mt-title{font-size:11.5px;font-weight:700;color:#3a2a63;line-height:1.3;margin-top:3px;min-height:30px}
+  .mission-tag .mt-thumb{margin-top:7px;height:64px;border-radius:7px;background:#f2ecfd;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--lav);overflow:hidden}
+  .mission-tag .mt-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .mission-tag .mt-stamp{position:absolute;right:7px;top:34px;border:2.5px solid #16a34a;color:#16a34a;font-weight:800;font-size:9.5px;letter-spacing:1.6px;padding:3px 7px;border-radius:5px;transform:rotate(-14deg);background:rgba(255,255,255,.86);display:none}
+  .mission-tag.done{border-color:#bfe8cd}
+  .mission-tag.done .mt-stamp{display:block}
   #playerbar{position:fixed;left:0;right:0;bottom:calc(var(--tick) + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:9px 16px;background:#160e2b;
     border-top:1px solid rgba(167,139,250,.32);box-shadow:0 -6px 26px rgba(18,8,38,.45);color:#fff;
@@ -922,6 +934,10 @@
       </div>
       <div class="album-grid" id="albumGrid"><div class="album-empty">loading our photos…</div></div>
       <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoPicked(event)">
+
+      <div class="sectlabel" style="margin-top:20px">🏷️ photo missions<span class="album-count" id="missionCount"></span></div>
+      <div class="mission-grid" id="missionGrid"></div>
+      <input type="file" id="missionInput" accept="image/*" capture="environment" style="display:none" onchange="onMissionPicked(event)">
 
       <div class="trk-actions">
         <button class="btn lav2btn" type="button" onclick="go(5)">🎬 date diary &amp; movie</button>
@@ -2558,7 +2574,48 @@ function renderQDeck(){
     if(bar)bar.style.width=(((i+1)/Q_DECK.length)*100)+'%';
   }); },{passive:true});
 }
-renderBingo(); renderQDeck();
+/* ---------- PHOTO MISSIONS (tracker page): baggage-tag challenges that feed the shared album ---------- */
+var MISSIONS=[
+  {id:'train', t:'2 Line window selfie 🚆'},
+  {id:'cone',  t:'Salt & Straw held like a trophy 🍦🏆'},
+  {id:'purple',t:'something purple in the wild 💜'},
+  {id:'dance', t:'her dancing, anywhere 💃'},
+  {id:'jersey',t:'both jerseys in one frame 👕👕'},
+  {id:'pitch', t:'the pitch from our spot ⚽'},
+  {id:'first', t:'recreate our first photo 🥹'},
+  {id:'kiss',  t:'kiss cam, self-serve 😚'}
+];
+var _missionPick=null;
+function _missionState(){ try{return JSON.parse(localStorage.getItem('wc_missions')||'{}');}catch(e){return {};} }
+function renderMissions(){
+  var g=document.getElementById('missionGrid'); if(!g)return;
+  var st=_missionState(), done=0;
+  g.innerHTML=MISSIONS.map(function(m){
+    var d=st[m.id]; if(d)done++;
+    return '<button type="button" class="mission-tag'+(d?' done':'')+'" onclick="pickMission(\''+m.id+'\')">'+
+      '<div class="mt-air">GANESH AIR · CLAIM TAG</div><div class="mt-title">'+m.t+'</div>'+
+      '<div class="mt-thumb">'+(d&&d.thumb?('<img src="'+d.thumb+'" alt="">'):'📷')+'</div>'+
+      '<div class="mt-stamp">APPROVED</div></button>';
+  }).join('');
+  var c=document.getElementById('missionCount'); if(c)c.textContent='· '+done+'/'+MISSIONS.length+' approved';
+}
+function pickMission(id){ _missionPick=id; var i=document.getElementById('missionInput'); if(i)i.click(); }
+function onMissionPicked(ev){
+  var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value='';
+  var id=_missionPick; _missionPick=null; if(!f||!id)return;
+  hint('stamping your mission… 🏷️');
+  _downscaleImg(f,1400,0.85).then(function(big){
+    var rec={sec:'photo',blob:big,t:Date.now()};
+    if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).catch(function(){}); } else { diaryAdd(rec).catch(function(){}); }   // missions feed the shared album (+ local backup)
+    return _downscaleImg(f,240,0.6);
+  }).then(function(small){
+    var fr=new FileReader();
+    fr.onload=function(){ var st=_missionState(); st[id]={t:Date.now(),thumb:String(fr.result)}; try{localStorage.setItem('wc_missions',JSON.stringify(st));}catch(e){ st[id]={t:Date.now()}; try{localStorage.setItem('wc_missions',JSON.stringify(st));}catch(e2){} } renderMissions(); renderPhotos(true); if(window.burstConfetti)burstConfetti(document.getElementById('missionGrid'),{emojis:['🏷️','💜','📸'],count:16}); if(window.buzz)buzz(24); hint('mission APPROVED 🏷️💜 it\'s in our album'); };
+    fr.onerror=function(){ var st=_missionState(); st[id]={t:Date.now()}; try{localStorage.setItem('wc_missions',JSON.stringify(st));}catch(e){} renderMissions(); renderPhotos(true); hint('mission APPROVED 🏷️💜'); };
+    fr.readAsDataURL(small);
+  }).catch(function(){ hint('could not stamp that one, try again 💜'); });
+}
+renderBingo(); renderQDeck(); renderMissions();
 function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
 function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
