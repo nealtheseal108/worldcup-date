@@ -33,10 +33,7 @@
   .wrap{max-width:680px;margin:0 auto}
   .layout{display:block}
   .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
-  .spice-toggle{position:fixed;top:10px;right:10px;z-index:130;background:rgba(36,23,51,.82);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:6px 12px;font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;font-weight:700;letter-spacing:.5px;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 3px 10px rgba(0,0,0,.2)}
-  .spice-toggle.pg{background:rgba(63,168,92,.85)}
-  @media print{.spice-toggle{display:none!important}}
-  .topbar .ball{font-size:22px}
+  .topbar .ball{font-size:22px;cursor:pointer}
   .topbar h1{font-family:'Courier Prime',ui-monospace,monospace;font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
   .matchup{text-align:center;margin:0 0 16px}
   .matchup .chip{display:inline-flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#3a2a63;background:rgba(255,255,255,.92);border-radius:30px;padding:6px 14px;box-shadow:0 3px 12px rgba(53,28,94,.22)}
@@ -380,8 +377,6 @@
   .sharehint{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}
 
   .foot{text-align:center;color:rgba(255,255,255,.92);font-size:12px;margin-top:16px;line-height:1.5}
-  .kquote{position:fixed;right:14px;bottom:calc(var(--player) + var(--tick) + 8px);z-index:40;max-width:260px;text-align:right;font-family:'Instrument Serif',Georgia,serif;font-style:italic;color:rgba(255,255,255,.62);font-size:13px;line-height:1.25;margin:0;pointer-events:none;text-shadow:0 1px 5px rgba(40,20,70,.45)}
-  .kquote span{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-style:normal;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:.85;margin-top:3px}
 
   /* Ganesh Air departure-board share card */
   /* shareable boarding pass (upright, lavender — matches the site's passes) */
@@ -636,7 +631,6 @@
     .pb-art{width:38px;height:38px;font-size:18px}
     .pb-btn{width:36px;height:36px;font-size:15px}
     .pb-play{width:40px;height:40px}
-    .kquote{position:static;max-width:none;margin:12px 6px 0;text-shadow:none;color:rgba(255,255,255,.72)}
   }
   #ythost{position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none}
 
@@ -699,9 +693,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-<button type="button" id="spiceToggle" class="spice-toggle" onclick="toggleSpice()" title="switch between PG and R content site-wide">🔞 R</button>
 <div class="wrap">
-  <div class="topbar"><span class="ball">⚽</span><h1>Sidhya & Neal · World Cup Date · July 6</h1></div>
+  <div class="topbar"><span class="ball" onclick="_ballTap()">⚽</span><h1>Sidhya & Neal · World Cup Date · July 6</h1></div>
   <div class="matchup"><span class="chip">🏆 Round of 16 · <b id="muText">TBD 🆚 TBD</b> · <span class="mu-note" id="muNote">🇺🇸 could be us!</span></span></div>
   <div class="progress" aria-hidden="true">
     <span class="pg-track"></span>
@@ -1094,7 +1087,6 @@
   </div>
   </div>
   <div class="foot">no car needed babu, every leg is train + bus on the 2 line.<br>it runs til midnight so there's never a rush home 💜</div>
-  <div class="kquote">"few solid n*ggas, but it's not enough"<span>- Kendrick Lamar</span></div>
 </div>
 
 <script>
@@ -1861,25 +1853,24 @@ function _liveStat(key){
 function _p2(n){n=String(n);return n.length<2?'0'+n:n;}
 function _p3(n){n=String(n);while(n.length<3)n='0'+n;return n;}
 function buzz(ms){try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e){}}
-/* ---------- PG / R content switch: default R, tap to go PG (hides/replaces spicier content site-wide) ---------- */
-function _spiceMode(){ try{ return localStorage.getItem('wc_spice')==='pg' ? 'pg' : 'r'; }catch(e){ return 'r'; } }
-function _applySpiceUI(){
-  var b=document.getElementById('spiceToggle'); if(!b)return;
-  var m=_spiceMode();
-  b.textContent = m==='pg' ? '🟢 PG' : '🔞 R';
-  b.classList.toggle('pg', m==='pg');
-}
+/* ---------- PG / R content switch: default PG, hidden trigger only (no visible button -- tap the topbar ball 5x) ---------- */
+function _spiceMode(){ try{ return localStorage.getItem('wc_spice')==='r' ? 'r' : 'pg'; }catch(e){ return 'pg'; } }
 function toggleSpice(){
   var next = _spiceMode()==='pg' ? 'r' : 'pg';
   try{ localStorage.setItem('wc_spice', next); }catch(e){}
-  _applySpiceUI();
   if(window.buzz)buzz(next==='pg'?10:20);
-  if(window.toast)toast(next==='pg' ? 'PG mode, keeping it sweet 💜' : 'R mode, back to spicy 😏');
+  if(window.toast)toast(next==='pg' ? 'PG mode, keeping it sweet 💜' : 'R mode unlocked 😏');
   if(window.resetQuiz)resetQuiz();     // deck length can change between modes, restart clean rather than risk a mismatched index
   if(window.renderKit)renderKit();
   if(window.renderDepartures)renderDepartures();
 }
-_applySpiceUI();
+var _ballTaps=0, _ballTapTimer=null;
+function _ballTap(){   // 5 taps on the topbar ball within 1.5s flips the PG/R switch -- deliberately not a visible control
+  _ballTaps++;
+  clearTimeout(_ballTapTimer);
+  _ballTapTimer=setTimeout(function(){_ballTaps=0;},1500);
+  if(_ballTaps>=5){ _ballTaps=0; toggleSpice(); }
+}
 var _fsCells=[], _fsLanded=false, _fsLandAt=null;
 function _fsSince(now){
   var m=(now.getFullYear()-US.metDate.getFullYear())*12+(now.getMonth()-US.metDate.getMonth());
@@ -2708,7 +2699,6 @@ var Q_DECK=[
   'what did you ACTUALLY think the night of Oct 25?',
   'if we could teleport anywhere for the next 24 hours, where are we?',
   "what's your favorite text i've ever sent you?",
-  'which of us cries first at the final whistle?',
   'describe our Disneyland day in 2036. every detail, babu.',
   'where are WE during the next World Cup (2030)?',
   'one thing i do that makes you feel the most loved?',
@@ -2780,7 +2770,6 @@ var QUIZ=[
   {q:'which of these is a REAL text I sent you, word for word?', opts:['"I love you so much I\'m going to explodeee"','"you make my heart do backflips"','"i love you to infinity and beyond"','"you\'re my whole world fr fr"'], correct:0, receipt:'yep, May 30 2026, word for word. still true every single day'},
   {q:'and THIS one, which text did I actually send?', opts:['"I want you to rip my clothes off"','"i can\'t wait to hold you all night"','"you\'re the only one for me"','"i think about you 24/7"'], correct:0, r:true, receipt:'that\'s the one. June 3 2026. no notes from me on this one 😏'},
   {q:'now flip it, which text did YOU actually send ME?', opts:['"I wanna give you infinite hickeys"','"you\'re my whole heart"','"i can\'t stop smiling because of you"','"forever isn\'t long enough"'], correct:0, r:true, receipt:'that was you, Jan 24 2026. still collecting on that one 😏💜'},
-  {q:'what do I text you the SECOND you land somewhere?', opts:['landed, lil bongo','touchdown babe','we\'re home!','made it 🛬'], correct:0, receipt:'"landed lil bongo." March 23 2026, exact words. the nickname just stuck after that'},
   {q:'what time did you say yes to being mine?', opts:['10 PM','9 PM','midnight','8 PM'], correct:0, receipt:'10pm, Oct 25 2025. don\'t need a screenshot for this one, i was there 💜'},
   {q:'which of these compliments did I actually send you, word for word?', opts:['"you are gorgeous"','"you\'re breathtaking"','"you\'re a whole vibe"','"you\'re unreal"'], correct:0, receipt:'yep, Feb 6 2026, said completely out of nowhere. still mean it'},
   {q:'and this compliment, which one is real?', opts:['"you are stunning"','"you\'re a whole mood"','"you glow different"','"you\'re ethereal"'], correct:0, receipt:'that one\'s real. March 11 2026, sent a 😋 right after for good measure'},
@@ -2795,11 +2784,17 @@ var QUIZ=[
   {q:'we did one of those couples "quiz" things once and answered in third person. which two did I name as the either or?', opts:['"missionary or cowgirl"','"cuddling or holding hands"','"movie night or dinner date"','"beach or mountains"'], correct:0, r:true, receipt:'yep, March 17 2026, mid quiz. real answer, verbatim'},
   {q:'in that same quiz, what did I say you loved?', opts:['"missionary"','"slow dancing"','"long drives"','"morning cuddles"'], correct:0, r:true, receipt:'"and she loooves missionary," 3 o\'s and all, March 17 2026, verbatim'},
   {q:'which real text mixes something sweet with something spicy?', opts:['"I feel butterflies when you giggle when you\'re horny and when you ride me slow"','"you make me laugh and you make me weak"','"you\'re cute and you\'re trouble"','"i love your laugh and your everything"'], correct:0, r:true, receipt:'that\'s a real one, May 28 2026. butterflies AND that, in the same text lol'},
+  {q:'which sex position do we actually mention most in our texts?', opts:['missionary','cowgirl','doggy','reverse cowgirl'], correct:0, r:true, receipt:'missionary, by a mile. counted it myself, 9 mentions vs cowgirl\'s 4 and doggy\'s 1'},
   {q:'roughly how many texts have we actually sent each other, all-time?', opts:['over 30,000','about 5,000','under 1,000','around 12,000'], correct:0, receipt:'over 30k and still going. check the number on our boarding pass, it\'s live 👀'},
   {q:'how many "love you"s have actually been sent between us?', opts:['over 700','around 100','just 12','over 5,000'], correct:0, receipt:'700+ and counting. we clearly never get tired of saying it'}
 ];
-var _quizIdx=0, _quizScore=0, _quizAnswered=false;
+var _quizIdx=0, _quizScore=0, _quizAnswered=false, _quizShuffled=null;
 function _quizDeck(){ return _spiceMode()==='r' ? QUIZ : QUIZ.filter(function(q){return !q.r;}); }
+function _shuffleOpts(item){   // the correct answer must NOT always sit at the same spot, so shuffle display order fresh every time a question renders
+  var idxs=item.opts.map(function(_,i){return i;});
+  for(var i=idxs.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=idxs[i]; idxs[i]=idxs[j]; idxs[j]=t; }
+  return { opts: idxs.map(function(k){return item.opts[k];}), correctIdx: idxs.indexOf(item.correct) };
+}
 function renderQuiz(){
   var wrap=document.getElementById('quizCard'); if(!wrap)return;
   var deck=_quizDeck();
@@ -2814,24 +2809,25 @@ function renderQuiz(){
     return;
   }
   var item=deck[_quizIdx];
+  _quizShuffled=_shuffleOpts(item);
   if(bar)bar.style.width=(_quizIdx/deck.length*100)+'%';
   if(num)num.textContent='Q '+(_quizIdx+1)+' / '+deck.length;
   _quizAnswered=false;
   wrap.innerHTML='<div class="quiz-q">'+_escB(item.q)+'</div>'+
-    '<div class="quiz-opts">'+item.opts.map(function(o,i){return '<button type="button" class="quiz-opt" data-i="'+i+'" onclick="answerQuiz('+i+')">'+_escB(o)+'</button>';}).join('')+'</div>'+
+    '<div class="quiz-opts">'+_quizShuffled.opts.map(function(o,i){return '<button type="button" class="quiz-opt" data-i="'+i+'" onclick="answerQuiz('+i+')">'+_escB(o)+'</button>';}).join('')+'</div>'+
     '<div class="quiz-receipt" id="quizReceipt" style="display:none"></div>'+
     '<button type="button" class="btn primary" id="quizNextBtn" style="display:none;margin-top:14px;width:100%" onclick="nextQuiz()">next question →</button>';
 }
 function answerQuiz(i){
-  if(_quizAnswered)return; _quizAnswered=true;
-  var item=_quizDeck()[_quizIdx];
+  if(_quizAnswered||!_quizShuffled)return; _quizAnswered=true;
+  var item=_quizDeck()[_quizIdx], correctIdx=_quizShuffled.correctIdx;
   Array.prototype.forEach.call(document.querySelectorAll('.quiz-opt'),function(b){
     b.disabled=true;
     var idx=+b.getAttribute('data-i');
-    if(idx===item.correct)b.classList.add('right');
+    if(idx===correctIdx)b.classList.add('right');
     else if(idx===i)b.classList.add('wrong');
   });
-  var right=(i===item.correct);
+  var right=(i===correctIdx);
   if(right){ _quizScore++; if(window.burstConfetti)burstConfetti(document.getElementById('quizCard'),{emojis:['💜','✨'],count:14}); if(window.buzz)buzz(24); }
   else if(window.buzz)buzz(10);
   var r=document.getElementById('quizReceipt'); if(r){ r.style.display='block'; r.innerHTML=(right?'✅ ':'❌ ')+_escB(item.receipt); }
