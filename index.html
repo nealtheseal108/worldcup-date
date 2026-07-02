@@ -931,7 +931,7 @@
           </div>
         </div>
       </div>
-      <div class="printrow" style="margin-top:20px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+      <div class="printrow" style="margin-top:20px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
     <!-- STEP 6 — the completed date-diary movie, its own page -->
@@ -983,7 +983,7 @@
         <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
         <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime Qs</button>
       </div>
-      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
     <!-- STEP 8 — custom World Cup bracket (games link out to ESPN) -->
@@ -991,7 +991,7 @@
       <div class="iti-head" style="margin-top:2px"><div class="big">🏆</div><h2 style="font-size:24px">the road to the cup</h2><div class="venue">the knockout bracket · tap a match for details on ESPN</div></div>
       <div class="album-add-row" style="margin-bottom:10px"><button class="btn lav2btn" type="button" onclick="loadBracket(true)">↻ refresh scores</button></div>
       <div class="bracket-scroll"><div class="bracket" id="bracketCols"><div class="album-empty">loading the bracket…</div></div></div>
-      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
     <!-- STEP 9 — BABU BINGO (offline in-flight match bingo) -->
@@ -1003,7 +1003,7 @@
         <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime questions</button>
         <button class="btn ghost" type="button" onclick="resetBingo()">↺ new card</button>
       </div>
-      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
     <!-- STEP 10 — ROW 25, SEATS A & B (halftime question deck) -->
@@ -1016,7 +1016,7 @@
       <div class="album-add-row" style="margin-top:12px">
         <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
       </div>
-      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
     <!-- STEP 11 — RETURN-FLIGHT COMFORT KIT (open-when letters, sealed until after the date) -->
@@ -1031,7 +1031,7 @@
         </div>
       </div>
       <div class="kit-rack" id="kitRack"></div>
-      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+      <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
     <!-- STEP 12 — FUTURE DEPARTURES (monthiversary auto-unlocks, zero backend) -->
@@ -1039,7 +1039,7 @@
       <div class="iti-head" style="margin-top:2px"><div class="big">🛫💜</div><h2 style="font-size:24px">future departures</h2><div class="venue">a new gate opens on the 25th of every month</div></div>
       <div class="dep-board" id="depBoard"></div>
       <div class="kit-note" style="margin-top:12px">every 25th, come back — a gate will be boarding 💜</div>
-      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="go(4)">← back to our date</button></div>
+      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
   </div>
@@ -1683,11 +1683,14 @@ function toast(msg){   // visible on ANY step (unlike hint(), which only shows o
   t.textContent=msg; t.style.opacity='1';
   clearTimeout(t._h); t._h=setTimeout(function(){t.style.opacity='0';},2200);
 }
+var lastMainStep=0;   // most recent step in the 0-4 picks/boarding-pass flow; add-ons "back" to THIS, not blindly to 4
+function backToDate(){ go(lastMainStep); }
 function go(n){
-  if(n>=4 && !pickComplete()){   // add-ons + boarding pass only exist once the picks are locked in; never show an empty pass
+  if(n>=4 && n!==8 && !pickComplete()){   // add-ons (except the bracket, which is just live scores) + the pass itself need locked-in picks; never show an empty pass
     toast('finish picking your night first, babu 💜'); if(window.buzz)buzz(15);
     n = pick.venue ? (pick.during ? 3 : 2) : 1;
   }
+  if(n<=4) lastMainStep=n;
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   var _pl=document.getElementById('pgPlane'); if(_pl){_pl.style.left=(6+Math.min(n,4)/4*88)+'%';}
@@ -2945,7 +2948,7 @@ function roundShort(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][0])||(sl?sl.replac
 function roundLong(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][1])||(sl?sl.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}):''); }
 function _escB(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 var _bracketCache=null, _bracketAt=0;
-function openBracket(){ if(!pickComplete()){ toast('finish picking your night first, babu 💜'); if(window.buzz)buzz(15); return; } go(8); loadBracket(); }
+function openBracket(){ go(8); loadBracket(); }   // viewable anytime, picks complete or not — it's just live scores, and go(8) never blocks it
 function loadBracket(force){
   var box=document.getElementById('bracketCols'); if(!box)return;
   if(!box._wired){ box.addEventListener('click',function(e){ var c=e.target.closest&&e.target.closest('.bracket-cell'); if(c&&c.getAttribute('data-href')) window.open(c.getAttribute('data-href'),'_blank','noopener'); }); box._wired=true; }
