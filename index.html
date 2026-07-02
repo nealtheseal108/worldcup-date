@@ -851,7 +851,7 @@
           <div class="stmt-row"><span class="stmt-emoji">😭</span><span class="stmt-l">our most-texted emoji (<span class="stmt-n stmt-inline" data-live="cry" data-to="382">0</span>×, lol)</span></div>
           <div class="stmt-row"><span class="stmt-emoji">😈</span><span class="stmt-l">devil horns sent (<span class="stmt-n stmt-inline" data-live="devil" data-to="32">0</span>×, no comment 😏)</span></div>
         </div>
-        <div class="stmt-foot">STATUS: BOARDING · destination — every round after 💜</div>
+        <div class="stmt-foot">STATUS: BOARDING · destination, every round after 💜</div>
       </div>
 
       <div class="iti-head" style="margin-top:18px">
@@ -885,7 +885,7 @@
       <div class="merge">💜 Our paths cross: we meet on the 2 Line around 3:00 PM and ride into Seattle together!</div>
 
       <div class="sectlabel deck-label">🛫 your boarding passes · the whole day, leg by leg</div>
-      <div class="diaryintro">📔 <b>our date diary</b> — hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild from 6:00-7:15 around full time, record as much as you want. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <span style="font-size:12px;color:var(--muted)">your movie unlocks at the end of the night 🎬</span></div>
+      <div class="diaryintro">📔 <b>our date diary</b>, hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild from 6:00-7:15 around full time, record as much as you want. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <span style="font-size:12px;color:var(--muted)">your movie unlocks at the end of the night 🎬</span></div>
       <div id="timeline"></div>
 
       <div class="sectlabel">🎒 what to prepare</div>
@@ -1057,7 +1057,7 @@
       <div class="kit-note" id="kitNote">sealed until after our date, babu 💜 no peeking.</div>
       <div id="kitGate" style="display:none">
         <div class="kit-gate-card">
-          <div class="kit-gate-q">security check 🛃 — what do you call me?</div>
+          <div class="kit-gate-q">security check 🛃, what do you call me?</div>
           <input class="modal-input" id="kitAnswer" type="text" placeholder="one word, you know it" autocomplete="off">
           <button class="btn primary" type="button" style="margin-top:10px;width:100%" onclick="kitTry()">unlock my kit 💜</button>
         </div>
@@ -1070,7 +1070,7 @@
     <section class="step" id="step12">
       <div class="iti-head" style="margin-top:2px"><div class="big">🛫💜</div><h2 style="font-size:24px">future departures</h2><div class="venue">a new gate opens on the 25th of every month</div></div>
       <div class="dep-board" id="depBoard"></div>
-      <div class="kit-note" style="margin-top:12px">every 25th, come back — a gate will be boarding 💜</div>
+      <div class="kit-note" style="margin-top:12px">every 25th, come back, a gate will be boarding 💜</div>
       <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
@@ -1090,7 +1090,7 @@
   </div>
   </div>
   <div class="foot">no car needed babu, every leg is train + bus on the 2 line.<br>it runs til midnight so there's never a rush home 💜</div>
-  <div class="kquote">"few solid n*ggas, but it's not enough"<span>— Kendrick Lamar</span></div>
+  <div class="kquote">"few solid n*ggas, but it's not enough"<span>- Kendrick Lamar</span></div>
 </div>
 
 <script>
@@ -1605,7 +1605,7 @@ function _swRenderAllPass(stepKey, cont){
   cont.innerHTML='<div class="swipe-done">'
     +'<div class="sw-done-emoji">🤔</div>'
     +'<div class="sw-done-ttl">nothing caught your eye?</div>'
-    +'<div class="sw-done-sub">no worries babu — add your own '+SWIPE_LABEL[stepKey]+' idea and i\'ll sort out how we get there 💜</div>'
+    +'<div class="sw-done-sub">no worries babu, add your own '+SWIPE_LABEL[stepKey]+' idea and i\'ll sort out how we get there 💜</div>'
     +'<div class="sw-done-btns">'
     +'<button type="button" class="btn primary" onclick="addPlace(\''+stepKey+'\')">➕ add my own idea</button>'
     +'<button type="button" class="btn lav2btn sw-again">↺ swipe again</button>'
@@ -2619,7 +2619,7 @@ function pickPhoto(){ var i=document.getElementById('photoInput'); if(i)i.click(
 function _downscaleImg(file,maxDim,q){ return new Promise(function(res){ try{ var img=new Image(),url=URL.createObjectURL(file); img.onload=function(){ var w=img.width||1,h=img.height||1,sc=Math.min(1,maxDim/Math.max(w,h)); var cv=document.createElement('canvas'); cv.width=Math.max(1,Math.round(w*sc)); cv.height=Math.max(1,Math.round(h*sc)); try{cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);}catch(e){} URL.revokeObjectURL(url); cv.toBlob(function(b){res(b&&b.size?b:file);},'image/jpeg',q||0.85); }; img.onerror=function(){URL.revokeObjectURL(url);res(file);}; img.src=url; }catch(e){res(file);} }); }
 function onPhotoPicked(ev){ var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value=''; if(!f)return; hint('adding your photo… 📸'); _downscaleImg(f,1400,0.85).then(function(blob){ var rec={sec:'photo',blob:blob,t:Date.now()}; if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).then(function(r){ hint(r?'added to our album 📸💜':'saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }).catch(function(){ hint('saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }); } else { diaryAdd(rec).then(function(){ hint('added to our album 📸💜'); renderPhotos(true); }).catch(function(){ hint('could not add the photo 😭'); }); } }); }
 var _albumUrls=[], _albumBusy=false;
-function renderPhotos(force){ var grid=document.getElementById('albumGrid'); if(!grid)return; if(_albumBusy&&!force)return; _albumBusy=true; gatherPhotos().then(function(photos){ _albumBusy=false; _albumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _albumUrls=[]; var cnt=document.getElementById('albumCount'); if(cnt)cnt.textContent=photos.length?('· '+photos.length+' photo'+(photos.length>1?'s':'')):''; if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet — tap ➕ to add the first one 📸💜<br>every pic you add shows up here for both of us</div>'; return; } grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _albumUrls.push(u); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="our date"></button>'; }).join(''); }).catch(function(){ _albumBusy=false; }); }
+function renderPhotos(force){ var grid=document.getElementById('albumGrid'); if(!grid)return; if(_albumBusy&&!force)return; _albumBusy=true; gatherPhotos().then(function(photos){ _albumBusy=false; _albumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _albumUrls=[]; var cnt=document.getElementById('albumCount'); if(cnt)cnt.textContent=photos.length?('· '+photos.length+' photo'+(photos.length>1?'s':'')):''; if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet, tap ➕ to add the first one 📸💜<br>every pic you add shows up here for both of us</div>'; return; } grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _albumUrls.push(u); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="our date"></button>'; }).join(''); }).catch(function(){ _albumBusy=false; }); }
 function openLightbox(u){ var o=document.getElementById('lightbox'),i=document.getElementById('lightboxImg'); if(o&&i){ i.src=u; o.style.display='flex'; } }
 function closeLightbox(){ var o=document.getElementById('lightbox'); if(o)o.style.display='none'; }
 function _laMins(){ try{ var s=new Date().toLocaleTimeString('en-US',{timeZone:'America/Los_Angeles',hour12:false,hour:'2-digit',minute:'2-digit'}); var m=s.match(/(\d+):(\d+)/); return m?(+m[1]*60 + +m[2]):null; }catch(e){ return new Date().getHours()*60+new Date().getMinutes(); } }
@@ -2750,24 +2750,24 @@ function onMissionPicked(ev){
 /* ---------- HOW WELL DO YOU KNOW US (step13): interactive quiz, every "receipt" is a verbatim line from our real thread ----------
    sourced from a fresh grep of the actual export -- verified sender + date on every real quote before it went in here. */
 var QUIZ=[
-  {q:'the very first thing you ever texted me, word for word, was...', opts:['"Heyy"','"Hi!!"','"omg hii"','"hey you 👋"'], correct:0, receipt:'Nov 16, 2024, 10:15am. "Heyy" then "Sidhya here" two texts later, in case I didn\'t have you saved 😂'},
-  {q:'what do I actually call you the most, by the numbers?', opts:['sidhu','babu','baabu','bongo'], correct:0, receipt:'sidhu wins by a mile in the real thread. babu\'s a strong second. "bongo" only happened once and I stand by it'},
-  {q:'our single most-texted emoji of all time is...', opts:['😭','❤️','😂','💜'], correct:0, receipt:'😭, well over 380 times and climbing. we are certified criers'},
-  {q:'how many times has 😈 shown up in our texts?', opts:['32','5','58','12'], correct:0, receipt:'32 times, verified. no further comment 😏'},
-  {q:'which of these is a REAL text I sent you, word for word?', opts:['"I love you so much I\'m going to explodeee"','"you make my heart do backflips"','"i love you to infinity and beyond"','"you\'re my whole world fr fr"'], correct:0, receipt:'verbatim, May 30, 2026. still true every day'},
-  {q:'and THIS one — which text did I actually send?', opts:['"I want you to rip my clothes off"','"i can\'t wait to hold you all night"','"you\'re the only one for me"','"i think about you 24/7"'], correct:0, receipt:'verbatim, June 3, 2026. no notes 😏'},
-  {q:'now flip it — which text did YOU actually send ME?', opts:['"I wanna give you infinite hickeys"','"you\'re my whole heart"','"i can\'t stop smiling because of you"','"forever isn\'t long enough"'], correct:0, receipt:'verbatim, Jan 24, 2026. still collecting on that one 😏💜'},
-  {q:'what do I text you the SECOND you land somewhere?', opts:['landed, lil bongo','touchdown babe','we\'re home!','made it 🛬'], correct:0, receipt:'"Landed lil bongo." — March 23, 2026, verbatim. the nickname stuck'},
-  {q:'what time did you say yes to being mine?', opts:['10 PM','9 PM','midnight','8 PM'], correct:0, receipt:'Oct 25, 2025, 10:00 PM. straight from you two, no receipt needed for this one 💜'},
-  {q:'which of these compliments did I actually send you, word for word?', opts:['"you are gorgeous"','"you\'re breathtaking"','"you\'re a whole vibe"','"you\'re unreal"'], correct:0, receipt:'verbatim, Feb 6, 2026, completely out of nowhere. still mean it'},
-  {q:'and this compliment — which one is real?', opts:['"you are stunning"','"you\'re a whole mood"','"you glow different"','"you\'re ethereal"'], correct:0, receipt:'verbatim, March 11, 2026, with a 😋 right after for good measure'},
-  {q:'okay a spicier one — which text did I actually send?', opts:['"You\'re so hot"','"you\'re breathtaking tonight"','"you look incredible"','"you\'re a whole snack"'], correct:0, receipt:'verbatim, May 29, 2026 — said it, then immediately said "like actually" for emphasis'},
-  {q:'which nickname did I actually call you, word for word?', opts:['"my sexy girl"','"my whole world"','"my favorite person"','"my entire heart"'], correct:0, receipt:'verbatim, May 20, 2026, right after you told me I get hotter every day'},
-  {q:'last one of these — which line is REAL?', opts:['"your body is my home"','"you\'re my safe place"','"home is wherever you are"','"you complete me"'], correct:0, receipt:'verbatim, May 28, 2026 — followed immediately by "I would live in you and hold you forever." certified real one 💜'},
-  {q:'okay, actually spicy now — which text did I really send, out of nowhere?', opts:['"I got so horny at yk thinking of you"','"you\'ve been on my mind all day"','"i can\'t focus because of you"','"i keep thinking about us"'], correct:0, receipt:'verbatim, Jan 19, 2026. mid-conversation about something totally unrelated. no shame 😈'},
-  {q:'and one more — which is the real receipt?', opts:['"got so horny thinking on you at 7am"','"woke up thinking about you"','"dreamt about you all night"','"can\'t start my day without you"'], correct:0, receipt:'verbatim, Feb 5, 2026, 7:22am. you Loved this one — verified, it\'s in the receipts 😏💜'},
-  {q:'roughly how many texts have we actually sent each other, all-time?', opts:['over 30,000','about 5,000','under 1,000','around 12,000'], correct:0, receipt:'verified from the real thread and still climbing (check the statement on our boarding pass 👀)'},
-  {q:'how many "love you"s have actually been sent between us?', opts:['over 700','around 100','just 12','over 5,000'], correct:0, receipt:'700+ and counting, verified. we clearly never get tired of saying it'}
+  {q:'the very first thing you ever texted me, word for word, was...', opts:['"Heyy"','"Hi!!"','"omg hii"','"hey you 👋"'], correct:0, receipt:'lol yep. Nov 16 2024, 10:15am, "Heyy" then "Sidhya here" two texts later in case i didn\'t have you saved yet'},
+  {q:'what do I actually call you the most, by the numbers?', opts:['sidhu','babu','baabu','bongo'], correct:0, receipt:'ngl sidhu wins by a mile. babu\'s a solid second. "bongo" happened ONE time and i regret nothing'},
+  {q:'our single most-texted emoji of all time is...', opts:['😭','❤️','😂','💜'], correct:0, receipt:'😭 lol. over 380 times and still climbing. we are certified criers'},
+  {q:'how many times has 😈 shown up in our texts?', opts:['32','5','58','12'], correct:0, receipt:'32. counted it myself. no further comment 😏'},
+  {q:'which of these is a REAL text I sent you, word for word?', opts:['"I love you so much I\'m going to explodeee"','"you make my heart do backflips"','"i love you to infinity and beyond"','"you\'re my whole world fr fr"'], correct:0, receipt:'yep, May 30 2026, word for word. still true every single day'},
+  {q:'and THIS one, which text did I actually send?', opts:['"I want you to rip my clothes off"','"i can\'t wait to hold you all night"','"you\'re the only one for me"','"i think about you 24/7"'], correct:0, receipt:'that\'s the one. June 3 2026. no notes from me on this one 😏'},
+  {q:'now flip it, which text did YOU actually send ME?', opts:['"I wanna give you infinite hickeys"','"you\'re my whole heart"','"i can\'t stop smiling because of you"','"forever isn\'t long enough"'], correct:0, receipt:'that was you, Jan 24 2026. still collecting on that one 😏💜'},
+  {q:'what do I text you the SECOND you land somewhere?', opts:['landed, lil bongo','touchdown babe','we\'re home!','made it 🛬'], correct:0, receipt:'"landed lil bongo." March 23 2026, exact words. the nickname just stuck after that'},
+  {q:'what time did you say yes to being mine?', opts:['10 PM','9 PM','midnight','8 PM'], correct:0, receipt:'10pm, Oct 25 2025. don\'t need a screenshot for this one, i was there 💜'},
+  {q:'which of these compliments did I actually send you, word for word?', opts:['"you are gorgeous"','"you\'re breathtaking"','"you\'re a whole vibe"','"you\'re unreal"'], correct:0, receipt:'yep, Feb 6 2026, said completely out of nowhere. still mean it'},
+  {q:'and this compliment, which one is real?', opts:['"you are stunning"','"you\'re a whole mood"','"you glow different"','"you\'re ethereal"'], correct:0, receipt:'that one\'s real. March 11 2026, sent a 😋 right after for good measure'},
+  {q:'okay a spicier one, which text did I actually send?', opts:['"You\'re so hot"','"you\'re breathtaking tonight"','"you look incredible"','"you\'re a whole snack"'], correct:0, receipt:'lol yes. May 29 2026, then i immediately followed up with "like actually" just in case it wasn\'t clear'},
+  {q:'which nickname did I actually call you, word for word?', opts:['"my sexy girl"','"my whole world"','"my favorite person"','"my entire heart"'], correct:0, receipt:'guilty. May 20 2026, right after you told me i get hotter every day'},
+  {q:'last one of these, which line is REAL?', opts:['"your body is my home"','"you\'re my safe place"','"home is wherever you are"','"you complete me"'], correct:0, receipt:'that\'s real. May 28 2026, and right after i said "i would live in you and hold you forever" too. certified real one 💜'},
+  {q:'okay actually spicy now, which text did I really send out of nowhere?', opts:['"I got so horny at yk thinking of you"','"you\'ve been on my mind all day"','"i can\'t focus because of you"','"i keep thinking about us"'], correct:0, receipt:'yeah that\'s me. Jan 19 2026, mid conversation about something totally unrelated. no shame 😈'},
+  {q:'and one more, which is the real receipt?', opts:['"got so horny thinking on you at 7am"','"woke up thinking about you"','"dreamt about you all night"','"can\'t start my day without you"'], correct:0, receipt:'that one\'s real, Feb 5 2026, 7:22am. you even Loved it when i sent it, so it\'s extra verified 😏💜'},
+  {q:'roughly how many texts have we actually sent each other, all-time?', opts:['over 30,000','about 5,000','under 1,000','around 12,000'], correct:0, receipt:'over 30k and still going. check the number on our boarding pass, it\'s live 👀'},
+  {q:'how many "love you"s have actually been sent between us?', opts:['over 700','around 100','just 12','over 5,000'], correct:0, receipt:'700+ and counting. we clearly never get tired of saying it'}
 ];
 var _quizIdx=0, _quizScore=0, _quizAnswered=false;
 function renderQuiz(){
@@ -2777,7 +2777,7 @@ function renderQuiz(){
     if(bar)bar.style.width='100%';
     if(num)num.textContent='done!';
     var pct=Math.round(_quizScore/QUIZ.length*100);
-    var line = pct===100 ? "perfect score. obviously. you're literally me at this point 💜" : pct>=70 ? "okay certified expert on us 😌💜" : "a few misses but you know the important stuff — that i'm obsessed with you 💜";
+    var line = pct===100 ? "perfect score. obviously. you're literally me at this point 💜" : pct>=70 ? "okay certified expert on us 😌💜" : "a few misses but you know the important stuff, that i'm obsessed with you 💜";
     wrap.innerHTML='<div class="quiz-done"><div class="qd-score">'+_quizScore+' / '+QUIZ.length+'</div><div class="qd-line">'+line+'</div>'+
       '<button type="button" class="btn primary" style="margin-top:16px" onclick="resetQuiz()">↺ play again</button></div>';
     return;
@@ -2812,17 +2812,17 @@ function resetQuiz(){ _quizIdx=0; _quizScore=0; renderQuiz(); }
    sourced from real texts to her (grepped from the actual thread), still yours to tweak, babu. */
 var KIT=[
   {ico:'🛫', lbl:'open when you board your flight back to SLC',
-   txt:"flight's boarded babu 💜\nwindow seat if you got it. i miss you already and i really do mean that, even though i just watched you walk to the gate five minutes ago.\nwhen you land, text me one word: landed, lil bongo. i'll be up. i'm always up for you.\n— neal"},
+   txt:"flight's boarded babu 💜\nwindow seat if you got it. i miss you already and i really do mean that, even though i just watched you walk to the gate five minutes ago.\nwhen you land, text me one word: landed, lil bongo. i'll be up. i'm always up for you.\n- neal"},
   {ico:'🌙', lbl:'open on your first night home missing me',
    txt:"i know. the room's too quiet and the phone feels heavy.\ntruth is i already told you this once: i didn't sleep well at all last night and when i did, i had like five extremely vivid dreams about you. that's just what missing you does to me.\ni'd die in your arms, and i mean that as literally as a person can. so open our album, watch our movie, we really did all of that.\n700 miles is just geography. i'm not going anywhere. dream the cuddling dream 💜"},
   {ico:'🌧️', lbl:'open on a rough day',
-   txt:"hey. come here.\ndeep breath.\ni've told you this before and i'll tell you every time i mean it: i am so proud of you. so, so proud, for being self sufficient and doing the hard things and still showing up as yourself.\nyou are the strongest, smartest, hottest person i know, and one bad day doesn't get to touch any of that.\ncall me. i don't care what time it is.\n— your biggest fan, forever"},
+   txt:"hey. come here.\ndeep breath.\ni've told you this before and i'll tell you every time i mean it: i am so proud of you. so, so proud, for being self sufficient and doing the hard things and still showing up as yourself.\nyou are the strongest, smartest, hottest person i know, and one bad day doesn't get to touch any of that.\ncall me. i don't care what time it is.\n- your biggest fan, forever"},
   {ico:'💃', lbl:'open when you want to dance',
    txt:"permission to be extra: GRANTED.\nput our playlist on. full volume.\ni've said it straight up before and it's still true: i do think you're the best dancer i know. so dance like it, and send me a video or it didn't happen 😏💜"},
   {ico:'🚆', lbl:"open when you're on a train",
    txt:"a train. our thing, except technically it isn't yet, not until today.\nwindow seat, headphones in, first song of the playlist.\nnow pretend i'm in the seat next to you, doing the thing where i just stare at you.\nyou can feel it, can't you 💜 by the time you read this we'll already have a real one to remember."},
   {ico:'💜', lbl:'open when you need to hear it',
-   txt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so fucking beautiful, and i still want you to rip my clothes off. so.\ni love you more than anyone.\n— neal"}
+   txt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so fucking beautiful, and i still want you to rip my clothes off. so.\ni love you more than anyone.\n- neal"}
 ];
 function _kitUnlockedByDate(){ return /[?&]kit=1/.test(location.search) || new Date()>=new Date(2026,6,7); }   // sealed until July 7 (?kit=1 to preview)
 function _kitOk(){ try{return localStorage.getItem('wc_kit_ok')==='1';}catch(e){return false;} }
@@ -2831,7 +2831,7 @@ function renderKit(){
   var rack=document.getElementById('kitRack'); if(!rack)return;
   var dateOk=_kitUnlockedByDate(), ok=_kitOk(), opened=_kitOpened();
   var note=document.getElementById('kitNote'), gate=document.getElementById('kitGate');
-  if(note)note.textContent = !dateOk ? 'sealed until after our date, babu 💜 no peeking.' : (ok ? 'tap one when its moment comes 💜 no rush.' : 'they\'re ready for you — one security question first 💜');
+  if(note)note.textContent = !dateOk ? 'sealed until after our date, babu 💜 no peeking.' : (ok ? 'tap one when its moment comes 💜 no rush.' : 'they\'re ready for you, one security question first 💜');
   if(gate)gate.style.display = (dateOk&&!ok)?'':'none';
   rack.innerHTML=KIT.map(function(k,i){
     var open=opened.indexOf(i)>=0&&ok&&dateOk;
@@ -2856,13 +2856,13 @@ function kitTry(){
    NEAL: EDIT THE NOTES — drafts in your voice; the Oct 25 one is the big 1-year letter. */
 var DEPARTURES=[
   {date:'JUL 25', lbl:'monthiversary no. 9', at:new Date(2026,6,25),
-   note:"nine months, babu.\nthree weeks ago you were HERE — same train, same city, same me staring at you.\nre-watch our movie tonight. i'll do the same at the same time. 9pm? it's a date 💜"},
+   note:"nine months, babu.\nthree weeks ago you were HERE, same train, same city, same me staring at you.\nre-watch our movie tonight. i'll do the same at the same time. 9pm? it's a date 💜"},
   {date:'AUG 25', lbl:'monthiversary no. 10', at:new Date(2026,7,25),
    note:"double digits!! ten months.\nfun fact: the World Cup ended a month ago and i still think about you in that jersey every single day.\ngo get yourself something sweet today. tell them babu sent you 💜"},
   {date:'SEP 25', lbl:'monthiversary no. 11', at:new Date(2026,8,25),
    note:"eleven. ELEVEN.\none month from the biggest one. i'm already planning it and no, you can't have hints.\nyou are my favorite notification, my best decision, my whole starting XI 💜"},
   {date:'OCT 25', lbl:'★ ONE YEAR ★', at:new Date('2026-10-25T22:00:00-07:00'),
-   note:"one year ago, 10pm, you said yes to being mine.\n365 days. two cities. one airline that only flies one route.\nevery mile between us just proved how far i'd go for you.\nhappy anniversary, sidhya. i love you more than anyone, and next year i'm saying it from closer.\n— your captain, always 💜"},
+   note:"one year ago, 10pm, you said yes to being mine.\n365 days. two cities. one airline that only flies one route.\nevery mile between us just proved how far i'd go for you.\nhappy anniversary, sidhya. i love you more than anyone, and next year i'm saying it from closer.\n- your captain, always 💜"},
   {date:'SOMEDAY', lbl:'disneyland · the tea cups', at:null,
    note:"standby forever, never cancelled 💜\nour kids are riding those tea cups whether they like it or not."},
   {date:'SOMEDAY', lbl:'akshardham · the temple run', at:null,
@@ -3084,7 +3084,7 @@ function loadBracket(force){
   fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260628-20260720&limit=200',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
     var evs=((j&&j.events)||[]).map(function(ev){ var c=ev.competitions&&ev.competitions[0]; if(!c)return null; var cs=c.competitors||[]; var h=cs.filter(function(x){return x.homeAway==='home';})[0]||cs[0], a=cs.filter(function(x){return x.homeAway==='away';})[0]||cs[1]; if(!h||!a)return null; var st=(ev.status&&ev.status.type)||{}; return { id:ev.id||'', round:(ev.season&&ev.season.slug)||'', ms:Date.parse(ev.date)||0, h:(h.team&&h.team.abbreviation)||'', a:(a.team&&a.team.abbreviation)||'', hsdn:(h.team&&h.team.shortDisplayName)||'', asdn:(a.team&&a.team.shortDisplayName)||'', hs:h.score, as:a.score, hw:h.winner===true, aw:a.winner===true, state:st.state||'pre', detail:st.shortDetail||'', href:(ev.links&&ev.links[0]&&ev.links[0].href)||('https://www.google.com/search?q='+encodeURIComponent((ev.shortName||'')+' world cup')) }; }).filter(Boolean);
     _bracketCache=evs; _bracketAt=Date.now(); renderBracket(evs);
-  }).catch(function(){ if(!box.querySelector('.bracket-col')) box.innerHTML='<div class="album-empty">could not load the bracket right now — tap ↻ 💜</div>'; });
+  }).catch(function(){ if(!box.querySelector('.bracket-col')) box.innerHTML='<div class="album-empty">could not load the bracket right now, tap ↻ 💜</div>'; });
 }
 var PREV_ROUND={'round-of-16':'round-of-32','quarterfinals':'round-of-16','semifinals':'quarterfinals','final':'semifinals','3rd-place-match':'semifinals'};   // 3rd place is fed by the SEMIS (losers), not the final
 function _slotRef(sdn){   // parses ESPN's own placeholder shortDisplayName ("RD32 W11","RD16 W5","QF W3","SF L2") into {round, idx (0-based)}
@@ -3273,7 +3273,7 @@ function renderBracket(evs){
       if(prevGames){
         var si=_findSrcIdx(g.h,g.hsdn,prevGames), sj=_findSrcIdx(g.a,g.asdn,prevGames);
         if(si!=null&&pMap[si]!=null)links.push({from:psl+':'+pMap[si],to:sl+':'+i});
-        if(sj!=null&&pMap[sj]!=null)links.push({from:psl+':'+pMap[sj],to:sl+':'+i});
+        if(sj!=null&&sj!==si&&pMap[sj]!=null)links.push({from:psl+':'+pMap[sj],to:sl+':'+i});   // guard: ESPN's own feed can briefly show BOTH slots referencing the same source game right after it's decided (their data lag, not ours) -- never draw two connectors to the same cell
       }
       var ours = our.length===2 && our[0].indexOf('/')<0 && our[1].indexOf('/')<0 && [g.h,g.a].indexOf(our[0])>=0 && [g.h,g.a].indexOf(our[1])>=0;
       var scored=g.state!=='pre';
@@ -3323,7 +3323,7 @@ function renderBracket(evs){
     return '<span class="ft-game" data-href="'+esc(g.href)+'">'+rnd+'<span class="ft-team">'+esc(g.h)+'</span> '+mid+' <span class="ft-team">'+esc(g.a)+'</span> '+stat+'</span>';
   }
   function render(games){
-    if(!games.length){ track.innerHTML='<span class="ft-empty">⚽ no recent World Cup games — check back at kickoff 💜</span>'; track.style.animation='none'; return; }
+    if(!games.length){ track.innerHTML='<span class="ft-empty">⚽ no recent World Cup games, check back at kickoff 💜</span>'; track.style.animation='none'; return; }
     var one=games.map(itemHTML).join('');
     track.style.animation=''; track.innerHTML=one+one;
     var fill=function(){
