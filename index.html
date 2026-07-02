@@ -1673,7 +1673,20 @@ function scrollToMap(){
     return s;
   };
 })();
+function pickComplete(){ return !!(pick && pick.venue && pick.during && pick.after); }
+function toast(msg){   // visible on ANY step (unlike hint(), which only shows on step4's #shareHint)
+  var t=document.getElementById('gToast');
+  if(!t){ t=document.createElement('div'); t.id='gToast';
+    t.style.cssText='position:fixed;left:50%;bottom:calc(var(--player) + var(--tick) + 14px);transform:translateX(-50%);background:#241733;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-family:inherit;z-index:9999;box-shadow:0 8px 20px rgba(0,0,0,.3);opacity:0;transition:opacity .2s;max-width:86vw;text-align:center';
+    document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._h); t._h=setTimeout(function(){t.style.opacity='0';},2200);
+}
 function go(n){
+  if(n>=4 && !pickComplete()){   // add-ons + boarding pass only exist once the picks are locked in; never show an empty pass
+    toast('finish picking your night first, babu 💜'); if(window.buzz)buzz(15);
+    n = pick.venue ? (pick.during ? 3 : 2) : 1;
+  }
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   var _pl=document.getElementById('pgPlane'); if(_pl){_pl.style.left=(6+Math.min(n,4)/4*88)+'%';}
@@ -2931,7 +2944,7 @@ function roundShort(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][0])||(sl?sl.replac
 function roundLong(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][1])||(sl?sl.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}):''); }
 function _escB(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 var _bracketCache=null, _bracketAt=0;
-function openBracket(){ go(8); loadBracket(); }
+function openBracket(){ if(!pickComplete()){ toast('finish picking your night first, babu 💜'); if(window.buzz)buzz(15); return; } go(8); loadBracket(); }
 function loadBracket(force){
   var box=document.getElementById('bracketCols'); if(!box)return;
   if(!box._wired){ box.addEventListener('click',function(e){ var c=e.target.closest&&e.target.closest('.bracket-cell'); if(c&&c.getAttribute('data-href')) window.open(c.getAttribute('data-href'),'_blank','noopener'); }); box._wired=true; }
