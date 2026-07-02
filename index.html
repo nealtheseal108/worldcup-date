@@ -507,8 +507,14 @@
   .ah-btn{margin-top:10px}
   /* ticker round tag + custom bracket page (step8) */
   .ft-round{display:inline-block;background:rgba(167,139,250,.22);color:#c4b5fd;font-size:8px;font-weight:700;letter-spacing:.6px;padding:2px 5px;border-radius:5px;margin-right:8px;vertical-align:1px}
-  .bracket-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 12px;margin:0 -4px}
-  .bracket{display:flex;gap:12px;align-items:stretch;min-width:min-content;position:relative}
+  .bracket-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 12px;margin:0 -4px;transition:height .2s}
+  .bracket-scroll.zoomed{overflow:hidden}   /* height is set explicitly in JS to match the scaled content -- transform doesn't affect layout size, so an unclipped "auto" height would let the scaled-up content balloon the whole page's scroll area */
+  .bracket-zoomctrl{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px}
+  .bz-arrow{width:38px;height:38px;flex:none;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--lav);font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 3px 8px rgba(53,28,94,.1);transition:opacity .15s,transform .12s}
+  .bz-arrow:disabled{opacity:.3;cursor:default}
+  .bz-arrow:not(:disabled):hover{transform:scale(1.08)}
+  .bracket-zoomlbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--lav);font-weight:700;min-width:130px;text-align:center}
+  .bracket{display:flex;gap:12px;align-items:stretch;min-width:min-content;position:relative;transition:transform .55s cubic-bezier(.22,.8,.25,1)}
   .bracket-lines{position:absolute;top:0;left:0;overflow:visible;pointer-events:none;z-index:0}
   .bracket-lines path{fill:none;stroke:rgba(124,77,202,.32);stroke-width:1.5}
   .bracket-lines path.ours-line{stroke:var(--lav);stroke-width:2.4}
@@ -995,7 +1001,12 @@
     <section class="step" id="step8">
       <div class="iti-head" style="margin-top:2px"><div class="big">🏆</div><h2 style="font-size:24px">the road to the cup</h2><div class="venue">the knockout bracket · tap a match for details on ESPN</div></div>
       <div class="album-add-row" style="margin-bottom:10px"><button class="btn lav2btn" type="button" onclick="loadBracket(true)">↻ refresh scores</button></div>
-      <div class="bracket-scroll"><div class="bracket" id="bracketCols"><div class="album-empty">loading the bracket…</div></div></div>
+      <div class="bracket-zoomctrl" id="bracketZoomCtrl">
+        <button type="button" class="bz-arrow" id="bzPrev" onclick="zoomBracket(_bracketZoomIdx-1)" title="zoom out" disabled>‹</button>
+        <span class="bracket-zoomlbl" id="bracketZoomLbl">full bracket</span>
+        <button type="button" class="bz-arrow" id="bzNext" onclick="zoomBracket(_bracketZoomIdx+1)" title="zoom into the next round">›</button>
+      </div>
+      <div class="bracket-scroll" id="bracketScroll"><div class="bracket" id="bracketCols"><div class="album-empty">loading the bracket…</div></div></div>
       <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
@@ -3027,13 +3038,54 @@ function _drawBracketLines(){
     var fromEl=box.querySelector('[data-slot="'+l.from+'"]'), toEl=box.querySelector('[data-slot="'+l.to+'"]');
     if(!fromEl||!toEl)return;
     var fr=fromEl.getBoundingClientRect(), tr=toEl.getBoundingClientRect();
+    if(!fr.width||!tr.width)return;   // either endpoint's column is hidden (zoomed view dropped it) -- skip rather than draw a stray line from (0,0)
     var x0=fr.right-br.left, y0=fr.top+fr.height/2-br.top, x2=tr.left-br.left, y1=tr.top+tr.height/2-br.top, midX=(x0+x2)/2;
     var ours=fromEl.classList.contains('ours')||toEl.classList.contains('ours');   // OR, not AND: a connector touches exactly ONE 'ours' cell at a time (its two endpoints are always different games), so AND could never light up
     out+='<path class="'+(ours?'ours-line':'')+'" d="M'+x0.toFixed(1)+','+y0.toFixed(1)+' H'+midX.toFixed(1)+' V'+y1.toFixed(1)+' H'+x2.toFixed(1)+'"/>';
   });
   svg.innerHTML=out;
 }
-if(typeof window!=='undefined')window.addEventListener('resize',function(){ var s=document.getElementById('step8'); if(s&&s.classList.contains('active'))_drawBracketLines(); });
+var ZOOM_STOPS=['quarterfinals','semifinals','final'], _bracketPresent=[], _bracketZoomIdx=-1;
+function _zoomStopsAvail(){ return ZOOM_STOPS.filter(function(sl){ return _bracketPresent.indexOf(sl)>=0; }); }
+function zoomBracket(idx){
+  var stops=_zoomStopsAvail(); if(!stops.length)return;
+  if(idx<-1)idx=-1; if(idx>stops.length-1)idx=stops.length-1;
+  _bracketZoomIdx=idx; _applyZoom();
+}
+function _applyZoom(){
+  var box=_bracketBox, scroller=document.getElementById('bracketScroll'); if(!box||!scroller)return;
+  var stops=_zoomStopsAvail();
+  if(_bracketZoomIdx>stops.length-1)_bracketZoomIdx=stops.length-1;
+  var lbl=document.getElementById('bracketZoomLbl'), prevBtn=document.getElementById('bzPrev'), nextBtn=document.getElementById('bzNext');
+  if(lbl)lbl.textContent=(_bracketZoomIdx<0||!stops.length)?'full bracket':roundLong(stops[_bracketZoomIdx]);
+  if(prevBtn)prevBtn.disabled=_bracketZoomIdx<0;
+  if(nextBtn)nextBtn.disabled=!stops.length||_bracketZoomIdx>=stops.length-1;
+  var cols=Array.prototype.slice.call(box.querySelectorAll('.bracket-col'));
+  if(_bracketZoomIdx<0||!stops.length){
+    cols.forEach(function(c){c.style.display='';});
+    scroller.classList.remove('zoomed'); scroller.scrollLeft=0; scroller.style.height=''; box.style.transform='none';
+    setTimeout(_drawBracketLines,30);   // restore full connectors now that every column is visible again
+    return;
+  }
+  var sl=stops[_bracketZoomIdx], prevSl=PREV_ROUND[sl], visible=[prevSl,sl];
+  cols.forEach(function(c){ c.style.display = visible.indexOf(c.getAttribute('data-round'))>=0 ? '' : 'none'; });   // hide the now-irrelevant earlier rounds; flex align-items:stretch then auto-shrinks height to whichever VISIBLE column is tallest
+  scroller.classList.add('zoomed');
+  setTimeout(function(){   // let the display:none/flex-reflow settle before measuring (setTimeout, not rAF -- rAF can stall in a throttled/background preview context)
+    box.style.transform='none'; scroller.scrollLeft=0; scroller.style.height='';   // unscale first so the rects below are measured in natural, unscaled coordinates
+    _drawBracketLines();   // recompute connectors for the collapsed (fewer-columns) layout
+    var visCols=cols.filter(function(c){return visible.indexOf(c.getAttribute('data-round'))>=0;});
+    if(!visCols.length)return;
+    var br=box.getBoundingClientRect();
+    var minX=Infinity,maxX=-Infinity;
+    visCols.forEach(function(c){ var r=c.getBoundingClientRect(); minX=Math.min(minX,r.left-br.left); maxX=Math.max(maxX,r.right-br.left); });
+    var fw=Math.max(1,maxX-minX), vw=scroller.clientWidth;
+    var scale=Math.min(vw/fw, 1.8);   // width-fit only; height auto-shrinks via flex stretch, capped so desktop doesn't blow the cards up absurdly
+    scroller.style.height=(br.height*scale)+'px';   // transform doesn't affect layout size, so the scroller must be told explicitly how tall the SCALED content will paint, or it clips/balloons
+    box.style.transformOrigin='0 0';
+    box.style.transform='scale('+scale.toFixed(3)+')';
+  },30);
+}
+if(typeof window!=='undefined')window.addEventListener('resize',function(){ var s=document.getElementById('step8'); if(s&&s.classList.contains('active')){_drawBracketLines();_applyZoom();} });
 function renderBracket(evs){
   var box=document.getElementById('bracketCols'); if(!box)return;
   var order=['round-of-32','round-of-16','quarterfinals','semifinals','final','3rd-place-match'];
@@ -3054,11 +3106,13 @@ function renderBracket(evs){
       function row(ab,sc,win){ return '<div class="bc-team '+(scored?(win?'win':'lose'):'')+'"><span>'+_escB(ab||'TBD')+'</span>'+(scored?'<span class="bc-sc">'+_escB(sc)+'</span>':'<span class="bc-pct"></span>')+'</div>'; }
       return '<div class="bracket-cell'+(ours?' ours':'')+'" data-slot="'+sl+':'+i+'" data-id="'+_escB(g.id)+'" data-href="'+_escB(g.href)+'" role="button" title="open on ESPN">'+row(g.h,g.hs,g.hw)+row(g.a,g.as,g.aw)+'<div class="bc-meta">'+(g.state==='in'?'🔴 ':'')+_escB(g.detail||'vs')+'</div></div>';
     }).join('');
-    return '<div class="bracket-col"><div class="bracket-col-h">'+_escB(roundLong(sl))+'</div><div class="bracket-col-cells">'+cells+'</div></div>';
+    return '<div class="bracket-col" data-round="'+sl+'"><div class="bracket-col-h">'+_escB(roundLong(sl))+'</div><div class="bracket-col-cells">'+cells+'</div></div>';
   }).join('');
+  box.style.transform='none';   // always rebuild the connectors in natural (unscaled) coordinates; any active zoom is reapplied below
   box.innerHTML = html ? ('<svg class="bracket-lines"></svg>'+html) : '<div class="album-empty">bracket coming soon 💜</div>';
-  _bracketLinks=links; _bracketBox=box;
-  if(html){ requestAnimationFrame(_drawBracketLines); setTimeout(_drawBracketLines,150); setTimeout(_drawBracketLines,500); }   // fonts/layout settle, same pattern as fitTicketScale
+  _bracketLinks=links; _bracketBox=box; _bracketPresent=present;
+  if(html){ requestAnimationFrame(_drawBracketLines); setTimeout(_drawBracketLines,150); setTimeout(_drawBracketLines,500); setTimeout(_applyZoom,520); }   // fonts/layout settle, same pattern as fitTicketScale
+  else { _applyZoom(); }
   _loadBracketProbs(evs);
 }
 /* ---------- FIFA World Cup live score ticker (bottom strip, every page) ---------- */
