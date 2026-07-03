@@ -251,7 +251,7 @@
   /* ---------- hero live flight-status band (reunion countdown + miles-to-zero) ---------- */
   .flightstatus{max-width:340px;margin:-6px auto 24px;background:linear-gradient(165deg,#fff,#f7f2ff);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 22px rgba(53,28,94,.14);padding:12px 15px 15px;text-align:center;font-family:'Courier Prime',ui-monospace,monospace}
   .fs-top{font-size:10px;letter-spacing:2px;color:var(--lav);font-weight:700}
-  .fs-arc{display:flex;align-items:center;gap:9px;margin:11px auto 5px;max-width:280px}
+  .fs-arc{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:9px;margin:11px auto 5px;max-width:280px;width:100%}
   .fs-city{font-weight:800;font-size:13px;color:var(--ink);letter-spacing:1px;flex:none}
   .fs-track{flex:1 1 auto;height:2px;background:repeating-linear-gradient(90deg,var(--lav2) 0 5px,transparent 5px 11px);position:relative;border-radius:2px;transition:flex-basis .9s cubic-bezier(.5,.1,.3,1),max-width .9s cubic-bezier(.5,.1,.3,1);max-width:400px}
   .fs-plane{position:absolute;top:50%;left:12%;transform:translate(-50%,-50%);font-size:15px;transition:left 1s cubic-bezier(.5,.1,.4,1)}
@@ -295,6 +295,8 @@
   .pos-name{font-weight:700;color:#3a2a63;text-transform:capitalize}
   .pos-stamp{font-size:10.5px;color:var(--muted);white-space:nowrap}
   .pos-row.pos-done .pos-stamp{color:#3f9e5c;font-weight:700}
+  .pos-inkstamp{display:inline-block;transform:rotate(-9deg);border:2.5px solid #3f9e5c;border-radius:6px;color:#3f9e5c;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:800;letter-spacing:1.5px;padding:2px 7px;opacity:.85}
+  .pos-air{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:1.8px;color:var(--lav);text-transform:uppercase;font-weight:700;margin-bottom:2px}
   .pos-note{margin:-4px 0 4px;padding:0 13px;font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:12.5px;color:var(--lav);text-align:left}
   /* locked date-diary finale */
   .diarylock{text-align:center;background:linear-gradient(160deg,#f3eefc,#ece3fb);border:1px dashed var(--lav2);border-radius:16px;padding:28px 22px;margin-top:6px}
@@ -2040,16 +2042,14 @@ var POSITIONS=[
   {name:'lotus', done:true},
   {name:'doggy style', done:true},
   {name:'reverse cowgirl', done:false},
-  {name:'69', done:false},
   {name:'spooning', done:false},
   {name:'standing', done:false},
-  {name:'face-sitting', done:false},
   {name:'wheelbarrow', done:false}
 ];
 function renderPositions(){
   var l=document.getElementById('posList'); if(!l)return;
   l.innerHTML=POSITIONS.map(function(p){
-    return '<div class="pos-row'+(p.done?' pos-done':'')+'"><span class="pos-name">'+p.name+'</span><span class="pos-stamp">'+(p.done?'✅ stamped':'not yet · someday 😏')+'</span></div>'
+    return '<div class="pos-row'+(p.done?' pos-done':'')+'"><span class="pos-name">'+p.name+'</span><span class="pos-stamp">'+(p.done?'<span class="pos-inkstamp">VISITED</span>':'not yet · someday 😏')+'</span></div>'
       +(p.note?'<div class="pos-note">'+p.note+'</div>':'');
   }).join('');
 }
@@ -3704,6 +3704,7 @@ window.initTimeline=function(){};
 <div id="posOverlay" class="egg" style="display:none" onclick="if(event.target===this)hidePositions()">
   <div class="egg-card">
     <div class="egg-emoji">📖</div>
+    <div class="pos-air">✈ NEAL AIR</div>
     <h2 class="egg-h">our position passport</h2>
     <div class="pos-list" id="posList"></div>
     <div class="egg-sig">💜 more stamps to come</div>
