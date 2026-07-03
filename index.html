@@ -1770,8 +1770,8 @@ function reveal(){
     ['~6:55 PM','<b>full time!</b>','wraps up around 6:55. soak up the vibes, grab some pics, and let the first crowd wave clear out (a lil later if it goes to extra time + pens).'],
     ['7:30 PM',`<b>Dinner: ${pick.after.t}!</b>`, pick.after.d],
     ['~9:00 PM','<b>Free Salt &amp; Straw 🍦</b>','We hop off in Bellevue Downtown and cash in our free Salt &amp; Straw. Two spoons, one cup, zero regrets.'],
-    ['~9:20 PM','<b>Bellevue Downtown Park 💜</b>', _spiceMode()==='r' ? "A slow lap around the park and the waterfall, then a kiss under the lights that doesn't want to stop. hours of jerseys and crowds and a stolen hour still on both our minds, and you're still the only thing I want to look at. Best part of the night, just saying. 😚" : 'A slow lap around the park and the waterfall, then a little kiss under the lights. Best part of the night, just saying. 😚'],
-    ['~9:45 PM','<b>Easy ride home.</b>', _spiceMode()==='r' ? "Back on the 2 Line, which runs until midnight, so there is never a rush home. and babu, the day's not over just because we're back 😏 you asked me once, out of nowhere, \"can we shower together tonight\" 👀 well. tonight's finally that night." : 'Back on the 2 Line, which runs until midnight, so there is never a rush home.']
+    ['~9:20 PM','<b>Bellevue Downtown Park 💜</b>','A slow lap around the park and the waterfall, then a little kiss under the lights. Best part of the night, just saying. 😚'],
+    ['~9:45 PM','<b>Easy ride home.</b>', _spiceMode()==='r' ? "Back on the 2 Line, which runs until midnight, so there is never a rush home. and babu, the day's not over just because we're back 😏" : 'Back on the 2 Line, which runs until midnight, so there is never a rush home.']
   ];
   window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
   window.dayPlan = rows.map(function(r){return {t:r[0], label:(r[1]||'').replace(/<[^>]+>/g,'').trim(), mins:(typeof _parseLegTime==='function'?_parseLegTime(r[0]):null)};});   // for the live tracker's now/next
@@ -3681,7 +3681,7 @@ window.initTimeline=function(){};
   <div class="egg-card">
     <div class="egg-emoji">😏</div>
     <h2 class="egg-h">the train's not the only ride</h2>
-    <p class="egg-msg">real receipts, no notes 💜<br>"i want to ride you" <span style="opacity:.65">· jan 28, 2026</span><br>"RIDE YOU WHEN" <span style="opacity:.65">· mar 17, 2026, all caps, yours</span></p>
+    <p class="egg-msg">you can ride something else 💜</p>
     <div class="egg-sig">🚆 all aboard, neal</div>
     <button class="btn primary" type="button" onclick="hideRide()">okok, back to the pass ✨</button>
   </div>
