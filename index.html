@@ -1866,6 +1866,7 @@ document.addEventListener('click',function(e){
   if(el)buzz(8);
 },true);
 /* ---------- PG / R content switch: default PG, hidden trigger only (no visible button -- tap the topbar ball 5x) ---------- */
+try{ localStorage.setItem('wc_spice','pg'); }catch(e){}   // every fresh page load starts PG, even if a prior session left it in R
 function _spiceMode(){ try{ return localStorage.getItem('wc_spice')==='r' ? 'r' : 'pg'; }catch(e){ return 'pg'; } }
 function toggleSpice(){
   var next = _spiceMode()==='pg' ? 'r' : 'pg';
