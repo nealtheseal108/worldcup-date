@@ -1871,6 +1871,7 @@ function toggleSpice(){
   if(window.resetQuiz)resetQuiz();     // deck length can change between modes, restart clean rather than risk a mismatched index
   if(window.renderKit)renderKit();
   if(window.renderDepartures)renderDepartures();
+  if(window.renderQDeck){ var qd=document.getElementById('qDeck'); if(qd)qd.scrollLeft=0; renderQDeck(); }
 }
 var _ballTaps=0, _ballTapTimer=null;
 function _ballTap(){   // 5 taps on the topbar ball within 1.5s flips the PG/R switch -- deliberately not a visible control
@@ -1967,7 +1968,7 @@ function showArrivalsHall(){
   _ahFlipRow(document.getElementById('ahRow1'),'WELCOME TO SEATTLE');
   _ahFlipRow(document.getElementById('ahRow2'),'SIDHYA');
   var ahR=document.getElementById('ahRow3');
-  if(ahR){ if(_spiceMode()==='r'){ ahR.style.display=''; _ahFlipRow(ahR,'NEAL IS GOING TO POUND YOU IN MISSIONARY'); } else { ahR.style.display='none'; ahR.innerHTML=''; } }
+  if(ahR){ ahR.style.display=''; _ahFlipRow(ahR, _spiceMode()==='r' ? 'TIME FOR SOME MISSIONARY POUNDING' : 'TIME TO SPEND TIME WITH YOUR BABU'); }
   var mi=document.getElementById('ahMiles'), t0=null;
   function fr(t){ if(t0===null)t0=t; var p=Math.min(1,(t-t0)/2300); var v=Math.round(700*(1-p*p)); mi.textContent=v>0?(v+' mi'):'0 mi 💜'; if(p<1)requestAnimationFrame(fr); }
   if(mi){ requestAnimationFrame(fr); setTimeout(function(){ mi.textContent='0 mi 💜'; },2800); }   // fail-safe
@@ -2704,29 +2705,41 @@ function resetBingo(){ try{localStorage.removeItem('wc_bingo');localStorage.remo
 
 /* ---------- ROW 25 halftime question deck (step10): static, offline, scroll-snap ---------- */
 var Q_DECK=[
-  'window seat or aisle? defend your answer.',
-  'first thing you noticed about me. be honest 😏',
-  'what did you ACTUALLY think the night of Oct 25?',
-  'if we could teleport anywhere for the next 24 hours, where are we?',
-  "what's your favorite text i've ever sent you?",
-  'describe our Disneyland day in 2036. every detail, babu.',
-  'where are WE during the next World Cup (2030)?',
-  'one thing i do that makes you feel the most loved?',
-  'if our story was a movie, what is its title?',
-  "something you've never told me you want us to try together?",
-  'who fell first? (there is a correct answer)',
-  'invent our own stadium chant. right now. out loud.',
-  'one word for how today feels so far.',
-  'no question. just look at me for ten whole seconds. 💜'
+  {t:'window seat or aisle? defend your answer.'},
+  {t:'first thing you noticed about me. be honest 😏'},
+  {t:'what did you ACTUALLY think the night of Oct 25?'},
+  {t:'if we could teleport anywhere for the next 24 hours, where are we?'},
+  {t:"what's your favorite text i've ever sent you?"},
+  {t:'describe our Disneyland day in 2036. every detail, babu.'},
+  {t:'where are WE during the next World Cup (2030)?'},
+  {t:'one thing i do that makes you feel the most loved?'},
+  {t:'if our story was a movie, what is its title?'},
+  {t:"something you've never told me you want us to try together?"},
+  {t:'who fell first? (there is a correct answer)'},
+  {t:'invent our own stadium chant. right now. out loud.'},
+  {t:'one word for how today feels so far.'},
+  {t:'no question. just look at me for ten whole seconds. 💜'},
+  {t:"what's the naughtiest thing we've done that you'd never tell anyone about? 😏", r:true},
+  {t:'rate our sex life out of 10, right now, no lying', r:true},
+  {t:"what's one thing you want me to do to you tonight that we haven't tried yet?", r:true},
+  {t:"describe, in detail, what you want to do to me the second we're alone tonight 😈", r:true},
+  {t:'what\'s your favorite thing about our sex life?', r:true},
+  {t:'if we could do anything together tonight, no shame, what is it?', r:true}
 ];
+function _qDeckActive(){ return _spiceMode()==='r' ? Q_DECK : Q_DECK.filter(function(q){return !q.r;}); }
 function renderQDeck(){
-  var d=document.getElementById('qDeck'); if(!d||d.children.length)return;
-  d.innerHTML=Q_DECK.map(function(q,i){ return '<div class="q-card"><div class="q-tag">GANESH AIR · SEATBACK CARD '+(i+1)+' OF '+Q_DECK.length+'</div><div class="q-text">'+q+'</div></div>'; }).join('');
+  var d=document.getElementById('qDeck'); if(!d)return;
+  var deck=_qDeckActive();
+  d.innerHTML=deck.map(function(q,i){ return '<div class="q-card"><div class="q-tag">GANESH AIR · SEATBACK CARD '+(i+1)+' OF '+deck.length+'</div><div class="q-text">'+q.t+'</div></div>'; }).join('');
   var bar=document.getElementById('qBar'), num=document.getElementById('qNum'), tick=false;
+  if(num)num.textContent='Q 1 / '+deck.length;
+  if(bar)bar.style.width=((1/deck.length)*100)+'%';
+  if(d._qScrollBound)return; d._qScrollBound=true;
   d.addEventListener('scroll',function(){ if(tick)return; tick=true; requestAnimationFrame(function(){ tick=false;
-    var i=Math.min(Q_DECK.length-1,Math.max(0,Math.round(d.scrollLeft/(d.scrollWidth/Q_DECK.length))));
-    if(num)num.textContent='Q '+(i+1)+' / '+Q_DECK.length;
-    if(bar)bar.style.width=(((i+1)/Q_DECK.length)*100)+'%';
+    var cur=_qDeckActive();
+    var i=Math.min(cur.length-1,Math.max(0,Math.round(d.scrollLeft/(d.scrollWidth/cur.length))));
+    if(num)num.textContent='Q '+(i+1)+' / '+cur.length;
+    if(bar)bar.style.width=(((i+1)/cur.length)*100)+'%';
   }); },{passive:true});
 }
 /* ---------- PHOTO MISSIONS (tracker page): baggage-tag challenges that feed the shared album ---------- */
@@ -2925,7 +2938,8 @@ function answerQuiz(i){
   var r=document.getElementById('quizReceipt'); if(r){ r.style.display='block'; r.innerHTML=(right?'✅ ':'❌ ')+_escB(item.receipt); }
   var nb=document.getElementById('quizNextBtn'); if(nb)nb.style.display='';
 }
-function nextQuiz(){ _quizIdx++; renderQuiz(); }
+var _quizNexting=false;
+function nextQuiz(){ if(_quizNexting)return; _quizNexting=true; _quizIdx++; renderQuiz(); setTimeout(function(){_quizNexting=false;},250); }
 function resetQuiz(){ _quizCycle=null; _quizIdx=0; _quizScore=0; renderQuiz(); }
 /* ---------- COMFORT KIT (step11): open-when letters, sealed until after the date ----------
    sourced from real texts to her (grepped from the actual thread), still yours to tweak, babu. */
