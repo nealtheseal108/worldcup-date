@@ -1899,14 +1899,16 @@ function _fsSetClock(d,h,mi,s){
   for(var i=0;i<_fsCells.length;i++){ if(_fsCells[i].textContent!==digs[i]){ _fsCells[i].textContent=digs[i]; _fsCells[i].classList.remove('flip'); void _fsCells[i].offsetWidth; _fsCells[i].classList.add('flip'); } }
 }
 var _liveDistMi=null, _liveDistAt=0, _liveDistTrying=false;
+(function(){ try{ var c=JSON.parse(localStorage.getItem('wc_livedist')||'null'); if(c&&c.mi!=null){ _liveDistMi=c.mi; _liveDistAt=c.at; } }catch(e){} })();
 function _updateLiveDist(){   // real device GPS vs Neal's place -- there's no public API for Apple's Find My, this is the closest honest equivalent
   if(!navigator.geolocation||_liveDistTrying) return;
-  var t=Date.now(); if(t-_liveDistAt<20000) return;   // throttle: one location fix per 20s max
+  var t=Date.now(); if(t-_liveDistAt<120000) return;   // throttle: one fresh GPS fix per 2 min max, cached value shows instantly in between
   _liveDistTrying=true;
   navigator.geolocation.getCurrentPosition(function(pos){
     _liveDistTrying=false; _liveDistAt=Date.now();
     _liveDistMi=Math.round(_haversineMi({lat:pos.coords.latitude,lng:pos.coords.longitude},{lat:START_NEAL[0],lng:START_NEAL[1]}));
-  }, function(){ _liveDistTrying=false; _liveDistAt=Date.now(); }, {timeout:8000,maximumAge:15000});
+    try{localStorage.setItem('wc_livedist',JSON.stringify({mi:_liveDistMi,at:_liveDistAt}));}catch(e){}
+  }, function(){ _liveDistTrying=false; _liveDistAt=Date.now(); }, {timeout:8000,maximumAge:60000});
 }
 function _fsTick(){
   var el=document.getElementById('flightStatus'); if(!el) return;
