@@ -1558,6 +1558,7 @@ function _swRenderDeck(stepKey, cont, items, animate){
   }
   function fly(dir){
     if(busy||!topCard)return; busy=true;
+    if(window.buzz)buzz(dir==='like'?14:8);
     if(dir==='like')liked.push(items[idx]);
     var card=topCard, off=(dir==='like'?1:-1)*(window.innerWidth||500);
     card.style.transition='transform .4s cubic-bezier(.3,.1,.5,1), opacity .4s ease';
@@ -1633,6 +1634,7 @@ function _swRenderChosen(stepKey, cont, items){
 }
 
 function _swApplyPick(stepKey, it){
+  if(window.buzz)buzz(22);
   if(stepKey==='venue'){
     if(window.pickVenue){ window.pickVenue(it.key); }   // sets pick.venue, clears downstream, enables next1, re-renders -> chosen
     else { if(pick.venue!==it.key){pick.during=null;pick.after=null;} pick.venue=it.key; var n=document.getElementById('next1'); if(n)n.disabled=false; renderSwipeStep('venue'); }
@@ -1853,6 +1855,12 @@ function _liveStat(key){
 function _p2(n){n=String(n);return n.length<2?'0'+n:n;}
 function _p3(n){n=String(n);while(n.length<3)n='0'+n;return n;}
 function buzz(ms){try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e){}}
+/* universal light tap on any button/control, site-wide -- fires in the capture phase, so a stronger
+   purpose-built buzz() inside a specific handler still fires after and wins */
+document.addEventListener('click',function(e){
+  var el=e.target.closest&&e.target.closest('button, .btn, [onclick]');
+  if(el)buzz(8);
+},true);
 /* ---------- PG / R content switch: default PG, hidden trigger only (no visible button -- tap the topbar ball 5x) ---------- */
 function _spiceMode(){ try{ return localStorage.getItem('wc_spice')==='r' ? 'r' : 'pg'; }catch(e){ return 'pg'; } }
 function toggleSpice(){
