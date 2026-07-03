@@ -2202,13 +2202,13 @@ window.pickVenue=function(k){
 /* ---------- shareable image export ---------- */
 async function cardBlob(){
   const card=document.getElementById('shareCard');
-  const sc=document.getElementById('tkScaler');
-  card.classList.add('capturing');
-  const pt=card.style.transform, ph=sc?sc.style.height:'', po=sc?sc.style.overflow:'';
-  card.style.transform='none'; if(sc){sc.style.height='auto';sc.style.overflow='visible';}   // capture at full WIDE size
-  const canvas=await html2canvas(card,{scale:2,backgroundColor:'#faf7ff',useCORS:true});
-  card.classList.remove('capturing');
-  card.style.transform=pt; if(sc){sc.style.height=ph;sc.style.overflow=po;} fitTicketScale();
+  // all capture-only style changes happen on html2canvas's offscreen clone (onclone), never on
+  // the live card -- so the visible boarding pass never flickers/resizes on screen during export.
+  const canvas=await html2canvas(card,{scale:2,backgroundColor:'#faf7ff',useCORS:true,onclone:function(doc){
+    var c=doc.getElementById('shareCard'), sc=doc.getElementById('tkScaler');
+    if(c){c.style.transform='none'; c.classList.add('capturing');}
+    if(sc){sc.style.height='auto'; sc.style.overflow='visible';}   // capture at full WIDE size
+  }});
   return await new Promise(r=>canvas.toBlob(r,'image/png'));
 }
 function hint(msg){const h=document.getElementById('shareHint');if(h)h.textContent=msg;}
@@ -2267,24 +2267,33 @@ async function cardGifBlob(onProgress){
   const card=document.getElementById('shareCard');
   const ticker=card.querySelector('.tk-ticker');
   const track=card.querySelector('.tk-track');
-  const _tkSc=document.getElementById('tkScaler');   // render the card at its natural WIDE size (undo the fit-scale)
+  const _tkSc=document.getElementById('tkScaler');
+  const SCALE=1.25, FRAMES=44, DELAY=167;   // ~7.3s/loop to match the live ticker (-50% over 22s)
+  // ticker window geometry at full WIDE size, relative to the card, in capture pixels.
+  // mutate -> measure -> revert with no await in between, so no frame ever paints the resized
+  // state -- the live card never visibly flickers/enlarges during export.
   const _tkPT=card.style.transform, _tkPH=_tkSc?_tkSc.style.height:'', _tkPO=_tkSc?_tkSc.style.overflow:'';
   card.style.transform='none'; if(_tkSc){_tkSc.style.height='auto';_tkSc.style.overflow='visible';}
-  const SCALE=1.25, FRAMES=44, DELAY=167;   // ~7.3s/loop to match the live ticker (-50% over 22s)
-  // ticker window geometry, relative to the card, in capture pixels
   const cr=card.getBoundingClientRect(), tr=ticker.getBoundingClientRect();
   const tx=Math.round((tr.left-cr.left)*SCALE), ty=Math.round((tr.top-cr.top)*SCALE);
   const tw=Math.round(tr.width*SCALE), th=Math.round(tr.height*SCALE);
-  // 1) one STATIC base capture with the ticker text hidden (everything else frozen)
-  const pAnim=track.style.animation, pVis=track.style.visibility;
-  track.style.animation='none'; track.style.transform='none'; track.style.visibility='hidden';
-  const base=await html2canvas(card,{scale:SCALE,backgroundColor:'#faf7ff',useCORS:true});
+  card.style.transform=_tkPT; if(_tkSc){_tkSc.style.height=_tkPH;_tkSc.style.overflow=_tkPO;}
+  // 1) one STATIC base capture with the ticker text hidden (everything else frozen) -- all style
+  //    changes below happen on html2canvas's offscreen clone (onclone), never on the live card
+  const base=await html2canvas(card,{scale:SCALE,backgroundColor:'#faf7ff',useCORS:true,onclone:function(doc){
+    var c=doc.getElementById('shareCard'), sc=doc.getElementById('tkScaler'), tk=doc.getElementById('tkTicker');
+    if(c)c.style.transform='none';
+    if(sc){sc.style.height='auto';sc.style.overflow='visible';}
+    if(tk)tk.style.visibility='hidden';
+  }});
   if(onProgress)onProgress(0.25);
   // 2) the ticker text by itself on a transparent strip
-  track.style.visibility='visible';
-  const strip=await html2canvas(track,{scale:SCALE,backgroundColor:null,useCORS:true});
-  track.style.transform=''; track.style.animation=pAnim; track.style.visibility=pVis;
-  card.style.transform=_tkPT; if(_tkSc){_tkSc.style.height=_tkPH;_tkSc.style.overflow=_tkPO;} fitTicketScale();
+  const strip=await html2canvas(track,{scale:SCALE,backgroundColor:null,useCORS:true,onclone:function(doc){
+    var c=doc.getElementById('shareCard'), sc=doc.getElementById('tkScaler'), tk=doc.getElementById('tkTicker');
+    if(c)c.style.transform='none';
+    if(sc){sc.style.height='auto';sc.style.overflow='visible';}
+    if(tk){tk.style.animation='none'; tk.style.transform='none'; tk.style.visibility='visible';}
+  }});
   if(onProgress)onProgress(0.5);
   // 3) composite: redraw the identical base each frame, scroll ONLY the clipped ticker strip
   const loopUnit=strip.width/6;                 // ticker text is repeated 6x -> one unit = a seamless loop
@@ -3072,7 +3081,7 @@ var DEPARTURES=[
    note:"one time, you said. we'll let them take the credit AND the blame 😂💜"},
   {date:'SOMEDAY', lbl:'baby girl, pink bow, non negotiable', at:null,
    note:"you already picked her outfit. i already know we're doomed 💜"},
-  {date:'SOMEDAY', lbl:'infinite hickeys · rain check', at:null, pgLbl:'movie marathon · rain check',
+  {date:'SOMEDAY', lbl:'infinite hickeys · rain check', at:null, pgLbl:'a little something · rain check',
    note:"you called it, babu. i'm still collecting on that one 😏💜", pgNote:"you called it, babu. i'm still holding you to it 💜"},
   {date:'SOMEDAY', lbl:'the ceiling mirror · a whole engineering project', at:null, pgLbl:'the bedroom upgrade · a running joke',
    note:"you brought it up in february ('back is important when we have a ceiling mirror in our room'), and by june we were seriously debating fused glass vs. a motorized cover over it.\nwe have full blueprints for a joke at this point. someday, babu 😏💜",
