@@ -288,16 +288,6 @@
   .stmt-n.stmt-inline{font-size:inherit;min-width:0;text-align:inherit;display:inline;letter-spacing:normal}
   .stmt-l{font-size:13px;color:var(--muted);font-weight:600;line-height:1.3}
   .stmt-foot{margin-top:14px;font-size:9.5px;letter-spacing:1px;color:var(--lav);font-weight:700;text-align:center;text-transform:uppercase}
-  .stmt-poslink{display:block;margin:10px auto 0;background:none;border:none;color:var(--lav);font-family:inherit;font-size:11.5px;font-weight:700;text-decoration:underline;cursor:pointer;padding:4px}
-  .pos-list{display:flex;flex-direction:column;gap:8px;margin:14px 0;text-align:left}
-  .pos-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 13px;border-radius:10px;background:rgba(124,77,202,.08);font-family:'Courier Prime',ui-monospace,monospace;font-size:12.5px}
-  .pos-row.pos-done{background:rgba(63,168,92,.12)}
-  .pos-name{font-weight:700;color:#3a2a63;text-transform:capitalize}
-  .pos-stamp{font-size:10.5px;color:var(--muted);white-space:nowrap}
-  .pos-row.pos-done .pos-stamp{color:#3f9e5c;font-weight:700}
-  .pos-inkstamp{display:inline-block;transform:rotate(-9deg);border:2.5px solid #3f9e5c;border-radius:6px;color:#3f9e5c;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-weight:800;letter-spacing:1.5px;padding:2px 7px;opacity:.85}
-  .pos-air{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;letter-spacing:1.8px;color:var(--lav);text-transform:uppercase;font-weight:700;margin-bottom:2px}
-  .pos-note{margin:-4px 0 4px;padding:0 13px;font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:12.5px;color:var(--lav);text-align:left}
   /* locked date-diary finale */
   .diarylock{text-align:center;background:linear-gradient(160deg,#f3eefc,#ece3fb);border:1px dashed var(--lav2);border-radius:16px;padding:28px 22px;margin-top:6px}
   .dl-ico{font-size:32px;margin-bottom:6px}
@@ -860,10 +850,9 @@
           <div class="stmt-row"><span class="stmt-n" data-live="love" data-to="702">0</span><span class="stmt-l">"love you"s sent 💌</span></div>
           <div class="stmt-row"><span class="stmt-emoji">😭</span><span class="stmt-l">our most-texted emoji (<span class="stmt-n stmt-inline" data-live="cry" data-to="382">0</span>×, lol)</span></div>
           <div class="stmt-row"><span class="stmt-emoji">😈</span><span class="stmt-l">devil horns sent (<span class="stmt-n stmt-inline" data-live="devil" data-to="32">0</span>×, no comment 😏)</span></div>
-          <div class="stmt-row" id="stmtRideRow" style="display:none"><span class="stmt-n" data-to="19">0</span><span class="stmt-l">"ride" mentions on record 🐎 (not the train kind)</span></div>
+          <div class="stmt-row" id="stmtRideRow" style="display:none"><span class="stmt-n" data-to="19">0</span><span class="stmt-l">"ride" mentions on record 🐎</span></div>
         </div>
         <div class="stmt-foot">STATUS: BOARDING · destination, every round after 💜</div>
-        <button type="button" class="stmt-poslink" id="stmtPosLink" style="display:none" onclick="showPositions()">📖 see our full position passport</button>
       </div>
 
       <div class="iti-head" style="margin-top:18px">
@@ -2034,33 +2023,7 @@ function initStatement(){
 function _applyStatementSpice(){
   var on=_spiceMode()==='r';
   var r=document.getElementById('stmtRideRow'); if(r)r.style.display=on?'':'none';
-  var l=document.getElementById('stmtPosLink'); if(l)l.style.display=on?'':'none';
 }
-var POSITIONS=[
-  {name:'missionary', done:true, note:"wish we were in missionary, call that visionary 😏"},
-  {name:'cowgirl', done:true},
-  {name:'lotus', done:true},
-  {name:'doggy style', done:true},
-  {name:'reverse cowgirl', done:false},
-  {name:'spooning', done:false},
-  {name:'standing', done:false},
-  {name:'wheelbarrow', done:false},
-  {name:'legs on shoulders', done:false},
-  {name:'table edge', done:false},
-  {name:'the bridge', done:false},
-  {name:'amazon', done:false},
-  {name:'scissors', done:false},
-  {name:'the pretzel', done:false}
-];
-function renderPositions(){
-  var l=document.getElementById('posList'); if(!l)return;
-  l.innerHTML=POSITIONS.map(function(p){
-    return '<div class="pos-row'+(p.done?' pos-done':'')+'"><span class="pos-name">'+p.name+'</span><span class="pos-stamp">'+(p.done?'<span class="pos-inkstamp">VISITED</span>':'not yet · someday 😏')+'</span></div>'
-      +(p.note?'<div class="pos-note">'+p.note+'</div>':'');
-  }).join('');
-}
-function showPositions(){ if(_spiceMode()!=='r')return; renderPositions(); var o=document.getElementById('posOverlay'); if(o)o.style.display='flex'; }
-function hidePositions(){ var o=document.getElementById('posOverlay'); if(o)o.style.display='none'; }
 initStatement();
 _applyStatementSpice();
 /* ---------- accordion: tap a leg header to expand it into the full boarding pass ---------- */
@@ -3705,16 +3668,6 @@ window.initTimeline=function(){};
     <p class="egg-msg">you can ride something else 💜</p>
     <div class="egg-sig">🚆 all aboard, neal</div>
     <button class="btn primary" type="button" onclick="hideRide()">okok, back to the pass ✨</button>
-  </div>
-</div>
-<div id="posOverlay" class="egg" style="display:none" onclick="if(event.target===this)hidePositions()">
-  <div class="egg-card">
-    <div class="egg-emoji">📖</div>
-    <div class="pos-air">✈ NEAL AIR</div>
-    <h2 class="egg-h">our position passport</h2>
-    <div class="pos-list" id="posList"></div>
-    <div class="egg-sig">💜 more stamps to come</div>
-    <button class="btn primary" type="button" onclick="hidePositions()">okok, back to the pass ✨</button>
   </div>
 </div>
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
