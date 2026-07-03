@@ -22,6 +22,22 @@
   .reveal-up{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .7s cubic-bezier(.16,.8,.3,1);will-change:opacity,transform}
   .reveal-up.in{opacity:1;transform:none}
   @media(prefers-reduced-motion:reduce){.reveal-up{opacity:1!important;transform:none!important;transition:none}}
+  /* hero depth drift: purely decorative, behind the topbar/matchup band. Pure CSS scroll-driven
+     animation (no JS scroll listener) -- unsupported browsers just see a static layer, no breakage. */
+  .hero-parallax{position:absolute;inset:0;height:360px;overflow:hidden;z-index:-1;pointer-events:none}
+  .hero-parallax i{position:absolute;border-radius:50%;filter:blur(1px);opacity:.28;background:#fff}
+  .hero-parallax i:nth-child(1){width:130px;height:130px;top:-40px;left:-40px}
+  .hero-parallax i:nth-child(2){width:90px;height:90px;top:70px;right:-25px;background:var(--lav3)}
+  .hero-parallax i:nth-child(3){width:56px;height:56px;top:230px;left:38%;background:var(--sun);opacity:.16}
+  @media(prefers-reduced-motion:no-preference){
+    @supports (animation-timeline:scroll()){
+      @keyframes heroDriftSlow{from{transform:translateY(0)}to{transform:translateY(70px)}}
+      @keyframes heroDriftFast{from{transform:translateY(0)}to{transform:translateY(-40px)}}
+      .hero-parallax i:nth-child(1){animation:heroDriftSlow linear;animation-timeline:scroll(root);animation-range:0 600px}
+      .hero-parallax i:nth-child(2){animation:heroDriftFast linear;animation-timeline:scroll(root);animation-range:0 600px}
+      .hero-parallax i:nth-child(3){animation:heroDriftSlow linear;animation-timeline:scroll(root);animation-range:0 600px}
+    }
+  }
   body{
     font-family:'Inter',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
     background:linear-gradient(160deg,#7c4dca 0%,#9b72e8 45%,#c4b5fd 100%);
@@ -30,7 +46,7 @@
   h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;letter-spacing:-.02em}
   .fancy{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:1.2em;line-height:1;color:var(--accent2)}
   .lovenote{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400}
-  .wrap{max-width:680px;margin:0 auto}
+  .wrap{max-width:680px;margin:0 auto;position:relative}
   .layout{display:block}
   .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
   .topbar .ball{font-size:22px;cursor:pointer}
@@ -696,6 +712,7 @@
 </head>
 <body>
 <div class="wrap">
+  <div class="hero-parallax" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="topbar"><span class="ball" onclick="_ballTap()">⚽</span><h1>Sidhya & Neal · World Cup Date · July 6</h1></div>
   <div class="matchup"><span class="chip">🏆 Round of 16 · <b id="muText">TBD 🆚 TBD</b> · <span class="mu-note" id="muNote">🇺🇸 could be us!</span></span></div>
   <div class="progress" aria-hidden="true">
@@ -715,7 +732,7 @@
           <div class="ap-head"><span class="ap-air"><span class="ap-mark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 4 L21.5 20 L2.5 20 Z" fill="#fff"/><path d="M12 4 L21.5 20 L12 20 Z" fill="rgba(255,255,255,.6)"/></svg></span>DELTA</span><span class="ap-status">LANDED 💜</span></div>
           <div class="ap-route">
             <div class="ap-port"><b>SLC</b><span>dep 7:40 PM</span></div>
-            <div class="ap-plane"><i>✈</i></div>
+            <div class="ap-plane" onclick="showOrigin()" role="button" title="tap for the real story" style="cursor:pointer"><i>✈</i></div>
             <div class="ap-port"><b>SEA</b><span>arr 9:00 PM</span></div>
           </div>
           <div class="ap-meta">
@@ -1770,8 +1787,8 @@ function reveal(){
     ['~6:55 PM','<b>full time!</b>','wraps up around 6:55. soak up the vibes, grab some pics, and let the first crowd wave clear out (a lil later if it goes to extra time + pens).'],
     ['7:30 PM',`<b>Dinner: ${pick.after.t}!</b>`, pick.after.d],
     ['~9:00 PM','<b>Free Salt &amp; Straw 🍦</b>','We hop off in Bellevue Downtown and cash in our free Salt &amp; Straw. Two spoons, one cup, zero regrets.'],
-    ['~9:20 PM','<b>Bellevue Downtown Park 💜</b>','A slow lap around the park and the waterfall, then a little kiss under the lights. Best part of the night, just saying. 😚'],
-    ['~9:45 PM','<b>Easy ride home.</b>', _spiceMode()==='r' ? "Back on the 2 Line, which runs until midnight, so there is never a rush home. and babu, the day's not over just because we're back 😏" : 'Back on the 2 Line, which runs until midnight, so there is never a rush home.']
+    ['~9:20 PM','<b>Bellevue Downtown Park 💜</b>', _spiceMode()==='r' ? "A slow lap around the park and the waterfall, then a kiss under the lights that doesn't want to stop. hours of jerseys and crowds and a stolen hour still on both our minds, and you're still the only thing I want to look at. Best part of the night, just saying. 😚" : 'A slow lap around the park and the waterfall, then a little kiss under the lights. Best part of the night, just saying. 😚'],
+    ['~9:45 PM','<b>Easy ride home.</b>', _spiceMode()==='r' ? "Back on the 2 Line, which runs until midnight, so there is never a rush home. and babu, the day's not over just because we're back 😏 you asked me once, out of nowhere, \"can we shower together tonight\" 👀 well. tonight's finally that night." : 'Back on the 2 Line, which runs until midnight, so there is never a rush home.']
   ];
   window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
   window.dayPlan = rows.map(function(r){return {t:r[0], label:(r[1]||'').replace(/<[^>]+>/g,'').trim(), mins:(typeof _parseLegTime==='function'?_parseLegTime(r[0]):null)};});   // for the live tracker's now/next
@@ -1829,6 +1846,7 @@ function reveal(){
   if(window.initTimeline){requestAnimationFrame(window.initTimeline);setTimeout(window.initTimeline,140);}
   try{['.sharewrap','.iti-head','.twoplan','.merge'].forEach(function(sel){var e=document.querySelector(sel);if(e&&!e.classList.contains('in'))e.classList.add('reveal-up');});
     document.querySelectorAll('#step4 .perks').forEach(function(e){if(!e.classList.contains('in'))e.classList.add('reveal-up');});
+    document.querySelectorAll('#timeline .bpass').forEach(function(e){if(!e.classList.contains('in'))e.classList.add('reveal-up');});   // each leg settles into place as you scroll the deck
     armReveals();}catch(e){}
   applyCheekyGate();
   checkDateEnding();
@@ -2537,6 +2555,7 @@ function renderDiary(sec){
 }
 function renderAllDiary(){document.querySelectorAll('[id^="diary-s"]').forEach(function(b){renderDiary(b.id.replace('diary-',''));});}
 function openRecord(i){
+  if(i===0 && _spiceMode()==='r'){ toast('GANESH AIR retains no footage of the stolen hour 😏'); if(window.buzz)buzz(15); return; }   // the joke IS the lack of documentation
   diaryCurSec='s'+i;
   if(!recFreeWindow() && recRemaining()<=0){            // not your window yet -> countdown overlay FIRST, before any camera prompt
     _recWaitIdx=i; showRecWait();
@@ -2994,12 +3013,16 @@ var KIT=[
   {ico:'💃', lbl:'open when you want to dance',
    txt:"permission to be extra: GRANTED.\nput our playlist on. full volume.\ni've said it straight up before and it's still true: i do think you're the best dancer i know. so dance like it, and send me a video or it didn't happen 😏💜"},
   {ico:'🚆', lbl:"open when you're on a train",
-   txt:"a train. our thing, except technically it isn't yet, not until today.\nwindow seat, headphones in, first song of the playlist.\nnow pretend i'm in the seat next to you, doing the thing where i just stare at you.\nyou can feel it, can't you 💜 by the time you read this we'll already have a real one to remember."},
+   txt:"a train. our thing, except technically it isn't yet, not until today.\nwindow seat, headphones in, first song of the playlist.\nnow pretend i'm in the seat next to you, doing the thing where i just stare at you.\nyou can feel it, can't you 💜 by the time you read this we'll already have a real one to remember.\np.s. -- the blanket's long enough to hide two people's hands under it, and the seat next to you reclines just enough. some diary chapters really do belong on trains 😏",
+   pgTxt:"a train. our thing, except technically it isn't yet, not until today.\nwindow seat, headphones in, first song of the playlist.\nnow pretend i'm in the seat next to you, doing the thing where i just stare at you.\nyou can feel it, can't you 💜 by the time you read this we'll already have a real one to remember."},
   {ico:'💜', lbl:'open when you need to hear it',
    txt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so fucking beautiful, and i still want you to rip my clothes off. so.\ni love you more than anyone.\n- neal",
    pgTxt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so beautiful it's unfair. so.\ni love you more than anyone.\n- neal"},
   {ico:'🔥', lbl:'open when you miss me like THAT', r:true,
-   txt:"i know exactly which kind of missing this is. the 7:22am kind. the middle-of-a-big-data-class kind 😈\nso here's what i want you to do: close your eyes and replay seattle. the stolen hour. all of it, slow.\nthen call me. i'll say the rest out loud.\n- neal"}
+   txt:"i know exactly which kind of missing this is. the 7:22am kind. the middle-of-a-big-data-class kind 😈\nso here's what i want you to do: close your eyes and replay seattle. the stolen hour. all of it, slow.\nthen call me. i'll say the rest out loud.\n- neal"},
+  {ico:'🪞', lbl:'open when you need a mirror check',
+   txt:"open when you need reminding how hot you are, babu.\ni still think about the night you texted me, out of nowhere: \"i'm looking at my body in the mirror naked, i'm so proud of my progress.\" you were so right, and i wasn't even in the room and i still got worked up reading it.\nso look in the mirror right now. i already know what you'll see, because i've seen it, i've touched it, and i genuinely cannot stop thinking about it.\n- neal",
+   pgTxt:"open when you need reminding how hot you are, babu.\ni still think about the night you texted me, out of nowhere, about how proud you were of your progress, getting stronger, working so hard for yourself. you were so right to feel that.\nso look in the mirror right now. i already know what you'll see: someone i am unbelievably lucky to love.\n- neal"}
 ];
 function _kitUnlockedByDate(){ return /[?&]kit=1/.test(location.search) || new Date()>=new Date(2026,6,7); }   // sealed until July 7 (?kit=1 to preview)
 function _kitOk(){ try{return localStorage.getItem('wc_kit_ok')==='1';}catch(e){return false;} }
@@ -3042,7 +3065,9 @@ var DEPARTURES=[
   {date:'SEP 25', lbl:'monthiversary no. 11', at:new Date(2026,8,25),
    note:"eleven. ELEVEN.\none month from the biggest one. i'm already planning it and no, you can't have hints.\nyou are my favorite notification, my best decision, my whole starting XI 💜"},
   {date:'OCT 25', lbl:'★ ONE YEAR ★', at:new Date('2026-10-25T22:00:00-07:00'),
-   note:"one year ago, 10pm, you said yes to being mine.\n365 days. two cities. one airline that only flies one route.\nevery mile between us just proved how far i'd go for you.\nhappy anniversary, sidhya. i love you more than anyone, and next year i'm saying it from closer.\n- your captain, always 💜"},
+   note:"one year ago, 10pm, you said yes to being mine.\n365 days. two cities. one airline that only flies one route.\nevery mile between us just proved how far i'd go for you.\nyou once told me 'this month onwards we will both be our best selves and it'll be even greater' -- twelve months later, babu, you were right.\nhappy anniversary, sidhya. i love you more than anyone, and next year i'm saying it from closer.\n- your captain, always 💜"},
+  {date:'JUL 09', lbl:'utah · gate open 🛫', at:new Date(2026,6,9,17,0,0),
+   note:"it was almost 11pm and you'd had a long day, so i just told you: go to sleep, wake up well rested knowing the flight is already booked. you didn't have to think about a single thing.\nit's booked. all yours, taken care of.\nsee you thursday 💜"},
   {date:'SOMEDAY', lbl:'disneyland · the tea cups', at:null,
    note:"standby forever, never cancelled 💜\nour kids are riding those tea cups whether they like it or not."},
   {date:'SOMEDAY', lbl:'akshardham · the temple run', at:null,
@@ -3054,7 +3079,10 @@ var DEPARTURES=[
   {date:'SOMEDAY', lbl:'baby girl, pink bow, non negotiable', at:null,
    note:"you already picked her outfit. i already know we're doomed 💜"},
   {date:'SOMEDAY', lbl:'infinite hickeys · rain check', at:null, pgLbl:'movie marathon · rain check',
-   note:"you called it, babu. i'm still collecting on that one 😏💜", pgNote:"you called it, babu. i'm still holding you to it 💜"}
+   note:"you called it, babu. i'm still collecting on that one 😏💜", pgNote:"you called it, babu. i'm still holding you to it 💜"},
+  {date:'SOMEDAY', lbl:'the ceiling mirror · a whole engineering project', at:null, pgLbl:'the bedroom upgrade · a running joke',
+   note:"you brought it up in february ('back is important when we have a ceiling mirror in our room'), and by june we were seriously debating fused glass vs. a motorized cover over it.\nwe have full blueprints for a joke at this point. someday, babu 😏💜",
+   pgNote:"a very specific bedroom upgrade you've been half-joking, half-scheming about since february. we've genuinely discussed the engineering. someday, babu 💜"}
 ];
 function _depOpenList(){ try{return JSON.parse(localStorage.getItem('wc_dep_open')||'[]');}catch(e){return [];} }
 function renderDepartures(){
@@ -3204,6 +3232,9 @@ function spawnEggHearts(id){var h=document.getElementById(id||'eggHearts');if(!h
   h.innerHTML=s;}
 function showEgg(){var o=document.getElementById('eggOverlay');if(!o)return;spawnEggHearts();o.style.display='flex';}
 function hideEgg(){var o=document.getElementById('eggOverlay');if(o)o.style.display='none';}
+/* tap the plane between SLC/SEA on the arrival pass -> the real, true origin story of GANESH AIR */
+function showOrigin(){var o=document.getElementById('originOverlay');if(!o)return;spawnEggHearts('originHearts');o.style.display='flex';}
+function hideOrigin(){var o=document.getElementById('originOverlay');if(o)o.style.display='none';}
 /* tap the TRAIN RIDES header -> cheeky overlay, R mode only (kept off the pass face so the shared image stays clean) */
 function showRide(ev){ if(ev){ev.stopPropagation();} if(_spiceMode()!=='r')return; var o=document.getElementById('rideOverlay'); if(o)o.style.display='flex'; }
 function hideRide(){ var o=document.getElementById('rideOverlay'); if(o)o.style.display='none'; }
@@ -3667,9 +3698,20 @@ window.initTimeline=function(){};
   <div class="egg-card">
     <div class="egg-emoji">😏</div>
     <h2 class="egg-h">the train's not the only ride</h2>
-    <p class="egg-msg">you can ride something else 💜</p>
+    <p class="egg-msg">real receipts, no notes 💜<br>"i want to ride you" <span style="opacity:.65">· jan 28, 2026</span><br>"RIDE YOU WHEN" <span style="opacity:.65">· mar 17, 2026, all caps, yours</span></p>
     <div class="egg-sig">🚆 all aboard, neal</div>
     <button class="btn primary" type="button" onclick="hideRide()">okok, back to the pass ✨</button>
+  </div>
+</div>
+
+<div id="originOverlay" class="egg" style="display:none" onclick="if(event.target===this)hideOrigin()">
+  <div class="egg-hearts" id="originHearts" aria-hidden="true"></div>
+  <div class="egg-card">
+    <div class="egg-emoji">✈️</div>
+    <h2 class="egg-h">how GANESH AIR was born</h2>
+    <p class="egg-msg">the night we booked your flight, completely out of nowhere you texted: "GANESH AIR. THATS IT I GOT IT OMG. IM GONNA BECOME A TRILLIONAIRE BY STARTING GANESH AIRLINES, IN HONOR OF MY DAD."<br><br>so for the record: this whole airline theme, every boarding pass on this site, all of it, was your idea. i just built the airline you invented 💜</p>
+    <div class="egg-sig">✈ your co-founder, neal</div>
+    <button class="btn primary" type="button" onclick="hideOrigin()">back to the pass ✨</button>
   </div>
 </div>
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
