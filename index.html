@@ -1966,6 +1966,8 @@ function showArrivalsHall(){
   o.classList.add('on');
   _ahFlipRow(document.getElementById('ahRow1'),'WELCOME TO SEATTLE');
   _ahFlipRow(document.getElementById('ahRow2'),'SIDHYA');
+  var ahR=document.getElementById('ahRow3');
+  if(ahR){ if(_spiceMode()==='r'){ ahR.style.display=''; _ahFlipRow(ahR,'NEAL IS GOING TO POUND YOU IN MISSIONARY'); } else { ahR.style.display='none'; ahR.innerHTML=''; } }
   var mi=document.getElementById('ahMiles'), t0=null;
   function fr(t){ if(t0===null)t0=t; var p=Math.min(1,(t-t0)/2300); var v=Math.round(700*(1-p*p)); mi.textContent=v>0?(v+' mi'):'0 mi 💜'; if(p<1)requestAnimationFrame(fr); }
   if(mi){ requestAnimationFrame(fr); setTimeout(function(){ mi.textContent='0 mi 💜'; },2800); }   // fail-safe
@@ -3543,6 +3545,7 @@ window.initTimeline=function(){};
   <div class="ah-sub">✈ ARRIVALS · SEATTLE–TACOMA INTL</div>
   <div class="ah-row" id="ahRow1"></div>
   <div class="ah-row ah-name"><span id="ahRow2" class="ah-row" style="display:contents"></span><span class="ah-heart">💜</span></div>
+  <div class="ah-row" id="ahRow3" style="display:none"></div>
   <div class="ah-flight">DL 2016 · SLC → SEA · <b>LANDED</b><br><span style="font-size:10px;opacity:.75">2 hrs late, worth every minute 💜</span></div>
   <div class="ah-gate">GATE: NEAL'S ARMS</div>
   <div class="ah-miles"><span id="ahMiles">700 mi</span> apart</div>
