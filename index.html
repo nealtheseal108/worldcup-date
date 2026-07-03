@@ -847,6 +847,7 @@
           <div class="stmt-row"><span class="stmt-n" data-live="love" data-to="702">0</span><span class="stmt-l">"love you"s sent 💌</span></div>
           <div class="stmt-row"><span class="stmt-emoji">😭</span><span class="stmt-l">our most-texted emoji (<span class="stmt-n stmt-inline" data-live="cry" data-to="382">0</span>×, lol)</span></div>
           <div class="stmt-row"><span class="stmt-emoji">😈</span><span class="stmt-l">devil horns sent (<span class="stmt-n stmt-inline" data-live="devil" data-to="32">0</span>×, no comment 😏)</span></div>
+          <div class="stmt-row" id="stmtRideRow" style="display:none"><span class="stmt-n" data-to="19">0</span><span class="stmt-l">"ride" mentions on record 🐎 (not the train kind)</span></div>
         </div>
         <div class="stmt-foot">STATUS: BOARDING · destination, every round after 💜</div>
       </div>
@@ -1758,7 +1759,7 @@ function reveal(){
 
   var arriveAt=(typeof VENUE_LL!=='undefined'&&VENUE_LL[pick.venue])?nearestStationName(VENUE_LL[pick.venue]):'Westlake';
   const rows=[
-    ['~3:15 PM','<b>Stolen hour, just us 😏💜</b>', "i pull up to your place in Crossroads, and before anything else we slip away somewhere quiet, just the two of us. i can't promise i'll keep my hands to myself once i've got you alone."],
+    ['~3:15 PM','<b>Stolen hour, just us 😏💜</b>', _spiceMode()==='r' ? "i pull up to your place in Crossroads and we disappear for an hour before anything else, clothes optional, quiet not guaranteed 😈 then we fix our hair and act completely normal on the train like nothing happened." : "i pull up to your place in Crossroads, and before anything else we slip away somewhere quiet, just the two of us. i can't promise i'll keep my hands to myself once i've got you alone."],
     ['~4:00 PM','<b>Redmond Tech, all aboard 🚆</b>', "we (reluctantly) pull ourselves together and tap onto the 2 Line, headed for the match together 💜"],
     ['~4:45 PM','<b>Arrive '+arriveAt+'.</b>', v.transferLine],
     ['5:00 PM','<b>Kickoff, Round of 16! ⚽</b>','Watch party at '+v.name+'. Jerseys on! 💜'],
@@ -1767,7 +1768,7 @@ function reveal(){
     ['7:30 PM',`<b>Dinner: ${pick.after.t}!</b>`, pick.after.d],
     ['~9:00 PM','<b>Free Salt &amp; Straw 🍦</b>','We hop off in Bellevue Downtown and cash in our free Salt &amp; Straw. Two spoons, one cup, zero regrets.'],
     ['~9:20 PM','<b>Bellevue Downtown Park 💜</b>','A slow lap around the park and the waterfall, then a little kiss under the lights. Best part of the night, just saying. 😚'],
-    ['~9:45 PM','<b>Easy ride home.</b>','Back on the 2 Line, which runs until midnight, so there is never a rush home.']
+    ['~9:45 PM','<b>Easy ride home.</b>', _spiceMode()==='r' ? "Back on the 2 Line, which runs until midnight, so there is never a rush home. and babu, the day's not over just because we're back 😏" : 'Back on the 2 Line, which runs until midnight, so there is never a rush home.']
   ];
   window.diaryLabels = rows.map(function(r){return (r[1]||'').replace(/<[^>]+>/g,'').trim();});
   window.dayPlan = rows.map(function(r){return {t:r[0], label:(r[1]||'').replace(/<[^>]+>/g,'').trim(), mins:(typeof _parseLegTime==='function'?_parseLegTime(r[0]):null)};});   // for the live tracker's now/next
@@ -1873,6 +1874,7 @@ function toggleSpice(){
   if(window.renderDepartures)renderDepartures();
   if(window.renderQDeck){ var qd=document.getElementById('qDeck'); if(qd)qd.scrollLeft=0; renderQDeck(); }
   if(window.applyCheekyGate)applyCheekyGate();
+  if(window._applyStatementSpice)_applyStatementSpice();
 }
 var _ballTaps=0, _ballTapTimer=null;
 function _ballTap(){   // 5 taps on the topbar ball within 1.5s flips the PG/R switch -- deliberately not a visible control
@@ -1995,7 +1997,9 @@ function initStatement(){
   if('IntersectionObserver' in window){ var io=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ run(); io.disconnect(); } }); },{threshold:0.3}); io.observe(box); }
   else run();
 }
+function _applyStatementSpice(){ var r=document.getElementById('stmtRideRow'); if(r)r.style.display=_spiceMode()==='r'?'':'none'; }
 initStatement();
+_applyStatementSpice();
 /* ---------- accordion: tap a leg header to expand it into the full boarding pass ---------- */
 function toggleLeg(headEl){ var card=headEl&&headEl.closest?headEl.closest('.bpass'):null; if(card){ card.classList.toggle('open'); if(card.classList.contains('open')&&window.buzz)buzz(); } }
 /* temporary: hide the cheeky closing line for ~1 hour, then it comes back on its own */
@@ -2959,7 +2963,9 @@ var KIT=[
    txt:"a train. our thing, except technically it isn't yet, not until today.\nwindow seat, headphones in, first song of the playlist.\nnow pretend i'm in the seat next to you, doing the thing where i just stare at you.\nyou can feel it, can't you 💜 by the time you read this we'll already have a real one to remember."},
   {ico:'💜', lbl:'open when you need to hear it',
    txt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so fucking beautiful, and i still want you to rip my clothes off. so.\ni love you more than anyone.\n- neal",
-   pgTxt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so beautiful it's unfair. so.\ni love you more than anyone.\n- neal"}
+   pgTxt:"do you know how much i love you, baby? i mean it every one of the thousand times i've said it, and i'm about to say it again: i love you so much i'm going to explode.\nyou are so loved, sidhya ganesh. not the instagram kind, the boring tuesday kind. the kind that's texted you thousands of times and still isn't done.\nand since you're asking me to be honest, babu: you are so beautiful it's unfair. so.\ni love you more than anyone.\n- neal"},
+  {ico:'🔥', lbl:'open when you miss me like THAT', r:true,
+   txt:"i know exactly which kind of missing this is. the 7:22am kind. the middle-of-a-big-data-class kind 😈\nso here's what i want you to do: close your eyes and replay seattle. the stolen hour. all of it, slow.\nthen call me. i'll say the rest out loud.\n- neal"}
 ];
 function _kitUnlockedByDate(){ return /[?&]kit=1/.test(location.search) || new Date()>=new Date(2026,6,7); }   // sealed until July 7 (?kit=1 to preview)
 function _kitOk(){ try{return localStorage.getItem('wc_kit_ok')==='1';}catch(e){return false;} }
@@ -2972,6 +2978,7 @@ function renderKit(){
   if(gate)gate.style.display = (dateOk&&!ok)?'':'none';
   var pg=_spiceMode()==='pg';
   rack.innerHTML=KIT.map(function(k,i){
+    if(pg&&k.r)return '';   // R-only envelope, skip entirely in PG (index i stays intact for the rest)
     var open=opened.indexOf(i)>=0&&ok&&dateOk;
     var txt=(pg&&k.pgTxt)?k.pgTxt:k.txt;
     return '<button type="button" class="kit-env'+(open?' open':'')+((!dateOk||!ok)?' locked':'')+'" onclick="tapKit('+i+')">'+
