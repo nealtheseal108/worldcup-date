@@ -267,6 +267,8 @@
   .fs-since{font-size:11px;color:var(--lav);font-weight:700;margin-top:10px}
   .fs-land{margin-top:11px;background:linear-gradient(90deg,var(--lav),var(--lav2));color:#fff;border:none;border-radius:22px;padding:8px 22px;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;box-shadow:0 4px 12px rgba(124,77,202,.35)}
   .fs-land:active{transform:scale(.97)}
+  .fs-showsign{display:block;margin:8px auto 0;background:none;border:none;color:var(--muted);font-family:inherit;font-size:11px;text-decoration:underline;cursor:pointer;padding:4px}
+  .fs-showsign:active{opacity:.6}
   .flightstatus.landed .fs-track{max-width:26px}
   .flightstatus.landed .fs-board{background:linear-gradient(160deg,#241645,#3a1f63)}
   .flightstatus.landed .fs-cell{color:#7cffb0}
@@ -737,6 +739,7 @@
           </div>
           <div class="fs-since" id="fsSince"></div>
           <button type="button" class="fs-land" id="fsLandBtn">I landed 💜</button>
+          <button type="button" class="fs-showsign" onclick="showArrivalsHall()">🎉 show the welcome sign</button>
         </div>
         <h2>hey sidhu, you get to pick our <span class="fancy">date!!</span></h2>
         <p class="sub" style="margin-top:10px">happy 8 months babu!! 💜 a whole lot of miles and time zones between us, and you flew across every one of them to be here ✈ a few days in seattle, and now the main event. so i turned our date into boarding passes, one for each stop. you just pick the fun (watch spot, snack, dinner) and i'll fly us there 🤩 let's gooo ‼️⚽</p>
