@@ -288,6 +288,13 @@
   .stmt-n.stmt-inline{font-size:inherit;min-width:0;text-align:inherit;display:inline;letter-spacing:normal}
   .stmt-l{font-size:13px;color:var(--muted);font-weight:600;line-height:1.3}
   .stmt-foot{margin-top:14px;font-size:9.5px;letter-spacing:1px;color:var(--lav);font-weight:700;text-align:center;text-transform:uppercase}
+  .stmt-poslink{display:block;margin:10px auto 0;background:none;border:none;color:var(--lav);font-family:inherit;font-size:11.5px;font-weight:700;text-decoration:underline;cursor:pointer;padding:4px}
+  .pos-list{display:flex;flex-direction:column;gap:8px;margin:14px 0;text-align:left}
+  .pos-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 13px;border-radius:10px;background:rgba(124,77,202,.08);font-family:'Courier Prime',ui-monospace,monospace;font-size:12.5px}
+  .pos-row.pos-done{background:rgba(63,168,92,.12)}
+  .pos-name{font-weight:700;color:#3a2a63;text-transform:capitalize}
+  .pos-stamp{font-size:10.5px;color:var(--muted);white-space:nowrap}
+  .pos-row.pos-done .pos-stamp{color:#3f9e5c;font-weight:700}
   /* locked date-diary finale */
   .diarylock{text-align:center;background:linear-gradient(160deg,#f3eefc,#ece3fb);border:1px dashed var(--lav2);border-radius:16px;padding:28px 22px;margin-top:6px}
   .dl-ico{font-size:32px;margin-bottom:6px}
@@ -853,6 +860,7 @@
           <div class="stmt-row" id="stmtRideRow" style="display:none"><span class="stmt-n" data-to="19">0</span><span class="stmt-l">"ride" mentions on record 🐎 (not the train kind)</span></div>
         </div>
         <div class="stmt-foot">STATUS: BOARDING · destination, every round after 💜</div>
+        <button type="button" class="stmt-poslink" id="stmtPosLink" style="display:none" onclick="showPositions()">📖 see our full position passport</button>
       </div>
 
       <div class="iti-head" style="margin-top:18px">
@@ -2020,7 +2028,31 @@ function initStatement(){
   if('IntersectionObserver' in window){ var io=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ run(); io.disconnect(); } }); },{threshold:0.3}); io.observe(box); }
   else run();
 }
-function _applyStatementSpice(){ var r=document.getElementById('stmtRideRow'); if(r)r.style.display=_spiceMode()==='r'?'':'none'; }
+function _applyStatementSpice(){
+  var on=_spiceMode()==='r';
+  var r=document.getElementById('stmtRideRow'); if(r)r.style.display=on?'':'none';
+  var l=document.getElementById('stmtPosLink'); if(l)l.style.display=on?'':'none';
+}
+var POSITIONS=[
+  {name:'missionary', done:true},
+  {name:'cowgirl', done:true},
+  {name:'lotus', done:true},
+  {name:'doggy style', done:true},
+  {name:'reverse cowgirl', done:false},
+  {name:'69', done:false},
+  {name:'spooning', done:false},
+  {name:'standing', done:false},
+  {name:'face-sitting', done:false},
+  {name:'wheelbarrow', done:false}
+];
+function renderPositions(){
+  var l=document.getElementById('posList'); if(!l)return;
+  l.innerHTML=POSITIONS.map(function(p){
+    return '<div class="pos-row'+(p.done?' pos-done':'')+'"><span class="pos-name">'+p.name+'</span><span class="pos-stamp">'+(p.done?'✅ stamped':'not yet · someday 😏')+'</span></div>';
+  }).join('');
+}
+function showPositions(){ if(_spiceMode()!=='r')return; renderPositions(); var o=document.getElementById('posOverlay'); if(o)o.style.display='flex'; }
+function hidePositions(){ var o=document.getElementById('posOverlay'); if(o)o.style.display='none'; }
 initStatement();
 _applyStatementSpice();
 /* ---------- accordion: tap a leg header to expand it into the full boarding pass ---------- */
@@ -3662,9 +3694,18 @@ window.initTimeline=function(){};
   <div class="egg-card">
     <div class="egg-emoji">😏</div>
     <h2 class="egg-h">the train's not the only ride</h2>
-    <p class="egg-msg">you can ride something else 💜<br>wish we were in missionary, call that visionary 😏</p>
+    <p class="egg-msg">you can ride something else 💜</p>
     <div class="egg-sig">🚆 all aboard, neal</div>
     <button class="btn primary" type="button" onclick="hideRide()">okok, back to the pass ✨</button>
+  </div>
+</div>
+<div id="posOverlay" class="egg" style="display:none" onclick="if(event.target===this)hidePositions()">
+  <div class="egg-card">
+    <div class="egg-emoji">📖</div>
+    <h2 class="egg-h">our position passport</h2>
+    <div class="pos-list" id="posList"></div>
+    <div class="egg-sig">💜 more stamps to come</div>
+    <button class="btn primary" type="button" onclick="hidePositions()">okok, back to the pass ✨</button>
   </div>
 </div>
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
