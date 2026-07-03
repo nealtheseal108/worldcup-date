@@ -728,7 +728,7 @@
         <div class="flightstatus" id="flightStatus" aria-live="polite">
           <div class="fs-top">GANESH AIR ✈ LIVE FLIGHT STATUS</div>
           <div class="fs-arc">
-            <span class="fs-city">SLC</span>
+            <span class="fs-city" id="fsCityFrom">SLC</span>
             <span class="fs-track"><span class="fs-plane" id="fsPlane">✈</span></span>
             <span class="fs-city">SEA</span>
           </div>
@@ -1898,6 +1898,16 @@ function _fsSetClock(d,h,mi,s){
   var digs=(_p3(d)+_p2(h)+_p2(mi)+_p2(s)).split('');
   for(var i=0;i<_fsCells.length;i++){ if(_fsCells[i].textContent!==digs[i]){ _fsCells[i].textContent=digs[i]; _fsCells[i].classList.remove('flip'); void _fsCells[i].offsetWidth; _fsCells[i].classList.add('flip'); } }
 }
+var _liveDistMi=null, _liveDistAt=0, _liveDistTrying=false;
+function _updateLiveDist(){   // real device GPS vs Neal's place -- there's no public API for Apple's Find My, this is the closest honest equivalent
+  if(!navigator.geolocation||_liveDistTrying) return;
+  var t=Date.now(); if(t-_liveDistAt<20000) return;   // throttle: one location fix per 20s max
+  _liveDistTrying=true;
+  navigator.geolocation.getCurrentPosition(function(pos){
+    _liveDistTrying=false; _liveDistAt=Date.now();
+    _liveDistMi=Math.round(_haversineMi({lat:pos.coords.latitude,lng:pos.coords.longitude},{lat:START_NEAL[0],lng:START_NEAL[1]}));
+  }, function(){ _liveDistTrying=false; _liveDistAt=Date.now(); }, {timeout:8000,maximumAge:15000});
+}
 function _fsTick(){
   var el=document.getElementById('flightStatus'); if(!el) return;
   var now=new Date(), landed=_fsLanded||now>=US.landing;
@@ -1913,7 +1923,15 @@ function _fsTick(){
     var base=US.metDate, ms2=Math.max(0,now-base), s2=Math.floor(ms2/1000), d2=Math.floor(s2/86400); s2-=d2*86400; var h2=Math.floor(s2/3600); s2-=h2*3600; var m2=Math.floor(s2/60); s2-=m2*60;
     _fsSetClock(d2,h2,m2,s2);
     label.textContent='💜 TOGETHER FOR';
-    dist.innerHTML='<b>0 mi</b> apart · you made it 💜';
+    _updateLiveDist();
+    var cityFrom=document.getElementById('fsCityFrom');
+    if(_liveDistMi!=null){
+      if(cityFrom)cityFrom.textContent=_liveDistMi+' mi';
+      dist.innerHTML='<b>'+_liveDistMi+' mi</b> apart right now · almost there 💜';
+    }else{
+      if(cityFrom)cityFrom.textContent='SLC';
+      dist.innerHTML='<b>0 mi</b> apart · you made it 💜';
+    }
     if(plane)plane.style.left='50%'; el.classList.add('landed'); if(btn)btn.style.display='none';
   }
   var since=document.getElementById('fsSince'); if(since)since.textContent='together '+_fsSince(now)+' 💜';
@@ -1974,7 +1992,7 @@ function showArrivalsHall(){
   _ahFlipRow(document.getElementById('ahRow1'),'WELCOME TO SEATTLE');
   _ahFlipRow(document.getElementById('ahRow2'),'SIDHYA');
   var ahR=document.getElementById('ahRow3');
-  if(ahR){ ahR.style.display=''; _ahFlipRow(ahR, _spiceMode()==='r' ? 'TIME FOR SOME MISSIONARY POUNDING' : 'TIME TO SPEND TIME WITH YOUR BABU'); }
+  if(ahR){ ahR.style.display=''; _ahFlipRow(ahR, _spiceMode()==='r' ? 'TIME FOR SOME MISSIONARY POUNDING' : 'JUMP INTO MY ARMS'); }
   var mi=document.getElementById('ahMiles'), t0=null;
   function fr(t){ if(t0===null)t0=t; var p=Math.min(1,(t-t0)/2300); var v=Math.round(700*(1-p*p)); mi.textContent=v>0?(v+' mi'):'0 mi 💜'; if(p<1)requestAnimationFrame(fr); }
   if(mi){ requestAnimationFrame(fr); setTimeout(function(){ mi.textContent='0 mi 💜'; },2800); }   // fail-safe
