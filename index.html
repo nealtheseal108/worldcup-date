@@ -461,8 +461,10 @@
   .ft-game{display:inline-flex;align-items:center;gap:7px;padding:0 15px;height:100%;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;border-right:1px solid rgba(255,255,255,.10)}
   .ft-game:hover{background:rgba(167,139,250,.16)}
   .ft-team{font-weight:700;color:#fff}
+  .ft-team.ft-winner{color:#4ade80}
   .ft-vs{color:#8f7fb8;font-size:10px}
   .ft-score{font-weight:700;color:#ffd54a;letter-spacing:.5px}
+  .ft-pens{color:#b79bf0;font-weight:600;font-size:10.5px}
   .ft-status{color:#b79bf0;font-size:9.5px;letter-spacing:.6px;text-transform:uppercase}
   .ft-status.ft-live{color:#4ade80}
   .ft-empty{display:inline-flex;align-items:center;height:100%;padding:0 16px;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:#b79bf0}
@@ -531,6 +533,7 @@
   .bc-team.lose{color:var(--muted)}
   .bc-team.bc-pending{color:var(--muted);font-style:italic}
   .bc-team .bc-sc{color:var(--lav);font-weight:700;flex:none}
+  .bc-team .bc-pens{color:var(--muted);font-weight:600;font-style:normal;font-size:10px}
   .bc-tbd{letter-spacing:.6px}
   .bc-meta{font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:.4px;text-transform:uppercase}
   /* babu bingo (step9) */
@@ -3298,7 +3301,7 @@ function loadBracket(force){
   if(!box._wired){ box.addEventListener('click',function(e){ var c=e.target.closest&&e.target.closest('.bracket-cell'); if(c&&c.getAttribute('data-href')) window.open(c.getAttribute('data-href'),'_blank','noopener'); }); box._wired=true; }
   if(_bracketCache && !force && Date.now()-_bracketAt<60000){ renderBracket(_bracketCache); return; }
   fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260628-20260720&limit=200',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
-    var evs=((j&&j.events)||[]).map(function(ev){ var c=ev.competitions&&ev.competitions[0]; if(!c)return null; var cs=c.competitors||[]; var h=cs.filter(function(x){return x.homeAway==='home';})[0]||cs[0], a=cs.filter(function(x){return x.homeAway==='away';})[0]||cs[1]; if(!h||!a)return null; var st=(ev.status&&ev.status.type)||{}; return { id:ev.id||'', round:(ev.season&&ev.season.slug)||'', ms:Date.parse(ev.date)||0, h:(h.team&&h.team.abbreviation)||'', a:(a.team&&a.team.abbreviation)||'', hsdn:(h.team&&h.team.shortDisplayName)||'', asdn:(a.team&&a.team.shortDisplayName)||'', hs:h.score, as:a.score, hw:h.winner===true, aw:a.winner===true, state:st.state||'pre', detail:st.shortDetail||'', href:(ev.links&&ev.links[0]&&ev.links[0].href)||('https://www.google.com/search?q='+encodeURIComponent((ev.shortName||'')+' world cup')) }; }).filter(Boolean);
+    var evs=((j&&j.events)||[]).map(function(ev){ var c=ev.competitions&&ev.competitions[0]; if(!c)return null; var cs=c.competitors||[]; var h=cs.filter(function(x){return x.homeAway==='home';})[0]||cs[0], a=cs.filter(function(x){return x.homeAway==='away';})[0]||cs[1]; if(!h||!a)return null; var st=(ev.status&&ev.status.type)||{}; return { id:ev.id||'', round:(ev.season&&ev.season.slug)||'', ms:Date.parse(ev.date)||0, h:(h.team&&h.team.abbreviation)||'', a:(a.team&&a.team.abbreviation)||'', hsdn:(h.team&&h.team.shortDisplayName)||'', asdn:(a.team&&a.team.shortDisplayName)||'', hs:h.score, as:a.score, hSO:(h.shootoutScore!=null?h.shootoutScore:null), aSO:(a.shootoutScore!=null?a.shootoutScore:null), hw:h.winner===true, aw:a.winner===true, state:st.state||'pre', detail:st.shortDetail||'', href:(ev.links&&ev.links[0]&&ev.links[0].href)||('https://www.google.com/search?q='+encodeURIComponent((ev.shortName||'')+' world cup')) }; }).filter(Boolean);
     _bracketCache=evs; _bracketAt=Date.now(); renderBracket(evs);
   }).catch(function(){ if(!box.querySelector('.bracket-col')) box.innerHTML='<div class="album-empty">could not load the bracket right now, tap ↻ 💜</div>'; });
 }
@@ -3495,12 +3498,15 @@ function renderBracket(evs){
       }
       var ours = our.length===2 && our[0].indexOf('/')<0 && our[1].indexOf('/')<0 && [g.h,g.a].indexOf(our[0])>=0 && [g.h,g.a].indexOf(our[1])>=0;
       var scored=g.state!=='pre';
-      function row(ab,sc,win,sdn){
+      var pens=g.hSO!=null&&g.aSO!=null;   // ESPN keeps the regulation score tied (e.g. 1-1) and reports the shootout separately
+      function row(ab,sc,win,sdn,so){
         var tbd=_isSlotPlaceholder(sdn);
         var label=tbd ? '<span class="bc-tbd">TBD</span>' : (TEAM_FLAG[ab]?TEAM_FLAG[ab]+' ':'')+_escB(ab||'TBD');
-        return '<div class="bc-team '+(scored?(win?'win':'lose'):'')+(tbd?' bc-pending':'')+'"><span>'+label+'</span>'+(scored?'<span class="bc-sc">'+_escB(sc)+'</span>':(tbd?'':'<span class="bc-pct"></span>'))+'</div>';
+        var scOut=scored?('<span class="bc-sc">'+_escB(sc)+(pens?' <i class="bc-pens">('+_escB(so)+')</i>':'')+'</span>'):(tbd?'':'<span class="bc-pct"></span>');
+        return '<div class="bc-team '+(scored?(win?'win':'lose'):'')+(tbd?' bc-pending':'')+'"><span>'+label+'</span>'+scOut+'</div>';
       }
-      return '<div class="bracket-cell'+(ours?' ours':'')+'" data-slot="'+sl+':'+i+'" data-id="'+_escB(g.id)+'" data-href="'+_escB(g.href)+'" role="button" title="open on ESPN">'+row(g.h,g.hs,g.hw,g.hsdn)+row(g.a,g.as,g.aw,g.asdn)+'<div class="bc-meta">'+(g.state==='in'?'🔴 ':'')+_escB(g.detail||'vs')+'</div></div>';
+      var meta=g.state==='in'?'🔴 '+_escB(g.detail||''):(pens?'PENS '+_escB(g.hSO)+'-'+_escB(g.aSO):_escB(g.detail||'vs'));
+      return '<div class="bracket-cell'+(ours?' ours':'')+'" data-slot="'+sl+':'+i+'" data-id="'+_escB(g.id)+'" data-href="'+_escB(g.href)+'" role="button" title="open on ESPN">'+row(g.h,g.hs,g.hw,g.hsdn,g.hSO)+row(g.a,g.as,g.aw,g.asdn,g.aSO)+'<div class="bc-meta">'+meta+'</div></div>';
     }).join('');
     return '<div class="bracket-col" data-round="'+sl+'"><div class="bracket-col-h">'+_escB(roundLong(sl))+'</div><div class="bracket-col-cells">'+cells+'</div></div>';
   }).join('');
@@ -3530,15 +3536,21 @@ function renderBracket(evs){
       var _hab=(home.team&&(home.team.abbreviation||home.team.shortDisplayName))||'', _aab=(away.team&&(away.team.abbreviation||away.team.shortDisplayName))||'';
       return { id:ev.id||((ev.shortName||'')+ev.date), ms:Date.parse(ev.date)||0, h:_hab, a:_aab, round:(ev.season&&ev.season.slug)||'',
         win:(home.winner===true?_hab:(away.winner===true?_aab:null)),   // ESPN sets .winner on the advancing side (handles penalties)
-        hs:home.score, as:away.score, state:st.state||'pre', detail:st.shortDetail||'', href:href };
+        hs:home.score, as:away.score, hSO:(home.shootoutScore!=null?home.shootoutScore:null), aSO:(away.shootoutScore!=null?away.shootoutScore:null),
+        state:st.state||'pre', detail:st.shortDetail||'', href:href };
     }).filter(Boolean);
   }
   function itemHTML(g){
-    var mid, stat;
+    var mid, stat, hCls='', aCls='';
     if(g.state==='pre'){ mid='<span class="ft-vs">vs</span>'; stat='<span class="ft-status">'+esc(g.detail)+'</span>'; }
-    else { var live=g.state==='in'; mid='<span class="ft-score">'+esc(g.hs)+'&nbsp;-&nbsp;'+esc(g.as)+'</span>'; stat='<span class="ft-status'+(live?' ft-live':'')+'">'+(live?'🔴 ':'')+esc(g.detail)+'</span>'; }
+    else {
+      var live=g.state==='in', pens=g.hSO!=null&&g.aSO!=null;   // ESPN keeps the regulation score tied and reports the shootout separately
+      if(pens){ hCls=(g.win===g.h)?' ft-winner':''; aCls=(g.win===g.a)?' ft-winner':''; }
+      mid='<span class="ft-score">'+esc(g.hs)+'&nbsp;-&nbsp;'+esc(g.as)+(pens?'&nbsp;<b class="ft-pens">('+esc(g.hSO)+'-'+esc(g.aSO)+' pens)</b>':'')+'</span>';
+      stat='<span class="ft-status'+(live?' ft-live':'')+'">'+(live?'🔴 ':'')+esc(g.detail)+'</span>';
+    }
     var rnd=(typeof roundShort==='function'&&g.round)?('<span class="ft-round">'+esc(roundShort(g.round))+'</span>'):'';
-    return '<span class="ft-game" data-href="'+esc(g.href)+'">'+rnd+'<span class="ft-team">'+esc(g.h)+'</span> '+mid+' <span class="ft-team">'+esc(g.a)+'</span> '+stat+'</span>';
+    return '<span class="ft-game" data-href="'+esc(g.href)+'">'+rnd+'<span class="ft-team'+hCls+'">'+esc(g.h)+'</span> '+mid+' <span class="ft-team'+aCls+'">'+esc(g.a)+'</span> '+stat+'</span>';
   }
   function render(games){
     if(!games.length){ track.innerHTML='<span class="ft-empty">⚽ no recent World Cup games, check back at kickoff 💜</span>'; track.style.animation='none'; return; }
