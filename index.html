@@ -2220,13 +2220,24 @@ async function savePhoto(){
   }catch(e){hint('Save failed, try the Share button or just screenshot 💜');}
 }
 async function shareCard(){
-  try{const blob=await cardBlob();
-    const file=new File([blob],'im-going-with-my-boyfriend.png',{type:'image/png'});
+  hint('Making your GIF... 🎞️');
+  try{
+    const blob=await cardGifBlob(p=>hint('Making your GIF... '+Math.round(p*100)+'%'));
+    const file=new File([blob],'sidhu-neal-world-cup-date.gif',{type:'image/gif'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:"I'm going with my boyfriend!",text:"I'm going to the World Cup with my boyfriend! 💜"});
+      await navigator.share({files:[file],title:"I'm going with my boyfriend! 💜",text:'Round of 16 · '+MATCHUP+' · July 6 🏆'});
       hint('Shared! 💜');
-    }else{await savePhoto();hint('Saved the image, attach it in your chat app 💜');}
-  }catch(e){hint('Share cancelled. You can Save photo instead 💜');}
+    }else{await saveGif();hint('Saved the GIF, attach it in your chat app 💜');}
+  }catch(e){
+    // GIF path had trouble (CDN/worker hiccup) -- fall back to the reliable static photo share
+    try{const blob=await cardBlob();
+      const file=new File([blob],'im-going-with-my-boyfriend.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:"I'm going with my boyfriend! 💜",text:'Round of 16 · '+MATCHUP+' · July 6 🏆'});
+        hint('Shared! 💜');
+      }else{await savePhoto();hint('Saved the image, attach it in your chat app 💜');}
+    }catch(e2){hint('Share cancelled. You can Save boarding pass instead 💜');}
+  }
 }
 async function copyImage(){
   try{const blob=await cardBlob();
