@@ -3377,6 +3377,7 @@ function _applyProb(box,g,p){
   if(pcts[1])pcts[1].textContent=(100-hPct)+'%';
   if(rows[0])rows[0].classList.toggle('fav',p.h>=p.a);
   if(rows[1])rows[1].classList.toggle('fav',p.a>p.h);
+  _layoutBracketCells(); _drawBracketLines();   // a %-text arriving late can nudge a cell's height, which shifts every downstream connector -- redraw so lines never go stale after this
 }
 var _bracketLinks=[], _bracketBox=null;
 function _layoutBracketCells(){
@@ -3385,6 +3386,7 @@ function _layoutBracketCells(){
   // connector lines that wander far from a cell's actual feeders (verified: was drawing a line from y=65 to y=403 for
   // a pair whose real feeders sit at y=65 and y=147).
   var box=_bracketBox; if(!box) return;
+  box.style.transform='none';   // a lingering zoom scale from before a refresh corrupts every getBoundingClientRect() below (scaled px read back in as raw local px); _applyZoom() re-applies the real scale right after this runs
   var cols=Array.prototype.slice.call(box.querySelectorAll('.bracket-col')); if(!cols.length) return;
   var byRoundEl={}; cols.forEach(function(c){ byRoundEl[c.getAttribute('data-round')]=c; });
   var order=['round-of-32','round-of-16','quarterfinals','semifinals','final','3rd-place-match'];
@@ -3476,7 +3478,11 @@ function _applyZoom(){
     box.style.transform='scale('+scale.toFixed(3)+')';
   },30);
 }
-if(typeof window!=='undefined')window.addEventListener('resize',function(){ var s=document.getElementById('step8'); if(s&&s.classList.contains('active')){_layoutBracketCells();_drawBracketLines();_applyZoom();} });
+if(typeof window!=='undefined')window.addEventListener('resize',function(){
+  var s=document.getElementById('step8'); if(!s||!s.classList.contains('active'))return;
+  function _settle(){ _layoutBracketCells(); _drawBracketLines(); }
+  requestAnimationFrame(_settle); setTimeout(_settle,150); setTimeout(_applyZoom,180);   // mobile resize (address-bar show/hide) fires mid-reflow -- retry instead of a single synchronous read, same pattern as the initial bracket load
+});
 function renderBracket(evs){
   var box=document.getElementById('bracketCols'); if(!box)return;
   var order=['round-of-32','round-of-16','quarterfinals','semifinals','final','3rd-place-match'];
