@@ -3397,7 +3397,7 @@ function _drawBracketLines(){
   });
   svg.innerHTML=out;
 }
-var ZOOM_STOPS=['quarterfinals','semifinals','final'], _bracketPresent=[], _bracketZoomIdx=-1;
+var ZOOM_STOPS=['quarterfinals','semifinals','final'], _bracketPresent=[], _bracketZoomIdx=-1, _zoomGen=0;
 function _zoomStopsAvail(){ return ZOOM_STOPS.filter(function(sl){ return _bracketPresent.indexOf(sl)>=0; }); }
 function zoomBracket(idx){
   var stops=_zoomStopsAvail(); if(!stops.length)return;
@@ -3406,6 +3406,7 @@ function zoomBracket(idx){
 }
 function _applyZoom(){
   var box=_bracketBox, scroller=document.getElementById('bracketScroll'); if(!box||!scroller)return;
+  var myGen=++_zoomGen;   // rapid taps schedule overlapping deferred callbacks below; only the LAST call's callback should ever touch the DOM, or a stale one can redraw lines/scale against a visibility state a newer tap already replaced
   var stops=_zoomStopsAvail();
   if(_bracketZoomIdx>stops.length-1)_bracketZoomIdx=stops.length-1;
   var lbl=document.getElementById('bracketZoomLbl'), prevBtn=document.getElementById('bzPrev'), nextBtn=document.getElementById('bzNext');
@@ -3416,13 +3417,14 @@ function _applyZoom(){
   if(_bracketZoomIdx<0||!stops.length){
     cols.forEach(function(c){c.style.display='';});
     scroller.classList.remove('zoomed'); scroller.scrollLeft=0; scroller.style.height=''; box.style.transform='none';
-    setTimeout(_drawBracketLines,30);   // restore full connectors now that every column is visible again
+    setTimeout(function(){ if(myGen!==_zoomGen)return; _drawBracketLines(); },30);   // restore full connectors now that every column is visible again
     return;
   }
   var sl=stops[_bracketZoomIdx], prevSl=PREV_ROUND[sl], visible=[prevSl,sl];
   cols.forEach(function(c){ c.style.display = visible.indexOf(c.getAttribute('data-round'))>=0 ? '' : 'none'; });   // hide the now-irrelevant earlier rounds; flex align-items:stretch then auto-shrinks height to whichever VISIBLE column is tallest
   scroller.classList.add('zoomed');
   setTimeout(function(){   // let the display:none/flex-reflow settle before measuring (setTimeout, not rAF -- rAF can stall in a throttled/background preview context)
+    if(myGen!==_zoomGen)return;   // a newer zoom call already took over; let IT finish the job instead of fighting over box.style.transform
     box.style.transform='none'; scroller.scrollLeft=0; scroller.style.height='';   // unscale first so the rects below are measured in natural, unscaled coordinates
     _drawBracketLines();   // recompute connectors for the collapsed (fewer-columns) layout
     var visCols=cols.filter(function(c){return visible.indexOf(c.getAttribute('data-round'))>=0;});
