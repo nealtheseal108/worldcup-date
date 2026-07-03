@@ -22,22 +22,6 @@
   .reveal-up{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .7s cubic-bezier(.16,.8,.3,1);will-change:opacity,transform}
   .reveal-up.in{opacity:1;transform:none}
   @media(prefers-reduced-motion:reduce){.reveal-up{opacity:1!important;transform:none!important;transition:none}}
-  /* hero depth drift: purely decorative, behind the topbar/matchup band. Pure CSS scroll-driven
-     animation (no JS scroll listener) -- unsupported browsers just see a static layer, no breakage. */
-  .hero-parallax{position:absolute;inset:0;height:360px;overflow:hidden;z-index:-1;pointer-events:none}
-  .hero-parallax i{position:absolute;border-radius:50%;filter:blur(1px);opacity:.28;background:#fff}
-  .hero-parallax i:nth-child(1){width:130px;height:130px;top:-40px;left:-40px}
-  .hero-parallax i:nth-child(2){width:90px;height:90px;top:70px;right:-25px;background:var(--lav3)}
-  .hero-parallax i:nth-child(3){width:56px;height:56px;top:230px;left:38%;background:var(--sun);opacity:.16}
-  @media(prefers-reduced-motion:no-preference){
-    @supports (animation-timeline:scroll()){
-      @keyframes heroDriftSlow{from{transform:translateY(0)}to{transform:translateY(70px)}}
-      @keyframes heroDriftFast{from{transform:translateY(0)}to{transform:translateY(-40px)}}
-      .hero-parallax i:nth-child(1){animation:heroDriftSlow linear;animation-timeline:scroll(root);animation-range:0 600px}
-      .hero-parallax i:nth-child(2){animation:heroDriftFast linear;animation-timeline:scroll(root);animation-range:0 600px}
-      .hero-parallax i:nth-child(3){animation:heroDriftSlow linear;animation-timeline:scroll(root);animation-range:0 600px}
-    }
-  }
   body{
     font-family:'Inter',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
     background:linear-gradient(160deg,#7c4dca 0%,#9b72e8 45%,#c4b5fd 100%);
@@ -46,7 +30,7 @@
   h2,.hero h2,.iti-head h2,.tk-title,.tk-pickname{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;letter-spacing:-.02em}
   .fancy{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:1.2em;line-height:1;color:var(--accent2)}
   .lovenote{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400}
-  .wrap{max-width:680px;margin:0 auto;position:relative}
+  .wrap{max-width:680px;margin:0 auto}
   .layout{display:block}
   .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
   .topbar .ball{font-size:22px;cursor:pointer}
@@ -712,7 +696,6 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="hero-parallax" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="topbar"><span class="ball" onclick="_ballTap()">⚽</span><h1>Sidhya & Neal · World Cup Date · July 6</h1></div>
   <div class="matchup"><span class="chip">🏆 Round of 16 · <b id="muText">TBD 🆚 TBD</b> · <span class="mu-note" id="muNote">🇺🇸 could be us!</span></span></div>
   <div class="progress" aria-hidden="true">
