@@ -587,6 +587,35 @@
   .utah-card.pos-done .pos-inkstamp{opacity:.9;transform:rotate(-9deg) scale(1)}
   .utah-card.pos-pending .pos-inkstamp{transform:rotate(-9deg) scale(2.2)}
   .utah-card .pos-ask{font-size:11px;color:var(--muted);font-style:italic}
+  /* utah nature passport book: 3D page-flip leaf (compositor-only transform), swipe or arrows */
+  .pbook{max-width:320px;margin:0 auto}
+  .pbook-stage{position:relative;width:100%;aspect-ratio:32/43;perspective:1400px}
+  .pb-base{position:absolute;inset:0}
+  .pb-leaf{position:absolute;inset:0;transform-origin:left center;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.35,.1,.25,1);z-index:5;will-change:transform}
+  .pb-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;overflow:hidden}
+  .pb-face.pb-back{transform:rotateY(180deg);background:repeating-linear-gradient(45deg,rgba(124,77,202,.06) 0 2px,transparent 2px 14px),#efe7fb;border:1px solid var(--line)}
+  .pb-page{position:absolute;inset:0;display:flex;flex-direction:column;background:repeating-linear-gradient(45deg,rgba(124,77,202,.045) 0 2px,transparent 2px 14px),#fdfbff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 26px rgba(53,28,94,.18);padding:15px 15px 11px;text-align:left}
+  .pb-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:linear-gradient(160deg,#241733,#3a2560);border-radius:12px;border:1px solid rgba(167,139,250,.35);box-shadow:0 10px 26px rgba(18,8,38,.4);cursor:pointer}
+  .pb-crest{width:72px;height:72px;border:2.5px solid var(--sun);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px}
+  .pb-cover h3{font-family:'Courier Prime',ui-monospace,monospace;letter-spacing:6px;font-size:19px;margin:2px 0 0;color:var(--sun);font-weight:700}
+  .pb-cover .pb-sub{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:2px;color:#cbb7f5}
+  .pb-cover .pb-open{font-size:10px;color:#9b86c8;letter-spacing:1px;margin-top:10px}
+  .pb-head{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:2px;color:var(--lav);font-weight:700}
+  .pb-no{font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);margin:2px 0 9px}
+  .pb-name{font-weight:800;font-size:18px;color:#2e1f47;line-height:1.2;margin-bottom:5px;font-family:'Inter',system-ui,sans-serif}
+  .pb-desc{font-size:12px;color:var(--muted);line-height:1.45;overflow:hidden}
+  .pb-page .tag{align-self:flex-start;margin-top:6px}
+  .pb-stampzone{margin:auto auto 6px;background:none;border:2px dashed var(--lav3);border-radius:50%;width:116px;height:116px;flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;color:var(--muted);letter-spacing:.5px;text-align:center;padding:8px;line-height:1.5}
+  .pb-stampzone.stamped{border-color:transparent}
+  .pb-stampzone.pending{border-color:var(--lav);color:var(--lav);font-weight:700}
+  .pb-ink{display:inline-block;transform:rotate(-11deg);border:3px solid #3f9e5c;border-radius:8px;color:#3f9e5c;font-family:'Courier Prime',ui-monospace,monospace;font-size:12.5px;font-weight:800;letter-spacing:2px;padding:6px 10px;line-height:1.4;opacity:.9}
+  .pb-ink small{display:block;font-size:8px;letter-spacing:1.2px}
+  .pb-maybe{background:none;border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-family:inherit;font-size:11px;color:var(--muted);cursor:pointer;align-self:center;margin-bottom:9px}
+  .pb-maybe.on{border-color:var(--lav);color:var(--lav);font-weight:700;background:#f3ecfc}
+  .pb-mrz{border-top:1px dashed var(--line);padding-top:6px;font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;letter-spacing:1.5px;color:#b5a6d6;white-space:nowrap;overflow:hidden}
+  .pbook-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:11px}
+  .pbook-lbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;min-width:120px;text-align:center}
+  @media(prefers-reduced-motion:reduce){.pb-leaf{transition:none}}
   .kit-gate-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;box-shadow:0 8px 20px rgba(53,28,94,.12)}
   .kit-gate-q{font-family:'Courier Prime',ui-monospace,monospace;font-size:13px;font-weight:700;color:#3a2a63;margin-bottom:10px;text-align:center}
   .kit-rack{display:flex;flex-direction:column;gap:10px}
@@ -1100,8 +1129,15 @@
       <div class="iti-head" style="margin-top:2px"><div class="big">🏔️💜</div><h2 style="font-size:24px">the utah plan</h2><div class="venue">July 9-13 · no itinerary, just tap whatever sounds good</div></div>
       <p class="sub" style="margin:-6px 0 16px">Thu + Fri we both work til 5, so daytime's out those two days -- evenings and the whole weekend are wide open. nothing here is locked in or scheduled, just a menu. tap what you're feeling, we'll figure out the order when we get there 💜</p>
 
-      <div class="sectlabel">🌲 out in nature</div>
-      <div class="cards utah-grid" id="utahNature"></div>
+      <div class="sectlabel">🌲 out in nature · our utah passport</div>
+      <div class="pbook">
+        <div class="pbook-stage" id="pbStage"><div class="pb-base"></div></div>
+        <div class="pbook-nav">
+          <button type="button" class="bz-arrow" id="pbPrev" onclick="pbFlip(-1)" title="previous page">‹</button>
+          <span class="pbook-lbl" id="pbLbl">cover</span>
+          <button type="button" class="bz-arrow" id="pbNext" onclick="pbFlip(1)" title="next page">›</button>
+        </div>
+      </div>
 
       <div class="sectlabel" style="margin-top:20px">🏡 low-key, staying in</div>
       <div class="cards utah-grid" id="utahLowkey"></div>
@@ -3184,7 +3220,7 @@ var UTAH_LOWKEY=[
   {t:'just talk, no agenda', d:'a whole evening with nothing to do but be in the same room.'}
 ];
 var UTAH_INTIMATE=[
-  {t:'shower together, finally', r:true, d:'you\'ve been asking since February. no flight to catch after, no rush at all.', pgD:'a real slow morning together, coffee and all, nowhere to rush off to.'},
+  {t:'shower together', r:true, d:'a known favorite at this point 😏 just this time with no flight to catch after, and absolutely no rush.', pgD:'a real slow morning together, coffee and all, nowhere to rush off to.'},
   {t:'make love, all weekend', r:true, d:'no flights to catch, no alarms, no roommates walking in -- just us, slow and close, for as long as we want.', pgD:'a whole weekend together, finally, no rush and nowhere to be.'},
   {t:'the whole night, no alarm', r:true, d:'nowhere to be and nothing to catch -- just holding each other, making love, falling asleep, and waking up and doing it all again.', pgD:'a full night together with nowhere to be in the morning.'},
   {t:'pick your favorite from 8 months of texts', r:true, d:'you know exactly which one. we\'ve got a whole quiz full of receipts now -- pick one and let\'s make it real.', pgD:'finally do one of the things we\'ve been talking about doing together for 8 months.'},
@@ -3257,8 +3293,106 @@ function _utahPosGrid(){
       '</div>';
   }).join('');
 }
+/* ---------- utah nature passport book: flippable pages, real ink stamps ----------
+   page 0 = cover, pages 1..N = one verified nature spot each. Flip = a single 3D leaf
+   (front face + textured back) rotating on its left edge -- transform-only, so the
+   animation stays on the compositor. Stamps persist in wc_utah_stamps; the "maybe list"
+   pill reuses the same wc_utah_sel keys the old nature grid used, so prior picks survive. */
+var _pbIdx=0,_pbFlipping=false,_pbPend=null,_pbPendTimer=null;
+function _pbStamps(){ try{return JSON.parse(localStorage.getItem('wc_utah_stamps')||'{}');}catch(e){return {};} }
+function _pbPageHTML(i){
+  if(i===0){
+    return '<div class="pb-cover" onclick="pbFlip(1)">'+
+      '<div class="pb-crest">🏔️💜</div><h3>PASSPORT</h3>'+
+      '<div class="pb-sub">GANESH AIR · UTAH EDITION</div>'+
+      '<div class="pb-sub">SIDHYA 💜 NEAL · JUL 9-13 2026</div>'+
+      '<div class="pb-open">tap or swipe to open ✨</div></div>';
+  }
+  var it=UTAH_NATURE[i-1], st=_pbStamps(), sel=_utahSel();
+  var stamped=!!st['n'+(i-1)], pending=_pbPend===(i-1), maybe=!!sel['nature'+(i-1)];
+  var zone = stamped ? '<span class="pb-ink">VISITED ✓<small>UTAH · JUL 2026</small></span>'
+    : (pending ? 'tap again if we<br>really went 💜' : '🛂 tap to stamp<br>once we\'ve been');
+  var pn=(i<10?'0':'')+i, pt=(UTAH_NATURE.length<10?'0':'')+UTAH_NATURE.length;
+  return '<div class="pb-page">'+
+    '<div class="pb-head">GANESH AIR ✈ UTAH COUNTY</div>'+
+    '<div class="pb-no">ENTRY VISA · PAGE '+pn+' / '+pt+'</div>'+
+    '<div class="pb-name">'+it.t+'</div>'+
+    '<div class="pb-desc">'+it.d+'</div>'+
+    (it.tag?'<span class="tag">'+it.tag+'</span>':'')+
+    '<button type="button" class="pb-stampzone'+(stamped?' stamped':'')+(pending?' pending':'')+'" onclick="_pbStamp('+(i-1)+')">'+zone+'</button>'+
+    '<button type="button" class="pb-maybe'+(maybe?' on':'')+'" onclick="_pbMaybe('+(i-1)+')">'+(maybe?'💜 on the maybe list':'🤍 add to the maybe list')+'</button>'+
+    '<div class="pb-mrz">P&lt;GANESHAIR&lt;&lt;SIDHYA&lt;&lt;NEAL&lt;&lt;'+it.t.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,10)+'&lt;&lt;&lt;&lt;&lt;&lt;</div>'+
+    '</div>';
+}
+function _pbRenderBase(){ var b=document.querySelector('#pbStage .pb-base'); if(b)b.innerHTML=_pbPageHTML(_pbIdx); _pbNav(); }
+function _pbNav(){
+  var l=document.getElementById('pbLbl'), p=document.getElementById('pbPrev'), n=document.getElementById('pbNext');
+  if(l)l.textContent = _pbIdx===0 ? 'cover · tap to open' : ('page '+_pbIdx+' of '+UTAH_NATURE.length);
+  if(p)p.disabled=_pbIdx<=0||_pbFlipping;
+  if(n)n.disabled=_pbIdx>=UTAH_NATURE.length||_pbFlipping;
+}
+function pbFlip(dir){
+  if(_pbFlipping)return;
+  var to=_pbIdx+dir; if(to<0||to>UTAH_NATURE.length)return;
+  var stage=document.getElementById('pbStage'); if(!stage)return;
+  _pbFlipping=true; _pbPend=null; clearTimeout(_pbPendTimer);
+  var leaf=document.createElement('div'); leaf.className='pb-leaf';
+  var base=stage.querySelector('.pb-base');
+  if(dir>0){   // forward: leaf carries the OLD page and peels left, revealing the new page beneath
+    leaf.innerHTML='<div class="pb-face">'+_pbPageHTML(_pbIdx)+'</div><div class="pb-face pb-back"></div>';
+    _pbIdx=to; if(base)base.innerHTML=_pbPageHTML(_pbIdx);
+    stage.appendChild(leaf);
+    requestAnimationFrame(function(){requestAnimationFrame(function(){ leaf.style.transform='rotateY(-180deg)'; });});
+  } else {     // back: leaf carrying the PREVIOUS page sweeps in from the left, covering the current one
+    leaf.innerHTML='<div class="pb-face">'+_pbPageHTML(to)+'</div><div class="pb-face pb-back"></div>';
+    leaf.style.transition='none'; leaf.style.transform='rotateY(-180deg)';
+    stage.appendChild(leaf);
+    requestAnimationFrame(function(){requestAnimationFrame(function(){ leaf.style.transition=''; leaf.style.transform='rotateY(0deg)'; });});
+  }
+  if(window.buzz)buzz(12);
+  _pbNav();
+  setTimeout(function(){   // setTimeout, not transitionend: still fires if the tab throttles mid-flip
+    if(dir<0){ _pbIdx=to; if(base)base.innerHTML=_pbPageHTML(_pbIdx); }
+    if(leaf.parentNode)leaf.parentNode.removeChild(leaf);
+    _pbFlipping=false; _pbNav();
+  },700);
+}
+function _pbStamp(i){
+  var st=_pbStamps();
+  if(st['n'+i]){ delete st['n'+i]; try{localStorage.setItem('wc_utah_stamps',JSON.stringify(st));}catch(e){} _pbPend=null; _pbRenderBase(); return; }
+  if(_pbPend===i){   // second tap within the window -- commit the real stamp
+    clearTimeout(_pbPendTimer); _pbPend=null;
+    st['n'+i]=1; try{localStorage.setItem('wc_utah_stamps',JSON.stringify(st));}catch(e){}
+    if(window.buzz)buzz(28);
+    _pbRenderBase();
+    if(window.burstConfetti)burstConfetti(document.getElementById('pbStage'),{emojis:['🛂','💜','🏔️'],count:16});
+    return;
+  }
+  _pbPend=i; if(window.buzz)buzz(10);
+  clearTimeout(_pbPendTimer); _pbPendTimer=setTimeout(function(){ _pbPend=null; _pbRenderBase(); },4000);
+  _pbRenderBase();
+}
+function _pbMaybe(i){
+  var sel=_utahSel(), k='nature'+i;
+  if(sel[k])delete sel[k]; else { sel[k]=1; if(window.buzz)buzz(16); }
+  try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
+  _pbRenderBase(); _utahCount();
+}
+(function(){   // swipe to flip (horizontal only, so vertical page scroll stays untouched)
+  var s=document.getElementById('pbStage'); if(!s||s._wired)return; s._wired=true;
+  var x0=null,y0=null;
+  s.addEventListener('touchstart',function(e){ var t=e.touches[0]; x0=t.clientX; y0=t.clientY; },{passive:true});
+  s.addEventListener('touchend',function(e){
+    if(x0==null)return; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0; x0=null;
+    if(Math.abs(dx)>48 && Math.abs(dx)>Math.abs(dy)*1.4) pbFlip(dx<0?1:-1);
+  },{passive:true});
+})();
+function _utahCount(){
+  var sel=_utahSel(), n=Object.keys(sel).filter(function(k){return sel[k];}).length;
+  var c=document.getElementById('utahCount'); if(c)c.textContent = n ? (n+' thing'+(n===1?'':'s')+' on the maybe list 💜 tap to un-pick anytime') : 'nothing picked yet -- tap whatever sounds good, babu';
+}
 function renderUtah(){
-  _utahGrid('utahNature','nature',UTAH_NATURE);
+  _pbRenderBase();
   _utahGrid('utahLowkey','lowkey',UTAH_LOWKEY);
   _utahGrid('utahIntimate','intimate',UTAH_INTIMATE);
   _utahPosGrid();
@@ -3267,8 +3401,7 @@ function renderUtah(){
   if(lbl)lbl.style.display=pg?'none':'';
   if(done){ done.style.display=pg?'none':''; done.textContent='already stamped: '+UTAH_POS_DONE.join(', ')+' ✓ -- everything below is still someday 😏'; }
   if(posGrid)posGrid.style.display=pg?'none':'';
-  var sel=_utahSel(), n=Object.keys(sel).filter(function(k){return sel[k];}).length;
-  var c=document.getElementById('utahCount'); if(c)c.textContent = n ? (n+' thing'+(n===1?'':'s')+' on the maybe list 💜 tap to un-pick anytime') : 'nothing picked yet -- tap whatever sounds good, babu';
+  _utahCount();
 }
 renderBingo(); renderQDeck(); renderMissions(); renderKit(); renderDepartures(); renderQuiz(); renderUtah();
 function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
