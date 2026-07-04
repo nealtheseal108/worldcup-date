@@ -505,6 +505,13 @@
   .vs-fl{animation:vsFlick 2.8s infinite}
   .vs-nm{animation:vsFlick 4.6s infinite 1.1s}
   .vs-fab{animation:vsHum 3.6s infinite .4s}
+  /* neon glows (CSS drop-shadow chains -- SVG text ignores text-shadow) */
+  .vs-gw{filter:drop-shadow(0 0 5px rgba(255,250,235,.95)) drop-shadow(0 0 16px rgba(160,220,255,.55))}
+  .vs-gb{filter:drop-shadow(0 0 5px rgba(110,201,255,.9)) drop-shadow(0 0 14px rgba(110,201,255,.5))}
+  .vs-gp{filter:drop-shadow(0 0 5px rgba(255,122,162,.9)) drop-shadow(0 0 14px rgba(255,92,138,.5))}
+  .vs-gr{filter:drop-shadow(0 0 6px rgba(229,55,43,.85)) drop-shadow(0 0 16px rgba(229,55,43,.45))}
+  .vs-gc{filter:drop-shadow(0 0 6px rgba(253,246,236,.85))}
+  .vs-gl{filter:drop-shadow(0 0 4px rgba(203,183,245,.8))}
   .vs-sub{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:2.4px;color:#6f5da0}
   @keyframes vsHum{0%,100%{opacity:1}50%{opacity:.84}}
   @keyframes vsFlick{0%,17%,20%,24%,52%,56%,100%{opacity:1}18%,54%{opacity:.15}19%,23%{opacity:.65}55%{opacity:.4}}
@@ -4310,33 +4317,36 @@ window.initTimeline=function(){};
          white diamond with dark outline + yellow bulb rim, WELCOME in red-letter circles,
          blue "TO Fabulous" script, SEATTLE in red block letters, SIDHYA in blue caps -->
     <svg viewBox="0 0 360 340" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="vsbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#261a4e"/><stop offset="1" stop-color="#140e2e"/></linearGradient>
+      </defs>
       <!-- starburst (drawn first so the sign overlaps its lower spikes, like the real one) -->
-      <g transform="translate(138,66) scale(1.15)">
+      <g class="vs-gr" transform="translate(138,66) scale(1.15)">
         <polygon points="0,-52 3.1,-7.4 24,-24 7.4,-3.1 40,0 7.4,3.1 19.8,19.8 3.1,7.4 0,44 -3.1,7.4 -21.2,21.2 -7.4,3.1 -40,0 -7.4,-3.1 -24,-24 -3.1,-7.4" fill="#e5372b" stroke="#201a35" stroke-width="3.5" stroke-linejoin="round"/>
         <circle cx="0" cy="-30" r="2.6" fill="#fff"/><circle cx="18" cy="-18" r="2.6" fill="#fff"/><circle cx="-18" cy="-18" r="2.6" fill="#fff"/>
       </g>
-      <!-- the diamond board -->
-      <path d="M180 77 Q285 112 348 195 Q285 278 180 313 Q75 278 12 195 Q75 112 180 77 Z" fill="#f8f4e8" stroke="#201a35" stroke-width="7" stroke-linejoin="round"/>
+      <!-- the diamond board: dark, so the neon actually glows (this is the sign at night) -->
+      <path d="M180 77 Q285 112 348 195 Q285 278 180 313 Q75 278 12 195 Q75 112 180 77 Z" fill="url(#vsbg)" stroke="#0d0a20" stroke-width="7" stroke-linejoin="round"/>
       <!-- bulb rim: round-dot dashed stroke = a ring of marquee bulbs (halo layer underneath) -->
-      <path d="M180 89 Q276 121 336 195 Q276 269 180 301 Q84 269 24 195 Q84 121 180 89 Z" fill="none" stroke="#f6c944" stroke-width="8.5" stroke-dasharray="0.1 13" stroke-linecap="round" opacity=".35"/>
-      <path class="vs-bulbs" d="M180 89 Q276 121 336 195 Q276 269 180 301 Q84 269 24 195 Q84 121 180 89 Z" fill="none" stroke="#f0b429" stroke-width="4.5" stroke-dasharray="0.1 13" stroke-linecap="round"/>
-      <!-- WELCOME in circles -->
-      <g>
-        <circle cx="78" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="112" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="146" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="180" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="214" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="248" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="282" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/>
-        <text x="78" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">W</text><text x="112" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">E</text><text x="146" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">L</text><text x="180" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">C</text><text x="214" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">O</text><text x="248" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">M</text><text x="282" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">E</text>
+      <path d="M180 89 Q276 121 336 195 Q276 269 180 301 Q84 269 24 195 Q84 121 180 89 Z" fill="none" stroke="#f6c944" stroke-width="8.5" stroke-dasharray="0.1 13" stroke-linecap="round" opacity=".4"/>
+      <path class="vs-bulbs" d="M180 89 Q276 121 336 195 Q276 269 180 301 Q84 269 24 195 Q84 121 180 89 Z" fill="none" stroke="#ffd166" stroke-width="4.5" stroke-dasharray="0.1 13" stroke-linecap="round"/>
+      <!-- WELCOME in lit circles -->
+      <g class="vs-gc">
+        <circle cx="78" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="112" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="146" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="180" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="214" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="248" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="282" cy="136" r="14.5" fill="#fdf6ec"/>
+        <text x="78" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">W</text><text x="112" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">E</text><text x="146" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">L</text><text x="180" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">C</text><text x="214" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">O</text><text x="248" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">M</text><text x="282" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">E</text>
       </g>
-      <!-- TO Fabulous -->
-      <text class="vs-fab" x="180" y="182" text-anchor="middle"><tspan font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="12" letter-spacing="3" fill="#2ba7de">TO </tspan><tspan font-family="'Instrument Serif',Georgia,serif" font-style="italic" font-size="30" fill="#2ba7de">Fabulous</tspan></text>
-      <!-- SEATTLE, red block letters, first T does the dying-buzz flicker -->
-      <g font-family="Inter,system-ui,sans-serif" font-weight="900" font-size="46" fill="#d93a2b" text-anchor="middle">
-        <text class="vs-seat" x="72" y="234">S</text><text class="vs-seat" x="108" y="234">E</text><text class="vs-seat" x="144" y="234">A</text><text class="vs-seat vs-fl" x="180" y="234">T</text><text class="vs-seat" x="216" y="234">T</text><text class="vs-seat" x="252" y="234">L</text><text class="vs-seat" x="288" y="234">E</text>
+      <!-- TO Fabulous, blue neon script -->
+      <text class="vs-fab vs-gb" x="180" y="176" text-anchor="middle"><tspan font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="12" letter-spacing="3" fill="#6ec9ff">TO </tspan><tspan font-family="'Instrument Serif',Georgia,serif" font-style="italic" font-size="30" fill="#6ec9ff">Fabulous</tspan></text>
+      <!-- SEATTLE, bulb-lit white letters, first T does the dying-buzz flicker -->
+      <g class="vs-gw" font-family="Inter,system-ui,sans-serif" font-weight="900" font-size="46" fill="#fffdf5" text-anchor="middle">
+        <text class="vs-seat" x="72" y="226">S</text><text class="vs-seat" x="108" y="226">E</text><text class="vs-seat" x="144" y="226">A</text><text class="vs-seat vs-fl" x="180" y="226">T</text><text class="vs-seat" x="216" y="226">T</text><text class="vs-seat" x="252" y="226">L</text><text class="vs-seat" x="288" y="226">E</text>
       </g>
-      <!-- SIDHYA in the NEVADA slot -->
-      <g class="vs-nm" font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="17" fill="#2ba7de" text-anchor="middle">
-        <text x="120" y="266">S</text><text x="144" y="266">I</text><text x="168" y="266">D</text><text x="192" y="266">H</text><text x="216" y="266">Y</text><text x="240" y="266">A</text>
+      <!-- SIDHYA in the NEVADA slot, pink neon -->
+      <g class="vs-nm vs-gp" font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="17" fill="#ff7aa2" text-anchor="middle">
+        <text x="120" y="252">S</text><text x="144" y="252">I</text><text x="168" y="252">D</text><text x="192" y="252">H</text><text x="216" y="252">Y</text><text x="240" y="252">A</text>
       </g>
       <!-- and the guy holding the sign -->
-      <text x="180" y="284" text-anchor="middle" font-family="'Courier Prime',ui-monospace,monospace" font-weight="700" font-size="8.5" letter-spacing="1" fill="#4a4066">FROM YOUR NEAL 💜</text>
+      <text class="vs-gl" x="180" y="272" text-anchor="middle" font-family="'Courier Prime',ui-monospace,monospace" font-weight="700" font-size="8.5" letter-spacing="1" fill="#cbb7f5">FROM YOUR NEAL 💜</text>
     </svg>
   </div>
   <div class="vs-sub">TAP ANYWHERE TO ENTER ✨</div>
