@@ -497,21 +497,16 @@
      tap anywhere or auto-dismiss. all glow is text-shadow + opacity keyframes (compositor-cheap). */
   #vegasSign{position:fixed;inset:0;z-index:230;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 32%,#1b1233 0%,#0b0718 72%);cursor:pointer;transition:opacity .55s;padding:20px}
   #vegasSign.gone{opacity:0;pointer-events:none}
-  .vs-board{position:relative;width:min(330px,86vw);border:4px dotted rgba(255,209,102,.85);border-radius:48% 48% 48% 48% / 26%;padding:34px 20px 30px;text-align:center;background:rgba(18,10,38,.55);box-shadow:0 0 34px rgba(255,209,102,.16),inset 0 0 28px rgba(124,77,202,.2);animation:vsRim 2.6s infinite}
-  .vs-star{position:absolute;top:-34px;left:50%;transform:translateX(-50%);font-size:44px;color:#ffd166;text-shadow:0 0 10px #ffd166,0 0 30px rgba(255,209,102,.9);animation:vsStar 1.5s infinite}
-  .vs-welcome{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
-  .vs-welcome i{width:29px;height:29px;border-radius:50%;background:#fdf6ec;color:#c0392b;font-style:normal;font-weight:800;font-size:14px;font-family:'Courier Prime',ui-monospace,monospace;display:flex;align-items:center;justify-content:center;box-shadow:0 0 9px rgba(253,246,236,.75);animation:vsPop .45s backwards}
-  .vs-welcome i:nth-child(1){animation-delay:.05s}.vs-welcome i:nth-child(2){animation-delay:.13s}.vs-welcome i:nth-child(3){animation-delay:.21s}.vs-welcome i:nth-child(4){animation-delay:.29s}.vs-welcome i:nth-child(5){animation-delay:.37s}.vs-welcome i:nth-child(6){animation-delay:.45s}.vs-welcome i:nth-child(7){animation-delay:.53s}
-  .vs-to{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:25px;color:#ffd166;text-shadow:0 0 8px #ffd166,0 0 22px rgba(255,209,102,.85);margin-bottom:6px;animation:vsHum 3.4s infinite}
-  .vs-city{margin-bottom:10px}
-  .vs-city b{font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:41px;letter-spacing:2px;color:#fff;text-shadow:0 0 6px #fff,0 0 18px #7cf7ff,0 0 36px rgba(124,247,255,.8);animation:vsHum 3.1s infinite}
-  .vs-city b.vs-flick{animation:vsFlick 2.8s infinite}
-  .vs-name{font-family:'Courier Prime',ui-monospace,monospace;font-weight:800;font-size:19px;letter-spacing:7px;color:#ff5c8a;text-shadow:0 0 8px #ff5c8a,0 0 26px rgba(255,92,138,.85);animation:vsFlick 4.1s infinite .9s}
-  .vs-sub{margin-top:16px;font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:2px;color:#6f5da0}
-  @keyframes vsPop{from{transform:scale(0);opacity:0}70%{transform:scale(1.25)}to{transform:scale(1);opacity:1}}
-  @keyframes vsStar{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.16)}}
-  @keyframes vsHum{0%,100%{opacity:1}50%{opacity:.88}}
-  @keyframes vsRim{0%,100%{border-color:rgba(255,209,102,.85)}50%{border-color:rgba(255,209,102,.45)}}
+  #vegasSign{flex-direction:column;gap:22px}
+  .vs-svgwrap{width:min(372px,94vw);filter:drop-shadow(0 16px 34px rgba(0,0,0,.55))}
+  .vs-svgwrap svg{width:100%;height:auto;display:block}
+  .vs-bulbs{animation:vsHum 2.1s infinite}
+  .vs-seat{animation:vsHum 3.1s infinite}
+  .vs-fl{animation:vsFlick 2.8s infinite}
+  .vs-nm{animation:vsFlick 4.6s infinite 1.1s}
+  .vs-fab{animation:vsHum 3.6s infinite .4s}
+  .vs-sub{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:2.4px;color:#6f5da0}
+  @keyframes vsHum{0%,100%{opacity:1}50%{opacity:.84}}
   @keyframes vsFlick{0%,17%,20%,24%,52%,56%,100%{opacity:1}18%,54%{opacity:.15}19%,23%{opacity:.65}55%{opacity:.4}}
   @media(prefers-reduced-motion:reduce){#vegasSign *{animation:none!important}}
   /* the flight log: PRIVATE CHARTER landings on record (R-only, all fun and games) */
@@ -4242,15 +4237,42 @@ window.initTimeline=function(){};
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
 
 <!-- VEGAS-STYLE NEON ENTRY SIGN: shows on every load, tap anywhere (or wait) to enter -->
-<div id="vegasSign" role="dialog" aria-label="welcome to seattle sidhya" onclick="hideVegas()">
-  <div class="vs-board">
-    <div class="vs-star">✦</div>
-    <div class="vs-welcome"><i>W</i><i>E</i><i>L</i><i>C</i><i>O</i><i>M</i><i>E</i></div>
-    <div class="vs-to">to fabulous</div>
-    <div class="vs-city"><b>S</b><b>E</b><b>A</b><b class="vs-flick">T</b><b>T</b><b>L</b><b>E</b></div>
-    <div class="vs-name">SIDHYA 💜</div>
-    <div class="vs-sub">TAP ANYWHERE TO ENTER ✨</div>
+<div id="vegasSign" role="dialog" aria-label="welcome to fabulous seattle sidhya" onclick="hideVegas()">
+  <div class="vs-svgwrap">
+    <!-- faithful Welcome-to-Fabulous-Las-Vegas layout: red starburst behind the top point,
+         white diamond with dark outline + yellow bulb rim, WELCOME in red-letter circles,
+         blue "TO Fabulous" script, SEATTLE in red block letters, SIDHYA in blue caps -->
+    <svg viewBox="0 0 360 340" xmlns="http://www.w3.org/2000/svg">
+      <!-- starburst (drawn first so the sign overlaps its lower spikes, like the real one) -->
+      <g transform="translate(138,66) scale(1.15)">
+        <polygon points="0,-52 3.1,-7.4 24,-24 7.4,-3.1 40,0 7.4,3.1 19.8,19.8 3.1,7.4 0,44 -3.1,7.4 -21.2,21.2 -7.4,3.1 -40,0 -7.4,-3.1 -24,-24 -3.1,-7.4" fill="#e5372b" stroke="#201a35" stroke-width="3.5" stroke-linejoin="round"/>
+        <circle cx="0" cy="-30" r="2.6" fill="#fff"/><circle cx="18" cy="-18" r="2.6" fill="#fff"/><circle cx="-18" cy="-18" r="2.6" fill="#fff"/>
+      </g>
+      <!-- the diamond board -->
+      <path d="M180 77 Q285 112 348 195 Q285 278 180 313 Q75 278 12 195 Q75 112 180 77 Z" fill="#f8f4e8" stroke="#201a35" stroke-width="7" stroke-linejoin="round"/>
+      <!-- bulb rim: round-dot dashed stroke = a ring of marquee bulbs (halo layer underneath) -->
+      <path d="M180 89 Q276 121 336 195 Q276 269 180 301 Q84 269 24 195 Q84 121 180 89 Z" fill="none" stroke="#f6c944" stroke-width="8.5" stroke-dasharray="0.1 13" stroke-linecap="round" opacity=".35"/>
+      <path class="vs-bulbs" d="M180 89 Q276 121 336 195 Q276 269 180 301 Q84 269 24 195 Q84 121 180 89 Z" fill="none" stroke="#f0b429" stroke-width="4.5" stroke-dasharray="0.1 13" stroke-linecap="round"/>
+      <!-- WELCOME in circles -->
+      <g>
+        <circle cx="78" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="112" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="146" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="180" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="214" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="248" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/><circle cx="282" cy="140" r="14.5" fill="#fff" stroke="#201a35" stroke-width="1.6"/>
+        <text x="78" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">W</text><text x="112" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">E</text><text x="146" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">L</text><text x="180" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">C</text><text x="214" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">O</text><text x="248" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">M</text><text x="282" y="145.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">E</text>
+      </g>
+      <!-- TO Fabulous -->
+      <text class="vs-fab" x="180" y="182" text-anchor="middle"><tspan font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="12" letter-spacing="3" fill="#2ba7de">TO </tspan><tspan font-family="'Instrument Serif',Georgia,serif" font-style="italic" font-size="30" fill="#2ba7de">Fabulous</tspan></text>
+      <!-- SEATTLE, red block letters, first T does the dying-buzz flicker -->
+      <g font-family="Inter,system-ui,sans-serif" font-weight="900" font-size="46" fill="#d93a2b" text-anchor="middle">
+        <text class="vs-seat" x="72" y="234">S</text><text class="vs-seat" x="108" y="234">E</text><text class="vs-seat" x="144" y="234">A</text><text class="vs-seat vs-fl" x="180" y="234">T</text><text class="vs-seat" x="216" y="234">T</text><text class="vs-seat" x="252" y="234">L</text><text class="vs-seat" x="288" y="234">E</text>
+      </g>
+      <!-- SIDHYA in the NEVADA slot -->
+      <g class="vs-nm" font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="17" fill="#2ba7de" text-anchor="middle">
+        <text x="120" y="266">S</text><text x="144" y="266">I</text><text x="168" y="266">D</text><text x="192" y="266">H</text><text x="216" y="266">Y</text><text x="240" y="266">A</text>
+      </g>
+      <!-- and the guy holding the sign -->
+      <text x="180" y="284" text-anchor="middle" font-family="'Courier Prime',ui-monospace,monospace" font-weight="700" font-size="8.5" letter-spacing="1" fill="#4a4066">FROM YOUR NEAL 💜</text>
+    </svg>
   </div>
+  <div class="vs-sub">TAP ANYWHERE TO ENTER ✨</div>
 </div>
 
 <!-- ARRIVALS HALL — July 2, the moment she lands: the site holds a sign for her -->
