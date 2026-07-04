@@ -583,6 +583,10 @@
   /* comfort kit: sealed open-when envelopes (step11) */
   .kit-note{font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;color:var(--muted);text-align:center;margin:0 0 14px}
   .pos-note{margin:-6px 0 12px;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:var(--muted);text-align:center}
+  .pos-inkstamp{position:absolute;top:12px;right:12px;display:inline-block;transform:rotate(-9deg);border:2.5px solid #3f9e5c;border-radius:6px;color:#3f9e5c;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;font-weight:800;letter-spacing:1.5px;padding:3px 9px;opacity:0;transform-origin:center;transition:opacity .2s,transform .35s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+  .utah-card.pos-done .pos-inkstamp{opacity:.9;transform:rotate(-9deg) scale(1)}
+  .utah-card.pos-pending .pos-inkstamp{transform:rotate(-9deg) scale(2.2)}
+  .utah-card .pos-ask{font-size:11px;color:var(--muted);font-style:italic}
   .kit-gate-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;box-shadow:0 8px 20px rgba(53,28,94,.12)}
   .kit-gate-q{font-family:'Courier Prime',ui-monospace,monospace;font-size:13px;font-weight:700;color:#3a2a63;margin-bottom:10px;text-align:center}
   .kit-rack{display:flex;flex-direction:column;gap:10px}
@@ -3181,10 +3185,10 @@ var UTAH_LOWKEY=[
 ];
 var UTAH_INTIMATE=[
   {t:'shower together, finally', r:true, d:'you\'ve been asking since February. no flight to catch after, no rush at all.', pgD:'a real slow morning together, coffee and all, nowhere to rush off to.'},
-  {t:'just fucking, all weekend', r:true, d:'no flights to catch, no alarms, no roommates walking in -- just fucking you until neither of us can walk straight, then doing it again.', pgD:'a whole weekend together, finally, no rush and nowhere to be.'},
-  {t:'the whole night, no alarm', r:true, d:'nowhere to be and nothing to catch -- just us fucking and falling asleep and waking up and starting over.', pgD:'a full night together with nowhere to be in the morning.'},
+  {t:'make love, all weekend', r:true, d:'no flights to catch, no alarms, no roommates walking in -- just us, slow and close, for as long as we want.', pgD:'a whole weekend together, finally, no rush and nowhere to be.'},
+  {t:'the whole night, no alarm', r:true, d:'nowhere to be and nothing to catch -- just holding each other, making love, falling asleep, and waking up and doing it all again.', pgD:'a full night together with nowhere to be in the morning.'},
   {t:'pick your favorite from 8 months of texts', r:true, d:'you know exactly which one. we\'ve got a whole quiz full of receipts now -- pick one and let\'s make it real.', pgD:'finally do one of the things we\'ve been talking about doing together for 8 months.'},
-  {t:'make up for every mile', r:true, d:'700 miles of missing each other, fucked out of both our systems, in person.', pgD:'700 miles of missing each other, made up for in person.'},
+  {t:'make up for every mile', r:true, d:'700 miles of missing each other, closed the only way that actually works: in person, in your arms.', pgD:'700 miles of missing each other, made up for in person.'},
   {t:'just lie there for a while', r:true, d:'skin on skin, nothing that needs saying.', pgD:'just lie there together and not talk for a while.'}
 ];
 function _utahSel(){ try{return JSON.parse(localStorage.getItem('wc_utah_sel')||'{}');}catch(e){return {};} }
@@ -3220,11 +3224,44 @@ var UTAH_POSITIONS=[
   {t:'scissors', r:true, d:'not yet. someday soon 😏'},
   {t:'the pretzel', r:true, d:'not yet. someday soon 😏'}
 ];
+var _posPending=null, _posPendingTimer=null;
+function _utahPosStamp(i){
+  var sel=_utahSel();
+  if(sel['pos'+i]){   // already stamped -- one tap to unstamp, no confirm needed
+    delete sel['pos'+i]; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
+    _posPending=null; renderUtah(); return;
+  }
+  if(_posPending===i){   // second tap on the same card within the window -- actually stamp it
+    clearTimeout(_posPendingTimer); _posPending=null;
+    sel['pos'+i]=1; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
+    if(window.buzz)buzz(28);
+    renderUtah();
+    if(window.burstConfetti){ var el=document.querySelector('.utah-card[data-pos-i="'+i+'"]')||document.getElementById('utahPositions'); burstConfetti(el,{emojis:['💜','✅','📖'],count:16}); }
+    return;
+  }
+  _posPending=i;   // first tap -- ask for real before it counts as a real stamp
+  if(window.buzz)buzz(10);
+  clearTimeout(_posPendingTimer);
+  _posPendingTimer=setTimeout(function(){ _posPending=null; renderUtah(); },4000);
+  renderUtah();
+}
+function _utahPosGrid(){
+  var g=document.getElementById('utahPositions'); if(!g)return;
+  var sel=_utahSel();
+  g.innerHTML=UTAH_POSITIONS.map(function(it,i){
+    var done=!!sel['pos'+i], pending=_posPending===i;
+    var sub = done ? 'stamped ✓' : (pending ? 'tap again if it actually happened 💜' : it.d);
+    return '<div class="card utah-card'+(done?' pos-done':'')+(pending?' pos-pending':'')+'" data-pos-i="'+i+'" onclick="_utahPosStamp('+i+')">'+
+      '<span class="pos-inkstamp">STAMPED</span>'+
+      '<div><div class="ttl">'+it.t+'</div><div class="desc'+(pending?' pos-ask':'')+'">'+sub+'</div></div>'+
+      '</div>';
+  }).join('');
+}
 function renderUtah(){
   _utahGrid('utahNature','nature',UTAH_NATURE);
   _utahGrid('utahLowkey','lowkey',UTAH_LOWKEY);
   _utahGrid('utahIntimate','intimate',UTAH_INTIMATE);
-  _utahGrid('utahPositions','pos',UTAH_POSITIONS);
+  _utahPosGrid();
   var pg=_spiceMode()==='pg';
   var lbl=document.getElementById('utahPosLabel'), done=document.getElementById('utahPosDone'), posGrid=document.getElementById('utahPositions');
   if(lbl)lbl.style.display=pg?'none':'';
