@@ -4515,10 +4515,11 @@ window.initTimeline=function(){};
       <defs>
         <linearGradient id="vsbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#261a4e"/><stop offset="1" stop-color="#140e2e"/></linearGradient>
       </defs>
-      <!-- starburst (drawn first so the sign overlaps its lower spikes, like the real one) -->
-      <g class="vs-gr" transform="translate(138,66) scale(1.15)">
-        <polygon points="0,-52 3.1,-7.4 24,-24 7.4,-3.1 40,0 7.4,3.1 19.8,19.8 3.1,7.4 0,44 -3.1,7.4 -21.2,21.2 -7.4,3.1 -40,0 -7.4,-3.1 -24,-24 -3.1,-7.4" fill="#e5372b" stroke="#201a35" stroke-width="3.5" stroke-linejoin="round"/>
-        <circle cx="0" cy="-30" r="2.6" fill="#fff"/><circle cx="18" cy="-18" r="2.6" fill="#fff"/><circle cx="-18" cy="-18" r="2.6" fill="#fff"/>
+      <!-- starburst: centered on the diamond's top tip (x=180) so its lower spike tucks directly
+           behind the board instead of floating disconnected above it, like the real sign -->
+      <g class="vs-gr" transform="translate(180,66) scale(1.25)">
+        <polygon points="0,-52 3.1,-7.4 24,-24 7.4,-3.1 40,0 7.4,3.1 19.8,19.8 3.1,7.4 0,44 -3.1,7.4 -21.2,21.2 -7.4,3.1 -40,0 -7.4,-3.1 -24,-24 -3.1,-7.4" fill="#e5372b" stroke="#201a35" stroke-width="4.5" stroke-linejoin="round"/>
+        <circle cx="0" cy="-30" r="2.8" fill="#fff"/><circle cx="18" cy="-18" r="2.8" fill="#fff"/><circle cx="-18" cy="-18" r="2.8" fill="#fff"/>
       </g>
       <!-- the diamond board: dark, so the neon actually glows (this is the sign at night) -->
       <path d="M180 77 Q285 112 348 195 Q285 278 180 313 Q75 278 12 195 Q75 112 180 77 Z" fill="url(#vsbg)" stroke="#0d0a20" stroke-width="7" stroke-linejoin="round"/>
@@ -4541,7 +4542,7 @@ window.initTimeline=function(){};
         <text x="120" y="252">S</text><text x="144" y="252">I</text><text x="168" y="252">D</text><text x="192" y="252">H</text><text x="216" y="252">Y</text><text x="240" y="252">A</text>
       </g>
       <!-- and the guy holding the sign -->
-      <text class="vs-gl" x="180" y="272" text-anchor="middle" font-family="'Courier Prime',ui-monospace,monospace" font-weight="700" font-size="8.5" letter-spacing="1" fill="#cbb7f5">FROM YOUR NEAL 💜</text>
+      <text class="vs-gl" x="180" y="286" text-anchor="middle" font-family="'Courier Prime',ui-monospace,monospace" font-weight="700" font-size="9.5" letter-spacing="1.2" fill="#cbb7f5">FROM YOUR NEAL 💜</text>
     </svg>
   </div>
   <div class="vs-sub">TAP ANYWHERE TO ENTER ✨</div>
