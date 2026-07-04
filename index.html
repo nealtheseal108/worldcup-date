@@ -74,7 +74,7 @@
   .diary-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px}
   .clipwrap{position:relative;width:132px;max-width:46%}
   .diary-clip{width:100%;border-radius:10px;background:#000;box-shadow:0 4px 14px rgba(53,28,94,.3);display:block}
-  .clipdel{position:absolute;top:5px;right:5px;width:22px;height:22px;border:none;border-radius:50%;background:rgba(18,12,34,.72);color:#fff;font-size:12px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+  .clipdel{position:absolute;top:5px;right:5px;width:30px;height:30px;border:none;border-radius:50%;background:rgba(18,12,34,.72);color:#fff;font-size:13px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
   .cliploc{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;color:var(--muted);margin-top:3px}
   .rec-preview{width:100%;max-height:48vh;border-radius:12px;background:#000;transform:scaleX(-1);margin:4px 0 2px}
   .rec-timer{font-family:'Courier Prime',ui-monospace,monospace;font-weight:700;font-size:14px;color:#c0398b;text-align:center;margin:6px 0 2px;letter-spacing:.5px}
@@ -218,7 +218,7 @@
   .modal-card{background:var(--paper);border-radius:18px;padding:22px 20px;width:100%;max-width:420px;box-shadow:0 22px 60px rgba(30,12,60,.5)}
   .modal-title{font-weight:700;font-size:19px;margin-bottom:4px}
   .modal-sub{color:var(--muted);font-size:13.5px;margin-bottom:14px}
-  .modal-input{width:100%;padding:12px 13px;border:2px solid var(--line);border-radius:11px;font:inherit;font-size:14px}
+  .modal-input{width:100%;padding:12px 13px;border:2px solid var(--line);border-radius:11px;font:inherit;font-size:16px}   /* 16px minimum, or iOS Safari force-zooms the page on focus */
   .modal-input:focus{outline:none;border-color:var(--lav)}
   .modal-err{color:#c0392b;font-size:12.5px;min-height:15px;margin:6px 2px 0}
   .modal-row{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
@@ -1157,7 +1157,7 @@
       <div id="kitGate" style="display:none">
         <div class="kit-gate-card">
           <div class="kit-gate-q">security check 🛃, what do you call me?</div>
-          <input class="modal-input" id="kitAnswer" type="text" placeholder="one word, you know it" autocomplete="off">
+          <input class="modal-input" id="kitAnswer" type="text" placeholder="one word, you know it" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
           <button class="btn primary" type="button" style="margin-top:10px;width:100%" onclick="kitTry()">unlock my kit 💜</button>
         </div>
       </div>
@@ -1788,6 +1788,20 @@ function _swRenderChosen(stepKey, cont, items){
   cont.querySelector('.sw-again').onclick=function(){ _swRePick(stepKey); };
 }
 
+/* picks survive a closed tab: the whole day's plan hangs off `pick`, so losing it mid-date
+   (Safari purging the tab at the stadium) would blank the pass + lock the add-ons. */
+function _persistPick(){ try{localStorage.setItem('wc_pick',JSON.stringify({v:pick.venue,d:pick.during,a:pick.after}));}catch(e){} }
+function _restorePick(){
+  try{
+    var s=JSON.parse(localStorage.getItem('wc_pick')||'null'); if(!s)return;
+    if(s.v && VENUES[s.v])pick.venue=s.v;
+    if(s.d&&s.d.t)pick.during=s.d;
+    if(s.a&&s.a.t)pick.after=s.a;
+    if(pick.venue){ var n1=document.getElementById('next1'); if(n1)n1.disabled=false; }
+    if(pick.during){ var n2=document.getElementById('next2'); if(n2)n2.disabled=false; }
+    if(pick.after){ var n3=document.getElementById('next3'); if(n3)n3.disabled=false; }
+  }catch(e){}
+}
 function _swApplyPick(stepKey, it){
   if(window.buzz)buzz(22);
   if(stepKey==='venue'){
@@ -1799,6 +1813,7 @@ function _swApplyPick(stepKey, it){
     if(pick.venue&&typeof drawRoute==='function')drawRoute(pick.venue);
     renderSwipeStep(stepKey);
   }
+  _persistPick();
 }
 
 function _swRePick(stepKey){
@@ -1809,6 +1824,7 @@ function _swRePick(stepKey){
     pick[stepKey]=null;
     var nb=document.getElementById(stepKey==='during'?'next2':'next3'); if(nb)nb.disabled=true;
   }
+  _persistPick();
   renderSwipeStep(stepKey);
 }
 
@@ -1985,6 +2001,7 @@ function reveal(){
   applyCheekyGate();
   checkDateEnding();
 }
+_restorePick();   // bring back a saved plan before the first render, so a purged tab costs nothing
 venueCards();
 /* LDR arrival boarding pass on the welcome screen: editable origin, saved on her phone */
 function loadArrival(){var el=document.getElementById('apFrom');if(el){var v=localStorage.getItem('wc_arrival_from');if(v)el.textContent=v;}var b=document.querySelector('#arrivalPass .ap-bars');if(b&&window.bpBarcode&&!b.querySelector('.bc-row'))b.innerHTML=window.bpBarcode(706,{h:24,color:'#241733',target:300});}
@@ -2348,6 +2365,7 @@ window.pickVenue=function(k){
   if(pick.venue!==k){pick.during=null;pick.after=null;}
   pick.venue=k; try{venueCards();}catch(e){}
   var n=document.getElementById('next1');if(n)n.disabled=false;
+  if(typeof _persistPick==='function')_persistPick();
   // the map shows up on the next screens (snack/dinner); nothing to draw here while it's hidden
 };
 
@@ -3634,9 +3652,16 @@ function _flogRender(){
   }
 }
 
-/* vegas neon entry sign: tap anywhere or auto-dismiss */
-function hideVegas(){ var v=document.getElementById('vegasSign'); if(v){ v.classList.add('gone'); setTimeout(function(){ if(v.parentNode)v.parentNode.removeChild(v); },650); } }
-setTimeout(hideVegas,5500);
+/* vegas entry sign: once per browser session -- delightful on arrival, not a toll on every reload */
+function hideVegas(){
+  try{sessionStorage.setItem('wc_vegas_seen','1');}catch(e){}
+  var v=document.getElementById('vegasSign'); if(v){ v.classList.add('gone'); setTimeout(function(){ if(v.parentNode)v.parentNode.removeChild(v); },650); }
+}
+(function(){
+  var seen=false; try{seen=sessionStorage.getItem('wc_vegas_seen')==='1';}catch(e){}
+  if(seen){ var v=document.getElementById('vegasSign'); if(v&&v.parentNode)v.parentNode.removeChild(v); }
+  else setTimeout(hideVegas,5500);
+})();
 
 function _utahCount(){
   var sel=_utahSel(), n=Object.keys(sel).filter(function(k){return sel[k];}).length;
