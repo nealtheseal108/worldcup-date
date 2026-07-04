@@ -493,6 +493,44 @@
   #lightbox{position:fixed;inset:0;z-index:210;background:rgba(20,10,35,.93);display:none;align-items:center;justify-content:center;padding:16px}
   #lightbox img{max-width:100%;max-height:86vh;border-radius:12px;box-shadow:0 20px 55px rgba(0,0,0,.55)}
   .lb-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.16);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:19px;cursor:pointer;line-height:1}
+  /* vegas-style neon entry sign: WELCOME to fabulous SEATTLE · SIDHYA. shows on every load,
+     tap anywhere or auto-dismiss. all glow is text-shadow + opacity keyframes (compositor-cheap). */
+  #vegasSign{position:fixed;inset:0;z-index:230;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 32%,#1b1233 0%,#0b0718 72%);cursor:pointer;transition:opacity .55s;padding:20px}
+  #vegasSign.gone{opacity:0;pointer-events:none}
+  .vs-board{position:relative;width:min(330px,86vw);border:4px dotted rgba(255,209,102,.85);border-radius:48% 48% 48% 48% / 26%;padding:34px 20px 30px;text-align:center;background:rgba(18,10,38,.55);box-shadow:0 0 34px rgba(255,209,102,.16),inset 0 0 28px rgba(124,77,202,.2);animation:vsRim 2.6s infinite}
+  .vs-star{position:absolute;top:-34px;left:50%;transform:translateX(-50%);font-size:44px;color:#ffd166;text-shadow:0 0 10px #ffd166,0 0 30px rgba(255,209,102,.9);animation:vsStar 1.5s infinite}
+  .vs-welcome{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
+  .vs-welcome i{width:29px;height:29px;border-radius:50%;background:#fdf6ec;color:#c0392b;font-style:normal;font-weight:800;font-size:14px;font-family:'Courier Prime',ui-monospace,monospace;display:flex;align-items:center;justify-content:center;box-shadow:0 0 9px rgba(253,246,236,.75);animation:vsPop .45s backwards}
+  .vs-welcome i:nth-child(1){animation-delay:.05s}.vs-welcome i:nth-child(2){animation-delay:.13s}.vs-welcome i:nth-child(3){animation-delay:.21s}.vs-welcome i:nth-child(4){animation-delay:.29s}.vs-welcome i:nth-child(5){animation-delay:.37s}.vs-welcome i:nth-child(6){animation-delay:.45s}.vs-welcome i:nth-child(7){animation-delay:.53s}
+  .vs-to{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:25px;color:#ffd166;text-shadow:0 0 8px #ffd166,0 0 22px rgba(255,209,102,.85);margin-bottom:6px;animation:vsHum 3.4s infinite}
+  .vs-city{margin-bottom:10px}
+  .vs-city b{font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:41px;letter-spacing:2px;color:#fff;text-shadow:0 0 6px #fff,0 0 18px #7cf7ff,0 0 36px rgba(124,247,255,.8);animation:vsHum 3.1s infinite}
+  .vs-city b.vs-flick{animation:vsFlick 2.8s infinite}
+  .vs-name{font-family:'Courier Prime',ui-monospace,monospace;font-weight:800;font-size:19px;letter-spacing:7px;color:#ff5c8a;text-shadow:0 0 8px #ff5c8a,0 0 26px rgba(255,92,138,.85);animation:vsFlick 4.1s infinite .9s}
+  .vs-sub{margin-top:16px;font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:2px;color:#6f5da0}
+  @keyframes vsPop{from{transform:scale(0);opacity:0}70%{transform:scale(1.25)}to{transform:scale(1);opacity:1}}
+  @keyframes vsStar{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.16)}}
+  @keyframes vsHum{0%,100%{opacity:1}50%{opacity:.88}}
+  @keyframes vsRim{0%,100%{border-color:rgba(255,209,102,.85)}50%{border-color:rgba(255,209,102,.45)}}
+  @keyframes vsFlick{0%,17%,20%,24%,52%,56%,100%{opacity:1}18%,54%{opacity:.15}19%,23%{opacity:.65}55%{opacity:.4}}
+  @media(prefers-reduced-motion:reduce){#vegasSign *{animation:none!important}}
+  /* the flight log: PRIVATE CHARTER landings on record (R-only, all fun and games) */
+  .flog{background:#120a26;border-radius:15px;padding:14px 13px 15px;box-shadow:0 10px 26px rgba(18,8,38,.4)}
+  .flog-tally{font-family:'Courier Prime',ui-monospace,monospace;color:#ffd166;font-size:11.5px;letter-spacing:1.6px;text-align:center;margin-bottom:10px;text-transform:uppercase}
+  .flog-rows{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+  .flog-row{display:flex;align-items:center;gap:8px;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:#9ff2b6;letter-spacing:.4px;border-bottom:1px solid rgba(167,139,250,.12);padding-bottom:5px}
+  .flog-row .fno{color:#7c6aa8;flex:none}
+  .flog-row .fwhat{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .flog-row .fx{background:none;border:none;color:#5a4a80;cursor:pointer;font-size:12px;padding:2px 4px;flex:none}
+  .flog-empty{font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:#7c6aa8;text-align:center;margin-bottom:12px}
+  .flog .btn{width:100%}
+  .flog-form{margin-top:12px}
+  .flog-q{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:1.6px;color:#b79bf0;text-transform:uppercase;margin:10px 0 7px}
+  .flog-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .flog-chip{border:1px solid rgba(167,139,250,.4);color:#cbb7f5;background:none;border-radius:16px;padding:6px 11px;font-size:11px;font-family:'Courier Prime',ui-monospace,monospace;cursor:pointer}
+  .flog-chip.on{background:var(--lav);border-color:var(--lav);color:#fff;font-weight:700}
+  .flog-actions{display:flex;gap:8px;margin-top:13px}
+  .flog-actions .btn{flex:1}
   /* arrivals hall — July 2 landing takeover */
   #arrivalsHall{position:fixed;inset:0;z-index:220;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;background:linear-gradient(168deg,#160b2e,#2c1854 55%,#3a1f63);padding:26px 18px;text-align:center}
   #arrivalsHall.on{display:flex}
@@ -1153,6 +1191,24 @@
           <button type="button" class="bz-arrow" id="ppPrev" onclick="ppFlip(-1)" title="previous page">‹</button>
           <span class="pbook-lbl" id="ppLbl">cover</span>
           <button type="button" class="bz-arrow" id="ppNext" onclick="ppFlip(1)" title="next page">›</button>
+        </div>
+      </div>
+
+      <div class="sectlabel" style="margin-top:20px" id="flogLabel">🛬 the flight log</div>
+      <div class="pos-note" id="flogNote">every landing on record, all fun and games 😏 logging one in a new position stamps the passport automatically</div>
+      <div class="flog" id="flogWrap">
+        <div class="flog-tally" id="flogTally"></div>
+        <div class="flog-rows" id="flogRows"></div>
+        <button class="btn primary" type="button" id="flogAddBtn" onclick="flogOpen()">🛬 log a landing</button>
+        <div class="flog-form" id="flogForm" style="display:none">
+          <div class="flog-q">who landed 😌</div>
+          <div class="flog-chips" id="flogWho"></div>
+          <div class="flog-q">how it happened</div>
+          <div class="flog-chips" id="flogHow"></div>
+          <div class="flog-actions">
+            <button class="btn ghost" type="button" onclick="flogClose()">cancel</button>
+            <button class="btn primary" type="button" id="flogSaveBtn" onclick="flogSave()" disabled>stamp the log ✓</button>
+          </div>
         </div>
       </div>
 
@@ -3441,6 +3497,69 @@ function _ppStamp(j){
   PPB.render();
 }
 
+/* ---------- the flight log: PRIVATE CHARTER landings on record (R-only, all fun and games) ----------
+   each entry = {t, who, how}. Logging a landing in a someday position auto-stamps that page
+   in the position passport (same wc_utah_sel 'pos'+j keys), so the two features stay in sync. */
+function _flog(){ try{return JSON.parse(localStorage.getItem('wc_flightlog')||'[]');}catch(e){return [];} }
+function _flogSet(a){ try{localStorage.setItem('wc_flightlog',JSON.stringify(a));}catch(e){} }
+var FLOG_WHO=['sidhya 💜','neal','both 😌'];
+function _flogHowList(){   // positions first (originals + someday), then the non-position classics
+  return PP_DONE.map(function(p){return p.t;})
+    .concat(UTAH_POSITIONS.map(function(p){return p.t;}))
+    .concat(['hands','mouth','over the phone 📱','other 😏']);
+}
+var _flogWho=null,_flogHow=null;
+function flogOpen(){
+  _flogWho=null; _flogHow=null;
+  var f=document.getElementById('flogForm'), b=document.getElementById('flogAddBtn');
+  if(f)f.style.display=''; if(b)b.style.display='none';
+  _flogChips();
+}
+function flogClose(){
+  var f=document.getElementById('flogForm'), b=document.getElementById('flogAddBtn');
+  if(f)f.style.display='none'; if(b)b.style.display='';
+}
+function _flogChips(){
+  var w=document.getElementById('flogWho'), h=document.getElementById('flogHow'), s=document.getElementById('flogSaveBtn');
+  if(w)w.innerHTML=FLOG_WHO.map(function(x,i){return '<button type="button" class="flog-chip'+(_flogWho===i?' on':'')+'" onclick="_flogWho='+i+';_flogChips()">'+x+'</button>';}).join('');
+  if(h)h.innerHTML=_flogHowList().map(function(x,i){return '<button type="button" class="flog-chip'+(_flogHow===i?' on':'')+'" onclick="_flogHow='+i+';_flogChips()">'+x+'</button>';}).join('');
+  if(s)s.disabled=(_flogWho==null||_flogHow==null);
+}
+function flogSave(){
+  if(_flogWho==null||_flogHow==null)return;
+  var how=_flogHowList()[_flogHow], who=FLOG_WHO[_flogWho];
+  var a=_flog(); a.push({t:Date.now(),who:who,how:how}); _flogSet(a);
+  // a landing in a someday position counts as the real thing -- stamp its passport page too
+  var j=-1; UTAH_POSITIONS.forEach(function(p,k){ if(p.t===how)j=k; });
+  var sel=_utahSel(), newStamp=false;
+  if(j>=0 && !sel['pos'+j]){ sel['pos'+j]=1; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){} newStamp=true; PPB.render(); }
+  flogClose(); _flogRender();
+  if(window.buzz)buzz(28);
+  if(window.burstConfetti)burstConfetti(document.getElementById('flogWrap'),{emojis:['🛬','💜','😏'],count:16});
+  if(newStamp && window.toast)toast('new stamp in the position passport 📖💜');
+}
+function flogDel(i){ var a=_flog(); a.splice(i,1); _flogSet(a); _flogRender(); }
+function _flogRender(){
+  var a=_flog(), t=document.getElementById('flogTally'), r=document.getElementById('flogRows');
+  if(t){
+    var s=0,n=0;
+    a.forEach(function(e){ if(e.who.indexOf('sidhya')>=0||e.who.indexOf('both')>=0)s++; if(e.who.indexOf('neal')>=0||e.who.indexOf('both')>=0)n++; });
+    t.textContent='SIDHYA '+s+' · NEAL '+n+' · LANDINGS '+a.length;
+  }
+  if(r){
+    if(!a.length){ r.innerHTML='<div class="flog-empty">no landings on record yet 😏 the log awaits</div>'; return; }
+    var M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    r.innerHTML=a.map(function(e,i){
+      var d=new Date(e.t), no=(i+1<10?'00':(i+1<100?'0':''))+(i+1);
+      return '<div class="flog-row"><span class="fno">LOG '+no+'</span><span class="fwhat">'+M[d.getMonth()]+' '+d.getDate()+' · '+e.who+' · '+e.how+'</span><button type="button" class="fx" onclick="flogDel('+i+')" title="remove">✕</button></div>';
+    }).reverse().join('');
+  }
+}
+
+/* vegas neon entry sign: tap anywhere or auto-dismiss */
+function hideVegas(){ var v=document.getElementById('vegasSign'); if(v){ v.classList.add('gone'); setTimeout(function(){ if(v.parentNode)v.parentNode.removeChild(v); },650); } }
+setTimeout(hideVegas,5500);
+
 function _utahCount(){
   var sel=_utahSel(), n=Object.keys(sel).filter(function(k){return sel[k];}).length;
   var c=document.getElementById('utahCount'); if(c)c.textContent = n ? (n+' thing'+(n===1?'':'s')+' on the maybe list 💜 tap to un-pick anytime') : 'nothing picked yet -- tap whatever sounds good, babu';
@@ -3450,10 +3569,11 @@ function renderUtah(){
   _utahGrid('utahLowkey','lowkey',UTAH_LOWKEY);
   _utahGrid('utahIntimate','intimate',UTAH_INTIMATE);
   PPB.render();
+  _flogRender();
   var pg=_spiceMode()==='pg';
-  var lbl=document.getElementById('utahPosLabel'), wrap=document.getElementById('posBookWrap');
-  if(lbl)lbl.style.display=pg?'none':'';
-  if(wrap)wrap.style.display=pg?'none':'';
+  ['utahPosLabel','posBookWrap','flogLabel','flogNote','flogWrap'].forEach(function(id){   // position passport + flight log are R-only
+    var el=document.getElementById(id); if(el)el.style.display=pg?'none':'';
+  });
   _utahCount();
 }
 renderBingo(); renderQDeck(); renderMissions(); renderKit(); renderDepartures(); renderQuiz(); renderUtah();
@@ -4079,6 +4199,18 @@ window.initTimeline=function(){};
   </div>
 </div>
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
+
+<!-- VEGAS-STYLE NEON ENTRY SIGN: shows on every load, tap anywhere (or wait) to enter -->
+<div id="vegasSign" role="dialog" aria-label="welcome to seattle sidhya" onclick="hideVegas()">
+  <div class="vs-board">
+    <div class="vs-star">✦</div>
+    <div class="vs-welcome"><i>W</i><i>E</i><i>L</i><i>C</i><i>O</i><i>M</i><i>E</i></div>
+    <div class="vs-to">to fabulous</div>
+    <div class="vs-city"><b>S</b><b>E</b><b>A</b><b class="vs-flick">T</b><b>T</b><b>L</b><b>E</b></div>
+    <div class="vs-name">SIDHYA 💜</div>
+    <div class="vs-sub">TAP ANYWHERE TO ENTER ✨</div>
+  </div>
+</div>
 
 <!-- ARRIVALS HALL — July 2, the moment she lands: the site holds a sign for her -->
 <div id="arrivalsHall" role="dialog" aria-label="Welcome to Seattle">
