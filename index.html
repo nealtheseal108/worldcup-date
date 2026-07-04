@@ -837,7 +837,17 @@
   @keyframes dpFade{0%,100%{opacity:.55}50%{opacity:1}}
   @media(prefers-reduced-motion:reduce){.dc-flap,.dp-status.st-boarding,.dp-status.st-flight,.dp-empty,.dp-row{animation:none!important}}
   /* the bellevue pocket boarding pass: reuses .arrivalpass/.ap-* styling, adds a stamp + notes */
-  #bellevuePass{position:fixed;inset:0;z-index:236;display:none;background:rgba(10,6,22,.78);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:20px}
+  /* a real scene behind the pass instead of a translucent blur over whatever page happens to be
+     underneath: a dusk-at-the-park gradient (warm gold horizon fading up into evening purple),
+     matching the 4:15-5pm golden-hour timing of the actual date, plus the same soft sparkle
+     field used on the vegas sign so it doesn't read as flat. */
+  #bellevuePass{position:fixed;inset:0;z-index:236;display:none;background:linear-gradient(180deg,#2a1c48 0%,#4a2f5e 32%,#8a5a55 58%,#c98a5a 78%,#e0a866 100%);align-items:center;justify-content:center;padding:20px;overflow:hidden}
+  #bellevuePass::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:
+      radial-gradient(1.6px 1.6px at 14% 14%, rgba(255,255,255,.5), transparent 60%),
+      radial-gradient(1.4px 1.4px at 82% 10%, rgba(255,255,255,.4), transparent 60%),
+      radial-gradient(1.6px 1.6px at 90% 26%, rgba(255,209,102,.4), transparent 60%),
+      radial-gradient(1.4px 1.4px at 8% 30%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(1.4px 1.4px at 70% 8%, rgba(255,255,255,.3), transparent 60%)}
   #bellevuePass.on{display:flex;animation:fade .2s ease}
   .bv-wrap{max-width:360px;width:100%;position:relative}
   .bv-close{position:absolute;top:-40px;right:0;background:rgba(255,255,255,.14);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:17px;cursor:pointer}
@@ -4534,7 +4544,7 @@ window.initTimeline=function(){};
   <div class="bv-wrap">
     <button class="bv-close" type="button" onclick="closeBellevue()">✕</button>
     <div class="arrivalpass">
-      <div class="ap-head"><span class="ap-air"><span class="ap-mark">🏞️</span>GANESH AIR</span><span class="ap-status" id="bvHeadStatus">ON TIME</span></div>
+      <div class="ap-head"><span class="ap-air"><span class="ap-mark"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="10.8" cy="14" r="6" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="17.2" cy="14" r="6" fill="none" stroke="#7c4dca" stroke-width="4.4"/><circle cx="17.2" cy="14" r="6" fill="none" stroke="#fff" stroke-width="2.6"/></svg></span>GANESH AIR</span><span class="ap-status" id="bvHeadStatus">ON TIME</span></div>
       <div class="ap-route">
         <div class="ap-port ap-port-dual"><b>SAM<br>+XRD</b><span>dep 4:15 PM</span></div>
         <div class="ap-plane"><i>✈</i></div>
