@@ -508,8 +508,7 @@
       radial-gradient(1.6px 1.6px at 78% 82%, rgba(124,247,255,.35), transparent 60%),
       radial-gradient(2px 2px at 15% 45%, rgba(255,255,255,.3), transparent 60%),
       radial-gradient(1.6px 1.6px at 85% 40%, rgba(255,255,255,.3), transparent 60%)}
-  .vs-svgwrap{position:relative;width:min(460px,88vw);filter:drop-shadow(0 16px 34px rgba(0,0,0,.55))}
-  .vs-svgwrap::after{content:"";position:absolute;left:50%;bottom:-6%;width:135%;height:55%;transform:translateX(-50%);background:radial-gradient(ellipse at 50% 50%,rgba(255,209,102,.16) 0%,rgba(180,90,220,.08) 45%,transparent 72%);pointer-events:none;z-index:-1}
+  .vs-svgwrap{position:relative;width:min(380px,82vw);filter:drop-shadow(0 16px 34px rgba(0,0,0,.55))}
   .vs-svgwrap svg{width:100%;height:auto;display:block}
   .vs-bulbs{animation:vsHum 2.1s infinite}
   .vs-seat{animation:vsHum 3.1s infinite}
@@ -4574,44 +4573,75 @@ window.initTimeline=function(){};
   </div>
 </div>
 
-<!-- VEGAS-STYLE NEON ENTRY SIGN: shows on every load, tap anywhere (or wait) to enter -->
+<!-- VEGAS-STYLE NEON ENTRY SIGN: shows on every load, tap anywhere (or wait) to enter.
+     Redesigned per a Fable creative brief: a wider blunted-corner diamond (not a lens-curve),
+     support poles + ground glow so it reads as a real hung sign, a bolder geometric 8-point
+     starburst with bulb-tipped spikes, a wide bulb band with a few dead/hot bulbs for realism,
+     SIDHYA promoted to the hero line (the LAS VEGAS slot), and a ribbon banner for the
+     signature instead of cramped small print. Whole sign tilted -1.5deg for a hand-hung feel. -->
 <div id="vegasSign" role="dialog" aria-label="welcome to fabulous seattle sidhya" onclick="hideVegas()">
   <div class="vs-svgwrap">
-    <!-- faithful Welcome-to-Fabulous-Las-Vegas layout: red starburst behind the top point,
-         white diamond with dark outline + yellow bulb rim, WELCOME in red-letter circles,
-         blue "TO Fabulous" script, SEATTLE in red block letters, SIDHYA in blue caps -->
-    <svg viewBox="0 0 360 340" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 400 630" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="vsbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#261a4e"/><stop offset="1" stop-color="#140e2e"/></linearGradient>
+        <linearGradient id="vsbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c1d52"/><stop offset="100%" stop-color="#241733"/></linearGradient>
+        <radialGradient id="vsShade" cx="18%" cy="88%" r="60%"><stop offset="0" stop-color="#0d0818" stop-opacity=".55"/><stop offset="100%" stop-color="#0d0818" stop-opacity="0"/></radialGradient>
+        <linearGradient id="vsStarG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ef4a3d"/><stop offset="100%" stop-color="#a81c28"/></linearGradient>
+        <radialGradient id="vsGlow" cx="50%" cy="30%" r="60%"><stop offset="0" stop-color="#e8a84a" stop-opacity=".38"/><stop offset="100%" stop-color="#e8a84a" stop-opacity="0"/></radialGradient>
       </defs>
-      <!-- starburst: centered on the diamond's top tip (x=180) so its lower spike tucks directly
-           behind the board instead of floating disconnected above it, like the real sign -->
-      <g class="vs-gr" transform="translate(180,66) scale(1.25)">
-        <polygon points="0,-52 3.1,-7.4 24,-24 7.4,-3.1 40,0 7.4,3.1 19.8,19.8 3.1,7.4 0,44 -3.1,7.4 -21.2,21.2 -7.4,3.1 -40,0 -7.4,-3.1 -24,-24 -3.1,-7.4" fill="#e5372b" stroke="#201a35" stroke-width="4.5" stroke-linejoin="round"/>
-        <circle cx="0" cy="-30" r="2.8" fill="#fff"/><circle cx="18" cy="-18" r="2.8" fill="#fff"/><circle cx="-18" cy="-18" r="2.8" fill="#fff"/>
+
+      <g transform="rotate(-1.5 200 320)">
+        <!-- ground glow pool + support poles, grounding the sign as a real hung fixture -->
+        <ellipse cx="200" cy="606" rx="118" ry="24" fill="url(#vsGlow)"/>
+        <path d="M140,460 L158,460 L172,600 L156,600 Z" fill="#1c1430"/>
+        <path d="M156.8,460 L158,460 L172,600 L170.8,600 Z" fill="#4a3a68"/>
+        <path d="M242,460 L260,460 L244,600 L228,600 Z" fill="#1c1430"/>
+        <path d="M242,460 L243.2,460 L229.2,600 L228,600 Z" fill="#4a3a68"/>
+
+        <!-- starburst: geometric 8-point, wide triangular bases, gold-bulb spike tips, tucked
+             15% behind the diamond's top tip so it reads as bursting from behind the board -->
+        <g class="vs-gr" transform="translate(200,182) rotate(4)">
+          <polygon points="0,-58 4.97,-12.01 25.5,-25.5 12.01,-4.97 22,0 12.01,4.97 25.5,25.5 4.97,12.01 0,45 -4.97,12.01 -25.5,25.5 -12.01,4.97 -22,0 -12.01,-4.97 -25.5,-25.5 -4.97,-12.01" fill="url(#vsStarG)" stroke="#fff3d6" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="0" cy="-58" r="3.6" fill="#ffd166"/><circle cx="25.5" cy="-25.5" r="3.2" fill="#ffd166"/><circle cx="22" cy="0" r="3" fill="#ffd166"/><circle cx="25.5" cy="25.5" r="3.2" fill="#ffd166"/><circle cx="0" cy="45" r="3.3" fill="#ffd166"/><circle cx="-25.5" cy="25.5" r="3.2" fill="#ffd166"/><circle cx="-22" cy="0" r="3" fill="#ffd166"/><circle cx="-25.5" cy="-25.5" r="3.2" fill="#ffd166"/>
+        </g>
+
+        <!-- the diamond board: blunted rhombus (straight edges, small rounded corners), dark
+             gradient fill so the neon reads as genuinely lit against it -->
+        <path d="M187.5,170 Q200,160 212.5,170 L387.5,310 Q400,320 387.5,330 L212.5,470 Q200,480 187.5,470 L12.5,330 Q0,320 12.5,310 Z" fill="url(#vsbg)" stroke="#141026" stroke-width="4"/>
+        <path d="M187.5,170 Q200,160 212.5,170 L387.5,310 Q400,320 387.5,330 L212.5,470 Q200,480 187.5,470 L12.5,330 Q0,320 12.5,310 Z" fill="url(#vsShade)"/>
+        <!-- wide plum bulb band + cream pinstripe + the bulbs themselves (2 dim/dead, 2 extra-hot) -->
+        <path d="M188.06,176.75 Q200,167.2 211.94,176.75 L379.06,310.45 Q391,320 379.06,329.55 L211.94,463.25 Q200,472.8 188.06,463.25 L20.94,329.55 Q9,320 20.94,310.45 Z" fill="none" stroke="#2b1b44" stroke-width="22"/>
+        <path d="M188.81,185.75 Q200,176.8 211.19,185.75 L367.8,311.05 Q379,320 367.8,328.95 L211.19,454.25 Q200,463.2 188.81,454.25 L32.2,328.95 Q21,320 32.2,311.05 Z" fill="none" stroke="#fff3d6" stroke-width="1.5"/>
+        <path class="vs-bulbs" d="M188.06,176.75 Q200,167.2 211.94,176.75 L379.06,310.45 Q391,320 379.06,329.55 L211.94,463.25 Q200,472.8 188.06,463.25 L20.94,329.55 Q9,320 20.94,310.45 Z" fill="none" stroke="#ffd166" stroke-width="9" stroke-dasharray="0.1 22" stroke-linecap="round"/>
+        <circle cx="200" cy="167.2" r="5" fill="#8a6d3b"/>
+        <circle cx="391" cy="320" r="5" fill="#8a6d3b"/>
+        <circle cx="20.94" cy="310.45" r="5" fill="#8a6d3b"/>
+        <g fill="#fff8e6"><circle cx="211.94" cy="176.75" r="5.5"/><circle cx="211.19" cy="454.25" r="5.5"/></g>
+
+        <!-- WELCOME, a shallow arc of lit circles echoing the diamond's sloped top edges -->
+        <g class="vs-gc">
+          <circle cx="104" cy="251" r="16" fill="#fdf6ec" stroke="#fff3d6" stroke-width="1"/><circle cx="136" cy="238" r="16" fill="#fdf6ec" stroke="#fff3d6" stroke-width="1"/><circle cx="168" cy="231" r="16" fill="#fdf6ec" stroke="#fff3d6" stroke-width="1"/><circle cx="200" cy="228" r="16" fill="#fdf6ec" stroke="#fff3d6" stroke-width="1"/><circle cx="232" cy="231" r="16" fill="#fdf6ec" stroke="#fff3d6" stroke-width="1"/><circle cx="264" cy="238" r="16" fill="#fdf6ec" stroke="#fff3d6" stroke-width="1"/><circle cx="296" cy="251" r="16" fill="#fdf6ec" stroke="#fff3d6" stroke-width="1"/>
+          <text x="104" y="256.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="17" fill="#d93a2b">W</text><text x="136" y="243.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="17" fill="#d93a2b">E</text><text x="168" y="236.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="17" fill="#d93a2b">L</text><text x="200" y="233.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="17" fill="#d93a2b">C</text><text x="232" y="236.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="17" fill="#d93a2b">O</text><text x="264" y="243.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="17" fill="#d93a2b">M</text><text x="296" y="256.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="17" fill="#d93a2b">E</text>
+        </g>
+
+        <!-- to my Fabulous, ice-blue script -->
+        <text class="vs-fab vs-gb" x="200" y="292" text-anchor="middle"><tspan font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="14" letter-spacing="3" fill="#9fd0ff">TO MY </tspan><tspan font-family="'Instrument Serif',Georgia,serif" font-style="italic" font-size="36" fill="#9fd0ff">Fabulous</tspan></text>
+
+        <!-- SIDHYA: the hero line, the LAS VEGAS slot, biggest and whitest thing on the sign -->
+        <text class="vs-gw vs-nm" x="200" y="352" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="900" font-size="64" letter-spacing="4" fill="#fffdf5">SIDHYA</text>
+
+        <!-- SEATTLE, demoted to a small caption -- the NEVADA slot -->
+        <text class="vs-seat" x="200" y="396" text-anchor="middle" font-family="'Courier Prime',ui-monospace,monospace" font-weight="700" font-size="14" letter-spacing="3" fill="#d9b968">SEATTLE <tspan class="vs-fl">•</tspan> WORLD CUP 2026</text>
+
+        <!-- signature ribbon banner, draped across the bottom point, overlapping past the board's edges -->
+        <path d="M90,432 L310,432 L332,432 L312,448 L332,464 L310,464 L90,464 L68,464 L88,448 L68,432 Z" fill="#c1272d" stroke="#7a1015" stroke-width="1.5"/>
+        <path d="M310,432 L332,432 L312,448 Z" fill="#8f1c22"/>
+        <path d="M90,464 L68,464 L88,448 Z" fill="#8f1c22"/>
+        <text x="200" y="452.5" text-anchor="middle" font-family="'Courier Prime',ui-monospace,monospace" font-weight="700" font-size="13" letter-spacing="1.5" fill="#fdf0e0">FROM YOUR NEAL 💜</text>
+
+        <!-- a couple of stray sparkles crossing the sign's edge, night-sky glints -->
+        <path d="M50,120 L52,127 L59,129 L52,131 L50,138 L48,131 L41,129 L48,127 Z" fill="#fff3d6" opacity=".65"/>
+        <path d="M362,470 L363.6,475 L368.6,476.6 L363.6,478.2 L362,483.2 L360.4,478.2 L355.4,476.6 L360.4,475 Z" fill="#9fd0ff" opacity=".55"/>
       </g>
-      <!-- the diamond board: dark, so the neon actually glows (this is the sign at night) -->
-      <path d="M180 77 Q285 112 348 195 Q285 278 180 313 Q75 278 12 195 Q75 112 180 77 Z" fill="url(#vsbg)" stroke="#0d0a20" stroke-width="7" stroke-linejoin="round"/>
-      <!-- bulb rim: round-dot dashed stroke = a ring of marquee bulbs (halo layer underneath) -->
-      <path d="M180 89 Q276 121 336 195 Q276 269 180 301 Q84 269 24 195 Q84 121 180 89 Z" fill="none" stroke="#f6c944" stroke-width="8.5" stroke-dasharray="0.1 13" stroke-linecap="round" opacity=".4"/>
-      <path class="vs-bulbs" d="M180 89 Q276 121 336 195 Q276 269 180 301 Q84 269 24 195 Q84 121 180 89 Z" fill="none" stroke="#ffd166" stroke-width="4.5" stroke-dasharray="0.1 13" stroke-linecap="round"/>
-      <!-- WELCOME in lit circles -->
-      <g class="vs-gc">
-        <circle cx="78" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="112" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="146" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="180" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="214" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="248" cy="136" r="14.5" fill="#fdf6ec"/><circle cx="282" cy="136" r="14.5" fill="#fdf6ec"/>
-        <text x="78" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">W</text><text x="112" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">E</text><text x="146" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">L</text><text x="180" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">C</text><text x="214" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">O</text><text x="248" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">M</text><text x="282" y="141.5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="15" fill="#d93a2b">E</text>
-      </g>
-      <!-- TO Fabulous, blue neon script -->
-      <text class="vs-fab vs-gb" x="180" y="176" text-anchor="middle"><tspan font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="12" letter-spacing="3" fill="#6ec9ff">TO </tspan><tspan font-family="'Instrument Serif',Georgia,serif" font-style="italic" font-size="30" fill="#6ec9ff">Fabulous</tspan></text>
-      <!-- SEATTLE, bulb-lit white letters, first T does the dying-buzz flicker -->
-      <g class="vs-gw" font-family="Inter,system-ui,sans-serif" font-weight="900" font-size="46" fill="#fffdf5" text-anchor="middle">
-        <text class="vs-seat" x="72" y="226">S</text><text class="vs-seat" x="108" y="226">E</text><text class="vs-seat" x="144" y="226">A</text><text class="vs-seat vs-fl" x="180" y="226">T</text><text class="vs-seat" x="216" y="226">T</text><text class="vs-seat" x="252" y="226">L</text><text class="vs-seat" x="288" y="226">E</text>
-      </g>
-      <!-- SIDHYA in the NEVADA slot, pink neon -->
-      <g class="vs-nm vs-gp" font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="17" fill="#ff7aa2" text-anchor="middle">
-        <text x="120" y="252">S</text><text x="144" y="252">I</text><text x="168" y="252">D</text><text x="192" y="252">H</text><text x="216" y="252">Y</text><text x="240" y="252">A</text>
-      </g>
-      <!-- and the guy holding the sign -->
-      <text class="vs-gl" x="180" y="286" text-anchor="middle" font-family="'Courier Prime',ui-monospace,monospace" font-weight="700" font-size="9.5" letter-spacing="1.2" fill="#cbb7f5">FROM YOUR NEAL 💜</text>
     </svg>
   </div>
   <div class="vs-sub">TAP ANYWHERE TO ENTER ✨</div>
