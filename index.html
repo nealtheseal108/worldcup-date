@@ -3862,7 +3862,7 @@ if(/[?&]egg/.test(location.search)||/egg/.test(location.hash)){setTimeout(showEg
 if(/[?&]end=1/.test(location.search)){window.__forceEnd=true;setTimeout(function(){try{if(!pick.venue){pickVenue('mural');pick.during=VENUES.mural.during[0];pick.after=VENUES.mural.after[0];}reveal();}catch(e){}},400);}
 
 /* ---------- World Cup round labels + custom bracket page (step8) ---------- */
-var ROUND_LBL={'group-stage':['GRP','Group Stage'],'round-of-32':['R32','Round of 32'],'round-of-16':['R16','Round of 16'],'quarterfinals':['QF','Quarters'],'semifinals':['SF','Semis'],'3rd-place-match':['3RD','3rd Place'],'final':['FIN','Final']};
+var ROUND_LBL={'group-stage':['GRP','Group Stage'],'round-of-32':['R32','Round of 32'],'round-of-16':['R16','Round of 16'],'quarterfinals':['QF','Quarters'],'semifinals':['SF','Semis'],'final':['FIN','Final']};   // 3rd-place match intentionally excluded -- nobody's tracking that one
 var TEAM_FLAG={USA:'🇺🇸',CAN:'🇨🇦',MEX:'🇲🇽',BRA:'🇧🇷',ARG:'🇦🇷',FRA:'🇫🇷',GER:'🇩🇪',ESP:'🇪🇸',POR:'🇵🇹',NED:'🇳🇱',BEL:'🇧🇪',ENG:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',CRO:'🇭🇷',SUI:'🇨🇭',AUT:'🇦🇹',SWE:'🇸🇪',NOR:'🇳🇴',POL:'🇵🇱',DEN:'🇩🇰',ITA:'🇮🇹',IRL:'🇮🇪',UKR:'🇺🇦',SRB:'🇷🇸',TUR:'🇹🇷',ROU:'🇷🇴',HUN:'🇭🇺',CZE:'🇨🇿',SVK:'🇸🇰',SVN:'🇸🇮',JPN:'🇯🇵',KOR:'🇰🇷',AUS:'🇦🇺',IRN:'🇮🇷',KSA:'🇸🇦',QAT:'🇶🇦',UZB:'🇺🇿',JOR:'🇯🇴',IRQ:'🇮🇶',NZL:'🇳🇿',RSA:'🇿🇦',MAR:'🇲🇦',SEN:'🇸🇳',CIV:'🇨🇮',COD:'🇨🇩',EGY:'🇪🇬',ALG:'🇩🇿',TUN:'🇹🇳',GHA:'🇬🇭',CMR:'🇨🇲',CPV:'🇨🇻',COL:'🇨🇴',ECU:'🇪🇨',URU:'🇺🇾',CHI:'🇨🇱',PER:'🇵🇪',PAR:'🇵🇾',BOL:'🇧🇴',VEN:'🇻🇪',PAN:'🇵🇦',CRC:'🇨🇷',JAM:'🇯🇲',HAI:'🇭🇹',CUW:'🇨🇼',BIH:'🇧🇦'};
 function roundShort(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][0])||(sl?sl.replace(/[^a-z0-9]/gi,'').slice(0,3).toUpperCase():''); }
 function roundLong(sl){ return (ROUND_LBL[sl]&&ROUND_LBL[sl][1])||(sl?sl.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}):''); }
@@ -3878,7 +3878,7 @@ function loadBracket(force){
     _bracketCache=evs; _bracketAt=Date.now(); renderBracket(evs);
   }).catch(function(){ if(!box.querySelector('.bracket-col')) box.innerHTML='<div class="album-empty">could not load the bracket right now, tap ↻ 💜</div>'; });
 }
-var PREV_ROUND={'round-of-16':'round-of-32','quarterfinals':'round-of-16','semifinals':'quarterfinals','final':'semifinals','3rd-place-match':'semifinals'};   // 3rd place is fed by the SEMIS (losers), not the final
+var PREV_ROUND={'round-of-16':'round-of-32','quarterfinals':'round-of-16','semifinals':'quarterfinals','final':'semifinals'};
 function _slotRef(sdn){   // parses ESPN's own placeholder shortDisplayName ("RD32 W11","RD16 W5","QF W3","SF L2") into {round, idx (0-based)}
   var m=/^(RD32|RD16|QF|SF)\s*([WL])\s*(\d+)$/.exec(String(sdn||'').trim());
   if(!m) return null;
@@ -3914,7 +3914,6 @@ function _bracketVisualOrder(byRound){
     byRound[prevSl].forEach(function(_,i){ if(prevOrder.indexOf(i)<0)prevOrder.push(i); });   // safety net: anything the tree-walk missed still gets a slot, appended chronologically
     order[prevSl]=prevOrder;
   }
-  if(byRound['3rd-place-match']) order['3rd-place-match']=[0];   // single slot; fed by semifinals, whose order is already fixed via the 'final' chain above
   return order;
 }
 function _mlProb(ml){ ml=Number(ml); return isFinite(ml)&&ml!==0 ? (ml<0?(-ml)/(-ml+100):100/(ml+100)) : null; }
@@ -3962,7 +3961,7 @@ function _layoutBracketCells(){
   box.style.transform='none';   // a lingering zoom scale from before a refresh corrupts every getBoundingClientRect() below (scaled px read back in as raw local px); _applyZoom() re-applies the real scale right after this runs
   var cols=Array.prototype.slice.call(box.querySelectorAll('.bracket-col')); if(!cols.length) return;
   var byRoundEl={}; cols.forEach(function(c){ byRoundEl[c.getAttribute('data-round')]=c; });
-  var order=['round-of-32','round-of-16','quarterfinals','semifinals','final','3rd-place-match'];
+  var order=['round-of-32','round-of-16','quarterfinals','semifinals','final'];
   var present=order.filter(function(sl){return !!byRoundEl[sl];}); if(!present.length) return;
   var GAP=9, baseRound=present[0];
   var baseCellsEl=byRoundEl[baseRound].querySelectorAll('.bracket-cell'); if(!baseCellsEl.length) return;
@@ -4058,7 +4057,7 @@ if(typeof window!=='undefined')window.addEventListener('resize',function(){
 });
 function renderBracket(evs){
   var box=document.getElementById('bracketCols'); if(!box)return;
-  var order=['round-of-32','round-of-16','quarterfinals','semifinals','final','3rd-place-match'];
+  var order=['round-of-32','round-of-16','quarterfinals','semifinals','final'];
   var our=(typeof MATCHUP!=='undefined')?MATCHUP.split('🆚').map(function(x){return x.trim();}):[];
   var present=order.filter(function(sl){return evs.some(function(e){return e.round===sl;});});
   var byRound={}; present.forEach(function(sl){ byRound[sl]=evs.filter(function(e){return e.round===sl;}).sort(function(a,b){return a.ms-b.ms;}); });   // chronological base arrays -- _findSrcIdx's placeholder-index math is defined relative to THIS order
