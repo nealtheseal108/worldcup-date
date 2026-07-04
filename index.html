@@ -3371,7 +3371,7 @@ function _pbMaybe(i){
   _pbRenderBase(); _utahCount();
 }
 
-/* ---------- book 2: the position passport (NEAL AIR · POSITION EDITION, R-only) ----------
+/* ---------- book 2: the position passport (MILE HIGH AIR · POSITION EDITION, R-only) ----------
    pages 1-4 = the originals, permanently stamped. pages 5-14 = someday, two-tap to stamp.
    someday stamps keep the same wc_utah_sel 'pos'+index keys the old grid used. */
 var PP_DONE=[
@@ -3390,7 +3390,7 @@ function _ppPageHTML(i){
   if(i===0){
     return '<div class="pb-cover pb-cover-pos" onclick="ppFlip(1)">'+
       '<div class="pb-crest">📖💜</div><h3>PASSPORT</h3>'+
-      '<div class="pb-sub">NEAL AIR · POSITION EDITION</div>'+
+      '<div class="pb-sub">MILE HIGH AIR · POSITION EDITION</div>'+
       '<div class="pb-sub">SIDHYA 💜 NEAL · CLASSIFIED</div>'+
       '<div class="pb-open">tap or swipe to open 😏</div></div>';
   }
@@ -3399,12 +3399,12 @@ function _ppPageHTML(i){
     var d=PP_DONE[i-1];
     mrz=d.t.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,10);
     return '<div class="pb-page">'+
-      '<div class="pb-head">NEAL AIR ✈ CLASSIFIED</div>'+
+      '<div class="pb-head">MILE HIGH AIR ✈ CLASSIFIED</div>'+
       '<div class="pb-no">STAMPED VISA · PAGE '+pn+' / '+pt+'</div>'+
       '<div class="pb-name">'+d.t+'</div>'+
       '<div class="pb-desc">'+d.note+'</div>'+
       '<div class="pb-stampzone stamped"><span class="pb-ink">STAMPED ✓<small>THE ORIGINALS 💜</small></span></div>'+
-      '<div class="pb-mrz">P&lt;NEALAIR&lt;&lt;SIDHYA&lt;&lt;NEAL&lt;&lt;'+mrz+'&lt;&lt;&lt;&lt;&lt;&lt;</div>'+
+      '<div class="pb-mrz">P&lt;MILEHIGHAIR&lt;&lt;SIDHYA&lt;&lt;NEAL&lt;&lt;'+mrz+'&lt;&lt;&lt;&lt;&lt;&lt;</div>'+
       '</div>';
   }
   var j=i-1-PP_DONE.length, it=UTAH_POSITIONS[j], sel=_utahSel();
@@ -3413,12 +3413,12 @@ function _ppPageHTML(i){
     : (pending ? 'tap again if it<br>actually happened 💜' : '🛂 tap to stamp<br>someday soon 😏');
   mrz=it.t.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,10);
   return '<div class="pb-page">'+
-    '<div class="pb-head">NEAL AIR ✈ CLASSIFIED</div>'+
+    '<div class="pb-head">MILE HIGH AIR ✈ CLASSIFIED</div>'+
     '<div class="pb-no">PENDING VISA · PAGE '+pn+' / '+pt+'</div>'+
     '<div class="pb-name">'+it.t+'</div>'+
     '<div class="pb-desc">'+(stamped?'stamped ✓ no further comment 😏':'not yet. someday soon 😏')+'</div>'+
     '<button type="button" class="pb-stampzone'+(stamped?' stamped':'')+(pending?' pending':'')+'" onclick="_ppStamp('+j+')">'+zone+'</button>'+
-    '<div class="pb-mrz">P&lt;NEALAIR&lt;&lt;SIDHYA&lt;&lt;NEAL&lt;&lt;'+mrz+'&lt;&lt;&lt;&lt;&lt;&lt;</div>'+
+    '<div class="pb-mrz">P&lt;MILEHIGHAIR&lt;&lt;SIDHYA&lt;&lt;NEAL&lt;&lt;'+mrz+'&lt;&lt;&lt;&lt;&lt;&lt;</div>'+
     '</div>';
 }
 var PPB=_mkBook({stage:'ppStage',lbl:'ppLbl',prev:'ppPrev',next:'ppNext',
