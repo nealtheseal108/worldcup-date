@@ -490,7 +490,7 @@
   .album-empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:28px 12px;background:#f6f1ff;border:1px dashed var(--line);border-radius:12px;line-height:1.5}
   .trk-actions{margin-top:16px}
   .trk-actions .btn{width:100%}
-  #lightbox{position:fixed;inset:0;z-index:210;background:rgba(20,10,35,.93);display:none;align-items:center;justify-content:center;padding:16px}
+  #lightbox{position:fixed;inset:0;z-index:240;background:rgba(20,10,35,.93);display:none;align-items:center;justify-content:center;padding:16px}   /* above the bellevue pass (236) so its album photos open on top, not behind it */
   #lightbox img{max-width:100%;max-height:86vh;border-radius:12px;box-shadow:0 20px 55px rgba(0,0,0,.55)}
   .lb-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.16);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:19px;cursor:pointer;line-height:1}
   /* vegas-style neon entry sign: WELCOME to fabulous SEATTLE · SIDHYA. shows on every load,
@@ -2926,11 +2926,12 @@ function localItems(pred){   // this phone's IndexedDB backups (optionally filte
   return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){if(!pred||pred(c.value))all.push(c.value);c.continue();}else{res(all);}};cur.onerror=function(){res(all);};});}).catch(function(){return [];});
 }
 function bySection(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;}
-function localClips(){ return localItems(function(c){return c.sec!=='photo';}).then(function(a){a.sort(bySection);return a;}); }
+function _isPhotoSec(sec){ return sec==='photo'||sec==='bv-photo'; }   // any still-image bucket -- keep OUT of the video-clip gatherer below
+function localClips(){ return localItems(function(c){return !_isPhotoSec(c.sec);}).then(function(a){a.sort(bySection);return a;}); }
 function gatherClips(){   // VIDEO clips for the movie (photos excluded)
   if(cloudOn()){
     return cloudList().then(function(list){
-      var vids=(list||[]).filter(function(c){return c.sec!=='photo';});
+      var vids=(list||[]).filter(function(c){return !_isPhotoSec(c.sec);});
       if(!vids.length) return localClips();   // cloud reachable but no videos -> on-phone backups
       vids.sort(bySection);
       return Promise.all(vids.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {sec:c.sec,lat:c.lat,lng:c.lng,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:localClips();});
@@ -3730,9 +3731,11 @@ function hideVegas(){
    only 2 flights exist today, so DATES lives inline; add a row here when a new date happens.
    the hero row (worldcup) isn't time-gated -- it's always "NOW BOARDING" because it IS this
    whole site (the metaphor is "you're on this flight", not a literal countdown). */
+function BV_DEP(){ return new Date(2026,6,4,16,15,0); }   // leaving SAM+XRD, real commute time
+function BV_ARR(){ return new Date(2026,6,4,17,0,0); }    // landing at the park
 function _dpStatus(key){
   if(key==='bellevue'){
-    var now=new Date(), start=new Date(2026,6,4,17,0,0), end=new Date(2026,6,4,19,0,0);
+    var now=new Date(), start=BV_DEP(), end=BV_ARR();
     if(now<start)return {cls:'st-ontime',label:'ON TIME'};
     if(now<=end)return {cls:'st-flight',label:'IN FLIGHT'};
     return {cls:'st-landed',label:'LANDED 💜'};
@@ -3774,9 +3777,50 @@ function openBellevue(){
   var b=document.getElementById('bvBars'); if(b&&window.bpBarcode&&!b.querySelector('.bc-row'))b.innerHTML=window.bpBarcode(704,{h:24,color:'#241733',target:300});
   var n=document.getElementById('bvNotes'); if(n){ try{n.value=localStorage.getItem('wc_bellevue_notes')||'';}catch(e){} }
   _bvRenderStamp();
+  renderBellevueAlbum(true);
   _bvTick();
   clearInterval(_bvTimer); _bvTimer=setInterval(_bvTick,1000);   // only ticks while this overlay is open, not all day
   o.classList.add('on');
+}
+/* bellevue's own photo album -- sec='bv-photo' keeps it a separate bucket from the world cup
+   date's album (sec='photo') and out of that date's movie clip gatherer (_isPhotoSec above) */
+function pickBellevuePhoto(){ var i=document.getElementById('bvPhotoInput'); if(i)i.click(); }
+function onBellevuePhotoPicked(ev){
+  var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value=''; if(!f)return;
+  if(window.toast)toast('adding your photo… 📸');
+  _downscaleImg(f,1400,0.85).then(function(blob){
+    var rec={sec:'bv-photo',blob:blob,t:Date.now()};
+    if(cloudOn()){
+      diaryAdd(rec).catch(function(){});
+      cloudUpload(rec).then(function(r){ if(window.toast)toast(r?'added to the bellevue album 📸💜':'saved on your phone (cloud hiccup) 💜'); renderBellevueAlbum(true); }).catch(function(){ if(window.toast)toast('saved on your phone (cloud hiccup) 💜'); renderBellevueAlbum(true); });
+    } else {
+      diaryAdd(rec).then(function(){ if(window.toast)toast('added to the bellevue album 📸💜'); renderBellevueAlbum(true); }).catch(function(){ if(window.toast)toast('could not add the photo 😭'); });
+    }
+  });
+}
+var _bvAlbumUrls=[], _bvAlbumBusy=false;
+function gatherBellevuePhotos(){
+  function loc(){ return localItems(function(c){return c.sec==='bv-photo';}).then(function(a){a.sort(function(x,y){return (x.t||0)-(y.t||0);});return a;}); }
+  if(cloudOn()){
+    return cloudList().then(function(list){
+      var ph=(list||[]).filter(function(c){return c.sec==='bv-photo';});
+      if(!ph.length) return loc();
+      ph.sort(function(a,b){return (a.t||0)-(b.t||0);});
+      return Promise.all(ph.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {id:c.id,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:loc();});
+    }).catch(function(){return loc();});
+  }
+  return loc();
+}
+function renderBellevueAlbum(force){
+  var grid=document.getElementById('bvAlbumGrid'); if(!grid)return;
+  if(_bvAlbumBusy&&!force)return; _bvAlbumBusy=true;
+  gatherBellevuePhotos().then(function(photos){
+    _bvAlbumBusy=false;
+    _bvAlbumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _bvAlbumUrls=[];
+    var cnt=document.getElementById('bvAlbumCount'); if(cnt)cnt.textContent=photos.length?('· '+photos.length+' photo'+(photos.length>1?'s':'')):'';
+    if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet, tap ➕ to add the first one 📸💜</div>'; return; }
+    grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _bvAlbumUrls.push(u); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="bellevue park date"></button>'; }).join('');
+  }).catch(function(){ _bvAlbumBusy=false; });
 }
 function closeBellevue(){
   var o=document.getElementById('bellevuePass'); if(o)o.classList.remove('on');
@@ -3784,7 +3828,7 @@ function closeBellevue(){
   _bvSaveNotes();
 }
 function _bvTick(){
-  var now=new Date(), start=new Date(2026,6,4,17,0,0), end=new Date(2026,6,4,19,0,0);
+  var now=new Date(), start=BV_DEP(), end=BV_ARR();
   var head=document.getElementById('bvHeadStatus'), lbl=document.getElementById('bvStripLbl'), val=document.getElementById('bvStripVal');
   if(now<start){
     var ms=start-now, h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000);
@@ -4481,9 +4525,9 @@ window.initTimeline=function(){};
     <div class="arrivalpass">
       <div class="ap-head"><span class="ap-air"><span class="ap-mark">🏞️</span>GANESH AIR</span><span class="ap-status" id="bvHeadStatus">ON TIME</span></div>
       <div class="ap-route">
-        <div class="ap-port ap-port-dual"><b>SAM<br>+XRD</b><span>dep 5:00 PM</span></div>
+        <div class="ap-port ap-port-dual"><b>SAM<br>+XRD</b><span>dep 4:15 PM</span></div>
         <div class="ap-plane"><i>✈</i></div>
-        <div class="ap-port"><b>BLV</b><span>arr 7:00 PM</span></div>
+        <div class="ap-port"><b>BLV</b><span>arr 5:00 PM</span></div>
       </div>
       <div class="bv-origin-note">SAM · Neal, from Sammamish &nbsp;+&nbsp; XRD · Sidhya, from Crossroads -- two gates, one flight 💜</div>
       <div class="ap-meta">
@@ -4500,6 +4544,10 @@ window.initTimeline=function(){};
     <div class="bv-callback">🍦 in-flight service: <b>Molly Moon's</b>, right by the park -- a rerun of july 21, back before we were even a we 💜</div>
     <div class="bv-foot">a short-haul flight. still first class ✈</div>
     <div id="bvStampZone"></div>
+    <label class="bv-notes-lbl">📸 our album<span class="album-count" id="bvAlbumCount"></span></label>
+    <div class="album-add-row"><button class="btn primary" type="button" onclick="pickBellevuePhoto()">➕ add a photo</button></div>
+    <div class="album-grid" id="bvAlbumGrid"><div class="album-empty">loading our photos…</div></div>
+    <input type="file" id="bvPhotoInput" accept="image/*" style="display:none" onchange="onBellevuePhotoPicked(event)">
     <label class="bv-notes-lbl">flight notes</label>
     <textarea class="bv-notes" id="bvNotes" rows="2" placeholder="how'd it go, babu?" onblur="_bvSaveNotes()"></textarea>
   </div>
