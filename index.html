@@ -4563,7 +4563,7 @@ window.initTimeline=function(){};
     <label class="bv-notes-lbl">📸 our album<span class="album-count" id="bvAlbumCount"></span></label>
     <div class="album-add-row"><button class="btn primary" type="button" onclick="pickBellevuePhoto()">➕ add a photo</button></div>
     <div class="album-grid" id="bvAlbumGrid"><div class="album-empty">loading our photos…</div></div>
-    <input type="file" id="bvPhotoInput" accept="image/*" style="display:none" onchange="onBellevuePhotoPicked(event)">
+    <input type="file" id="bvPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="onBellevuePhotoPicked(event)">
   </div>
 </div>
 
