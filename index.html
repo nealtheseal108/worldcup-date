@@ -1098,6 +1098,7 @@
 
       <div class="trk-actions">
         <button class="btn lav2btn" type="button" onclick="go(5)">🎬 date diary &amp; movie</button>
+        <button class="btn lav2btn" type="button" onclick="backupDiary()">⬇ back up every clip &amp; photo</button>
       </div>
       <div class="album-add-row" style="margin-top:10px">
         <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
@@ -2667,7 +2668,7 @@ function closeStats(){var m=document.getElementById('statsModal');if(m)m.style.d
 var DIARY_DB=null, diaryGeo=null, diaryStream=null, diaryRec=null, diaryChunks=[], diaryCurSec=null;
 // recording allowance: 1 minute of footage per 20-minute window, lifted 6:00-7:15 PM (around full time)
 var REC_WIN_MS=20*60*1000, REC_CAP=60, recStopTimer=null, recTickTimer=null, recStartT=0, _recWaitIdx=null, recWaitTimer=null, _recModalAt=0;
-function recFreeWindow(d){d=d||new Date();var t=d.getHours()*60+d.getMinutes();return t>=1080&&t<=1155;}  // 6:00 PM (1080) -> 7:15 PM (1155): record as much as you want
+function recFreeWindow(d){if(/[?&]rec=1/.test(location.search))return true;d=d||new Date();var t=d.getHours()*60+d.getMinutes();return t>=1080&&t<=1155;}  // 6:00 PM (1080) -> 7:15 PM (1155): record as much as you want. TEST: ?rec=1 bypasses the window entirely
 function recWinKey(){return Math.floor(Date.now()/REC_WIN_MS);}
 function recUsed(){try{var o=JSON.parse(localStorage.getItem('wc_rec_budget')||'{}');return o.w===recWinKey()?(o.s||0):0;}catch(e){return 0;}}
 function recAddUsed(sec){try{var k=recWinKey(),o=JSON.parse(localStorage.getItem('wc_rec_budget')||'{}'),u=(o.w===k?(o.s||0):0)+sec;localStorage.setItem('wc_rec_budget',JSON.stringify({w:k,s:u}));}catch(e){}}
@@ -2784,6 +2785,32 @@ function cloudClipUrl(id){return CLOUD.url+'/api/clip/'+id+'?key='+encodeURIComp
 function cloudList(){return fetch(CLOUD.url+'/api/clips',{headers:cloudHeaders()}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];});}
 function cloudUpload(rec){var fd=new FormData();fd.append('video',rec.blob,'clip.webm');fd.append('sec',rec.sec);fd.append('t',String(rec.t));if(rec.lat!=null)fd.append('lat',String(rec.lat));if(rec.lng!=null)fd.append('lng',String(rec.lng));return fetch(CLOUD.url+'/api/clip',{method:'POST',headers:cloudHeaders(),body:fd}).then(function(r){return r.ok?r.json():null;});}
 function cloudDelete(id,sec){return fetch(CLOUD.url+'/api/clip/'+id,{method:'DELETE',headers:cloudHeaders()}).then(function(){renderDiary(sec);}).catch(function(){hint('could not delete from the cloud 💜');});}
+/* time capsule: pull EVERY clip + photo out of the cloud diary onto this device, one download per
+   memory. The cloud db is temporary (free-tier Postgres); this is how the day survives it. */
+var _backupBusy=false;
+function backupDiary(){
+  if(_backupBusy){ toast('already backing up, hang tight 💜'); return; }
+  if(!cloudOn()){ toast('cloud diary is off on this phone 💜'); return; }
+  cloudList().then(function(list){
+    if(!list.length){ toast('nothing in the cloud diary yet 💜'); return; }
+    _backupBusy=true;
+    toast('downloading '+list.length+' memories… keep this tab open 💜');
+    var i=0, ok=0;
+    (function next(){
+      if(i>=list.length){ _backupBusy=false; toast(ok+' of '+list.length+' saved to your downloads 💜 keep them forever'); return; }
+      var c=list[i++];
+      fetch(cloudClipUrl(c.id)).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(b){
+        var ext=(b.type.indexOf('mp4')>=0)?'mp4':(b.type.indexOf('image')>=0?'jpg':'webm');
+        var d=new Date(c.t||c.created||Date.now());
+        var a=document.createElement('a'); a.href=URL.createObjectURL(b);
+        a.download='our-date-'+(c.sec||'clip')+'-'+d.getMonth()+1+'-'+d.getDate()+'-'+String(i).padStart(2,'0')+'.'+ext;
+        document.body.appendChild(a); a.click(); a.remove();
+        ok++;
+        setTimeout(function(){ URL.revokeObjectURL(a.href); next(); },700);   // spaced out so mobile Safari's multi-download prompt keeps up
+      }).catch(function(){ setTimeout(next,150); });
+    })();
+  }).catch(function(){ toast('could not reach the cloud right now 💜'); });
+}
 /* ---------- compile the clips into "our date movie": in-app montage + best-effort file export ---------- */
 var movieClips=[], movieTimer=null, movieAbort=false, _movieResumeMusic=false;
 function movieName(){var f=document.getElementById('nameField');return ((f&&f.value)||'').trim()||'Sidhya';}
