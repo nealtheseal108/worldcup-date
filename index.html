@@ -864,7 +864,6 @@
   .bv-inkstamp span{display:inline-block;border:3px solid #3f9e5c;border-radius:9px;color:#3f9e5c;font-family:'Courier Prime',ui-monospace,monospace;font-weight:800;font-size:13px;letter-spacing:1.5px;padding:8px 14px;text-align:center;line-height:1.5;transform:rotate(-7deg) scale(1);animation:bvThunk .4s cubic-bezier(.36,1.8,.4,1) backwards}
   .bv-inkstamp span small{display:block;font-size:8.5px;letter-spacing:1px}
   @keyframes bvThunk{0%{transform:rotate(-7deg) scale(2.4);opacity:0}70%{transform:rotate(-7deg) scale(.92);opacity:1}100%{transform:rotate(-7deg) scale(1)}}
-  .bv-notes{width:100%;margin-top:10px;border:1.5px solid var(--line);border-radius:11px;padding:10px 12px;font:inherit;font-size:14px;resize:none;font-family:'Courier Prime',ui-monospace,monospace}
   .bv-notes-lbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:1.2px;color:var(--muted);margin-top:12px;display:block}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -3795,7 +3794,6 @@ function _pad2(n){return (n<10?'0':'')+n;}
 function openBellevue(){
   var o=document.getElementById('bellevuePass'); if(!o)return;
   var b=document.getElementById('bvBars'); if(b&&window.bpBarcode&&!b.querySelector('.bc-row'))b.innerHTML=window.bpBarcode(704,{h:24,color:'#241733',target:300});
-  var n=document.getElementById('bvNotes'); if(n){ try{n.value=localStorage.getItem('wc_bellevue_notes')||'';}catch(e){} }
   _bvRenderStamp();
   renderBellevueAlbum(true);
   _bvTick();
@@ -3845,7 +3843,6 @@ function renderBellevueAlbum(force){
 function closeBellevue(){
   var o=document.getElementById('bellevuePass'); if(o)o.classList.remove('on');
   clearInterval(_bvTimer); _bvTimer=null;
-  _bvSaveNotes();
 }
 function _bvTick(){
   var now=new Date(), start=BV_DEP(), end=BV_ARR();
@@ -3878,7 +3875,6 @@ function _bvStamp(){
   _bvRenderStamp();
   if(window.burstConfetti)burstConfetti(document.getElementById('bvStampZone'),{emojis:['💜','✅','🏞️'],count:16});
 }
-function _bvSaveNotes(){ var n=document.getElementById('bvNotes'); if(n){ try{localStorage.setItem('wc_bellevue_notes',n.value);}catch(e){} } }
 
 function _utahCount(){
   var sel=_utahSel(), n=Object.keys(sel).filter(function(k){return sel[k];}).length;
@@ -4568,8 +4564,6 @@ window.initTimeline=function(){};
     <div class="album-add-row"><button class="btn primary" type="button" onclick="pickBellevuePhoto()">➕ add a photo</button></div>
     <div class="album-grid" id="bvAlbumGrid"><div class="album-empty">loading our photos…</div></div>
     <input type="file" id="bvPhotoInput" accept="image/*" style="display:none" onchange="onBellevuePhotoPicked(event)">
-    <label class="bv-notes-lbl">flight notes</label>
-    <textarea class="bv-notes" id="bvNotes" rows="2" placeholder="how'd it go, babu?" onblur="_bvSaveNotes()"></textarea>
   </div>
 </div>
 
