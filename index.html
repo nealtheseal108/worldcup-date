@@ -494,11 +494,22 @@
   #lightbox img{max-width:100%;max-height:86vh;border-radius:12px;box-shadow:0 20px 55px rgba(0,0,0,.55)}
   .lb-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.16);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:19px;cursor:pointer;line-height:1}
   /* vegas-style neon entry sign: WELCOME to fabulous SEATTLE · SIDHYA. shows on every load,
-     tap anywhere or auto-dismiss. all glow is text-shadow + opacity keyframes (compositor-cheap). */
-  #vegasSign{position:fixed;inset:0;z-index:230;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 32%,#1b1233 0%,#0b0718 72%);cursor:pointer;transition:opacity .55s;padding:20px}
+     tap anywhere or auto-dismiss. all glow is text-shadow + opacity keyframes (compositor-cheap).
+     ::before layers a night-sky sparkle field + a warm ground-glow pool behind the sign so wide
+     desktop viewports don't read as a tiny card lost in a flat black void. */
+  #vegasSign{position:fixed;inset:0;z-index:230;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(ellipse at 50% 46%,#241a48 0%,#150d30 45%,#08050f 78%);cursor:pointer;transition:opacity .55s;padding:20px;overflow:hidden}
   #vegasSign.gone{opacity:0;pointer-events:none}
-  #vegasSign{flex-direction:column;gap:22px}
-  .vs-svgwrap{width:min(372px,94vw);filter:drop-shadow(0 16px 34px rgba(0,0,0,.55))}
+  #vegasSign::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:
+      radial-gradient(2px 2px at 12% 22%, rgba(255,209,102,.55), transparent 60%),
+      radial-gradient(1.6px 1.6px at 24% 68%, rgba(124,247,255,.4), transparent 60%),
+      radial-gradient(1.6px 1.6px at 8% 78%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(2px 2px at 88% 18%, rgba(255,122,162,.4), transparent 60%),
+      radial-gradient(1.6px 1.6px at 92% 62%, rgba(255,209,102,.45), transparent 60%),
+      radial-gradient(1.6px 1.6px at 78% 82%, rgba(124,247,255,.35), transparent 60%),
+      radial-gradient(2px 2px at 15% 45%, rgba(255,255,255,.3), transparent 60%),
+      radial-gradient(1.6px 1.6px at 85% 40%, rgba(255,255,255,.3), transparent 60%)}
+  .vs-svgwrap{position:relative;width:min(460px,88vw);filter:drop-shadow(0 16px 34px rgba(0,0,0,.55))}
+  .vs-svgwrap::after{content:"";position:absolute;left:50%;bottom:-6%;width:135%;height:55%;transform:translateX(-50%);background:radial-gradient(ellipse at 50% 50%,rgba(255,209,102,.16) 0%,rgba(180,90,220,.08) 45%,transparent 72%);pointer-events:none;z-index:-1}
   .vs-svgwrap svg{width:100%;height:auto;display:block}
   .vs-bulbs{animation:vsHum 2.1s infinite}
   .vs-seat{animation:vsHum 3.1s infinite}
