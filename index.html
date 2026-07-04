@@ -624,9 +624,18 @@
   .pbook{max-width:320px;margin:0 auto}
   .pbook-stage{position:relative;width:100%;aspect-ratio:32/43;perspective:1400px}
   .pb-base{position:absolute;inset:0}
-  .pb-leaf{position:absolute;inset:0;transform-origin:left center;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.35,.1,.25,1);z-index:5;will-change:transform}
-  .pb-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;overflow:hidden}
-  .pb-face.pb-back{transform:rotateY(180deg);background:repeating-linear-gradient(45deg,rgba(124,77,202,.06) 0 2px,transparent 2px 14px),#efe7fb;border:1px solid var(--line)}
+  /* page turn = a two-state fold on the left edge: the leaf only ever travels 0 <-> -90deg
+     (edge-on), so it stays inside the book instead of sweeping out across the layout.
+     A gradient shade rides the leaf so the fold reads as paper curling, not a flat spin. */
+  .pb-leaf{position:absolute;inset:0;transform-origin:left center;z-index:5;will-change:transform;transform:rotateY(0);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .pb-face{position:absolute;inset:0;border-radius:12px;overflow:hidden}
+  .pb-shade{position:absolute;inset:0;border-radius:12px;background:linear-gradient(90deg,rgba(20,10,40,.45),rgba(20,10,40,.06));opacity:0;pointer-events:none;transition:opacity .3s ease-in}
+  .pb-leaf.pb-fold{transition:transform .3s cubic-bezier(.55,0,.85,.4);transform:rotateY(-89.9deg)}
+  .pb-leaf.pb-fold .pb-shade{opacity:1}
+  .pb-leaf.pb-open0{transform:rotateY(-89.9deg)}
+  .pb-leaf.pb-open0 .pb-shade{opacity:1;transition:opacity .3s ease-out}
+  .pb-leaf.pb-open1{transition:transform .3s cubic-bezier(.15,.6,.45,1);transform:rotateY(0)}
+  .pb-leaf.pb-open1 .pb-shade{opacity:0}
   .pb-page{position:absolute;inset:0;display:flex;flex-direction:column;background:repeating-linear-gradient(45deg,rgba(124,77,202,.045) 0 2px,transparent 2px 14px),#fdfbff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 26px rgba(53,28,94,.18);padding:15px 15px 11px;text-align:left}
   /* passport COVER: leather grain (two offset dot-noise layers over the base gradient),
      gold letterpress type, embossed seal, inset frame, biometric chip symbol -- like the real booklet */
@@ -3348,27 +3357,33 @@ function _mkBook(cfg){   // cfg: {stage,lbl,prev,next,count(),page(i),onFlip()}
     if(B.busy)return;
     var to=B.idx+dir; if(to<0||to>cfg.count())return;
     var stage=document.getElementById(cfg.stage); if(!stage)return;
-    B.busy=true; if(cfg.onFlip)cfg.onFlip();
+    var base=stage.querySelector('.pb-base'); if(!base)return;
+    if(cfg.onFlip)cfg.onFlip();
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){   // no animation, just turn the page
+      B.idx=to; base.innerHTML=cfg.page(B.idx); B.nav(); return;
+    }
+    B.busy=true;
     var leaf=document.createElement('div'); leaf.className='pb-leaf';
-    var base=stage.querySelector('.pb-base');
-    if(dir>0){   // forward: leaf carries the OLD page and peels left, revealing the new page beneath
-      leaf.innerHTML='<div class="pb-face">'+cfg.page(B.idx)+'</div><div class="pb-face pb-back"></div>';
-      B.idx=to; if(base)base.innerHTML=cfg.page(B.idx);
+    // the leaf carries whichever page is doing the moving; it only ever travels 0 <-> -90deg
+    leaf.innerHTML='<div class="pb-face">'+cfg.page(dir>0?B.idx:to)+'</div><div class="pb-shade"></div>';
+    if(dir>0){   // forward: the OLD page folds away to edge-on, revealing the new page beneath
+      B.idx=to; base.innerHTML=cfg.page(B.idx);
       stage.appendChild(leaf);
-      requestAnimationFrame(function(){requestAnimationFrame(function(){ leaf.style.transform='rotateY(-180deg)'; });});
-    } else {     // back: leaf carrying the PREVIOUS page sweeps in from the left, covering the current one
-      leaf.innerHTML='<div class="pb-face">'+cfg.page(to)+'</div><div class="pb-face pb-back"></div>';
-      leaf.style.transition='none'; leaf.style.transform='rotateY(-180deg)';
+      void leaf.offsetWidth;   // commit the start state so the transition actually runs
+      leaf.classList.add('pb-fold');
+    } else {     // back: the PREVIOUS page unfolds from edge-on to cover the current one
+      leaf.classList.add('pb-open0');
       stage.appendChild(leaf);
-      requestAnimationFrame(function(){requestAnimationFrame(function(){ leaf.style.transition=''; leaf.style.transform='rotateY(0deg)'; });});
+      void leaf.offsetWidth;
+      leaf.classList.add('pb-open1');
     }
     if(window.buzz)buzz(12);
     B.nav();
     setTimeout(function(){
-      if(dir<0){ B.idx=to; if(base)base.innerHTML=cfg.page(B.idx); }
+      if(dir<0){ B.idx=to; base.innerHTML=cfg.page(B.idx); }
       if(leaf.parentNode)leaf.parentNode.removeChild(leaf);
       B.busy=false; B.nav();
-    },700);
+    },340);
   };
   (function(){   // swipe to flip (horizontal only, so vertical page scroll stays untouched)
     var s=document.getElementById(cfg.stage); if(!s||s._wired)return; s._wired=true;
