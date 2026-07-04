@@ -633,11 +633,22 @@
   .pb-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;overflow:hidden}
   .pb-face.pb-back{transform:rotateY(180deg);background:repeating-linear-gradient(45deg,rgba(124,77,202,.06) 0 2px,transparent 2px 14px),#efe7fb;border:1px solid var(--line)}
   .pb-page{position:absolute;inset:0;display:flex;flex-direction:column;background:repeating-linear-gradient(45deg,rgba(124,77,202,.045) 0 2px,transparent 2px 14px),#fdfbff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 26px rgba(53,28,94,.18);padding:15px 15px 11px;text-align:left}
-  .pb-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:linear-gradient(160deg,#241733,#3a2560);border-radius:12px;border:1px solid rgba(167,139,250,.35);box-shadow:0 10px 26px rgba(18,8,38,.4);cursor:pointer}
-  .pb-crest{width:72px;height:72px;border:2.5px solid var(--sun);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px}
-  .pb-cover h3{font-family:'Courier Prime',ui-monospace,monospace;letter-spacing:6px;font-size:19px;margin:2px 0 0;color:var(--sun);font-weight:700}
-  .pb-cover .pb-sub{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:2px;color:#cbb7f5}
-  .pb-cover .pb-open{font-size:10px;color:#9b86c8;letter-spacing:1px;margin-top:10px}
+  /* passport COVER: leather grain (two offset dot-noise layers over the base gradient),
+     gold letterpress type, embossed seal, inset frame, biometric chip symbol -- like the real booklet */
+  .pb-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border-radius:12px;cursor:pointer;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(255,255,255,.028) 1px, transparent 1.6px) 0 0/7px 9px,
+      radial-gradient(circle at 65% 55%, rgba(0,0,0,.22) 1px, transparent 1.6px) 3px 5px/11px 13px,
+      linear-gradient(155deg,#221542,#140d29 70%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -3px 9px rgba(0,0,0,.55),0 10px 26px rgba(18,8,38,.45)}
+  .pb-cover::after{content:"";position:absolute;inset:9px;border:1px solid rgba(217,185,104,.4);border-radius:8px;pointer-events:none}
+  .pb-cover *{position:relative}
+  .pb-cty{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:4px;color:#d9b968;font-weight:700;text-shadow:0 1px 1px rgba(0,0,0,.6)}
+  .pb-cover h3{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:9px;font-size:27px;margin:0 0 2px;color:#d9b968;text-indent:9px;text-shadow:0 1px 1px rgba(0,0,0,.65),0 0 14px rgba(217,185,104,.18)}
+  .pb-emblem{width:104px;height:104px;margin:5px 0 7px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+  .pb-cover .pb-sub{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:2.4px;color:#d9b968;opacity:.92;text-shadow:0 1px 1px rgba(0,0,0,.6)}
+  .pb-chip{width:34px;height:22px;margin-top:12px;opacity:.85}
+  .pb-cover .pb-open{font-size:9.5px;color:#7c6aa8;letter-spacing:1.6px;margin-top:9px;font-family:'Courier Prime',ui-monospace,monospace}
   .pb-head{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:2px;color:var(--lav);font-weight:700}
   .pb-no{font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);margin:2px 0 9px}
   .pb-name{font-weight:800;font-size:18px;color:#2e1f47;line-height:1.2;margin-bottom:5px;font-family:'Inter',system-ui,sans-serif}
@@ -651,7 +662,10 @@
   .pb-maybe{background:none;border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-family:inherit;font-size:11px;color:var(--muted);cursor:pointer;align-self:center;margin-bottom:9px}
   .pb-maybe.on{border-color:var(--lav);color:var(--lav);font-weight:700;background:#f3ecfc}
   .pb-mrz{border-top:1px dashed var(--line);padding-top:6px;font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;letter-spacing:1.5px;color:#b5a6d6;white-space:nowrap;overflow:hidden}
-  .pb-cover.pb-cover-pos{background:linear-gradient(160deg,#33101f,#571c38);border-color:rgba(255,209,102,.3)}
+  .pb-cover.pb-cover-pos{background:
+      radial-gradient(circle at 30% 40%, rgba(255,255,255,.028) 1px, transparent 1.6px) 0 0/7px 9px,
+      radial-gradient(circle at 65% 55%, rgba(0,0,0,.22) 1px, transparent 1.6px) 3px 5px/11px 13px,
+      linear-gradient(155deg,#3a1224,#1d0812 70%)}
   .pbook-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:11px}
   .pbook-lbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;min-width:120px;text-align:center}
   @media(prefers-reduced-motion:reduce){.pb-leaf{transition:none}}
@@ -3297,7 +3311,7 @@ var UTAH_LOWKEY=[
 var UTAH_INTIMATE=[
   {t:'shower together', r:true, d:'a known favorite at this point 😏 just this time with no flight to catch after, and absolutely no rush.', pgD:'a real slow morning together, coffee and all, nowhere to rush off to.'},
   {t:'make love, all weekend', r:true, d:'no flights to catch, no alarms, no roommates walking in -- just us, slow and close, for as long as we want.', pgD:'a whole weekend together, finally, no rush and nowhere to be.'},
-  {t:'the whole night, no alarm', r:true, d:'nowhere to be and nothing to catch -- just holding each other, making love, falling asleep, and waking up and doing it all again.', pgD:'a full night together with nowhere to be in the morning.'},
+  {t:'everything on schedule 😌', r:true, d:'we\'re not a stay-up-til-3am couple and we\'re proud of it: sex at the right time, asleep on time, up on time. disciplined in the gym, disciplined in bed.', pgD:'we\'re not a stay-up-til-3am couple and we\'re proud of it -- everything at the right time, asleep on time, up on time. the routine is the romance.'},
   {t:'pick your favorite from 8 months of texts', r:true, d:'you know exactly which one. we\'ve got a whole quiz full of receipts now -- pick one and let\'s make it real.', pgD:'finally do one of the things we\'ve been talking about doing together for 8 months.'},
   {t:'make up for every mile', r:true, d:'700 miles of missing each other, closed the only way that actually works: in person, in your arms.', pgD:'700 miles of missing each other, made up for in person.'},
   {t:'just lie there for a while', r:true, d:'skin on skin, nothing that needs saying.', pgD:'just lie there together and not talk for a while.'}
@@ -3379,10 +3393,25 @@ function _pbStamps(){ try{return JSON.parse(localStorage.getItem('wc_utah_stamps
 function _pbPageHTML(i){
   if(i===0){
     return '<div class="pb-cover" onclick="pbFlip(1)">'+
-      '<div class="pb-crest">🏔️💜</div><h3>PASSPORT</h3>'+
-      '<div class="pb-sub">GANESH AIR · UTAH EDITION</div>'+
-      '<div class="pb-sub">SIDHYA 💜 NEAL · JUL 9-13 2026</div>'+
-      '<div class="pb-open">tap or swipe to open ✨</div></div>';
+      '<div class="pb-cty">GANESH AIR</div>'+
+      '<h3>PASSPORT</h3>'+
+      // embossed gold seal: mountains over a lake, heart above, laurel below -- their coat of arms
+      '<svg class="pb-emblem" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+        '<circle cx="60" cy="60" r="54" fill="none" stroke="#d9b968" stroke-width="2.4"/>'+
+        '<circle cx="60" cy="60" r="46" fill="none" stroke="#d9b968" stroke-width="1"/>'+
+        '<path d="M30 76 L47 48 L57 62 L68 44 L90 76 Z" fill="none" stroke="#d9b968" stroke-width="2.2" stroke-linejoin="round"/>'+
+        '<path d="M60 20 c-2.6-5 -10.5-4.2 -10.5 1.8 0 4.4 6 7.8 10.5 11.4 4.5-3.6 10.5-7 10.5-11.4 0-6 -7.9-6.8 -10.5-1.8z" fill="#d9b968"/>'+
+        '<path d="M38 82 h44" stroke="#d9b968" stroke-width="1.5"/>'+
+        '<path d="M42 87 h36" stroke="#d9b968" stroke-width="1"/>'+
+        '<path d="M22 90 q12 11 28 13" fill="none" stroke="#d9b968" stroke-width="1.4"/>'+
+        '<path d="M98 90 q-12 11 -28 13" fill="none" stroke="#d9b968" stroke-width="1.4"/>'+
+        '<circle cx="33" cy="33" r="2" fill="#d9b968"/><circle cx="87" cy="33" r="2" fill="#d9b968"/>'+
+      '</svg>'+
+      '<div class="pb-sub">UTAH EDITION · JUL 9-13 2026</div>'+
+      '<div class="pb-sub">SIDHYA 💜 NEAL</div>'+
+      // the biometric ePassport chip symbol, because of course
+      '<svg class="pb-chip" viewBox="0 0 40 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="1.5" y="1.5" width="37" height="23" rx="5.5" fill="none" stroke="#d9b968" stroke-width="2"/><circle cx="20" cy="13" r="5" fill="none" stroke="#d9b968" stroke-width="2"/><path d="M1.5 13 h13.5 M25 13 h13.5" stroke="#d9b968" stroke-width="2"/></svg>'+
+      '<div class="pb-open">TAP OR SWIPE TO OPEN ✨</div></div>';
   }
   var it=UTAH_NATURE[i-1], st=_pbStamps(), sel=_utahSel();
   var stamped=!!st['n'+(i-1)], pending=_pbPend===(i-1), maybe=!!sel['nature'+(i-1)];
@@ -3445,10 +3474,22 @@ function _ppPageHTML(i){
   var total=PP_DONE.length+UTAH_POSITIONS.length;
   if(i===0){
     return '<div class="pb-cover pb-cover-pos" onclick="ppFlip(1)">'+
-      '<div class="pb-crest">📖💜</div><h3>PASSPORT</h3>'+
-      '<div class="pb-sub">PRIVATE CHARTER · POSITION EDITION</div>'+
+      '<div class="pb-cty">PRIVATE CHARTER</div>'+
+      '<h3>PASSPORT</h3>'+
+      // this edition's seal: two interlocked hearts inside the ring, laurel below
+      '<svg class="pb-emblem" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+        '<circle cx="60" cy="60" r="54" fill="none" stroke="#d9b968" stroke-width="2.4"/>'+
+        '<circle cx="60" cy="60" r="46" fill="none" stroke="#d9b968" stroke-width="1"/>'+
+        '<path d="M50 42 c-5.4-9.5 -20-7.8 -20 3.6 0 8.6 11.5 15.2 20 22 8.5-6.8 20-13.4 20-22 0-11.4 -14.6-13.1 -20-3.6z" fill="none" stroke="#d9b968" stroke-width="2.4" stroke-linejoin="round"/>'+
+        '<path d="M70 52 c-5.4-9.5 -20-7.8 -20 3.6 0 8.6 11.5 15.2 20 22 8.5-6.8 20-13.4 20-22 0-11.4 -14.6-13.1 -20-3.6z" fill="none" stroke="#d9b968" stroke-width="2.4" stroke-linejoin="round" transform="translate(-10,8) scale(.82)"/>'+
+        '<path d="M22 90 q12 11 28 13" fill="none" stroke="#d9b968" stroke-width="1.4"/>'+
+        '<path d="M98 90 q-12 11 -28 13" fill="none" stroke="#d9b968" stroke-width="1.4"/>'+
+        '<circle cx="33" cy="33" r="2" fill="#d9b968"/><circle cx="87" cy="33" r="2" fill="#d9b968"/>'+
+      '</svg>'+
+      '<div class="pb-sub">POSITION EDITION · CLASSIFIED</div>'+
       '<div class="pb-sub">SIDHYA 💜 NEAL · PASSENGERS: 2 ONLY</div>'+
-      '<div class="pb-open">tap or swipe to open 😏</div></div>';
+      '<svg class="pb-chip" viewBox="0 0 40 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="1.5" y="1.5" width="37" height="23" rx="5.5" fill="none" stroke="#d9b968" stroke-width="2"/><circle cx="20" cy="13" r="5" fill="none" stroke="#d9b968" stroke-width="2"/><path d="M1.5 13 h13.5 M25 13 h13.5" stroke="#d9b968" stroke-width="2"/></svg>'+
+      '<div class="pb-open">TAP OR SWIPE TO OPEN 😏</div></div>';
   }
   var pn=(i<10?'0':'')+i, pt=(total<10?'0':'')+total, mrz;
   if(i<=PP_DONE.length){   // the originals: permanently stamped, not toggleable
