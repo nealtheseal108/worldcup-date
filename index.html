@@ -3854,7 +3854,7 @@ function _bvTick(){
   if(now<start){
     var ms=start-now, h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000);
     if(head)head.textContent='ON TIME'; if(lbl)lbl.textContent='BOARDING IN';
-    if(val)val.textContent=(h>0?h+'H ':'')+_pad2(m)+':'+_pad2(s);
+    if(val)val.textContent=_pad2(h)+':'+_pad2(m)+':'+_pad2(s);   // HH:MM:SS throughout -- matches the in-flight clock below, no mixed "H"/":" separators
   } else if(now<=end){
     var ms2=now-start, h2=Math.floor(ms2/3600000), m2=Math.floor((ms2%3600000)/60000), s2=Math.floor((ms2%60000)/1000);
     if(head)head.textContent='IN FLIGHT ✈'; if(lbl)lbl.textContent='TIME ALOFT';
