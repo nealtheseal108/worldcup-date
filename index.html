@@ -871,6 +871,7 @@
         <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
         <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime Qs</button>
         <button class="btn lav2btn" type="button" onclick="go(13)">🧠 how well do you know us</button>
+        <button class="btn lav2btn" type="button" onclick="go(14)">🏔️ the utah plan</button>
       </div>
 
       <!-- the date diary lives at the end now, locked until ~9:30 PM -->
@@ -1010,6 +1011,7 @@
       <div class="album-add-row" style="margin-top:10px">
         <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
         <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime Qs</button>
+        <button class="btn lav2btn" type="button" onclick="go(14)">🏔️ the utah plan</button>
       </div>
       <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
@@ -1035,6 +1037,7 @@
       <div class="album-add-row" style="margin-top:12px">
         <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime questions</button>
         <button class="btn lav2btn" type="button" onclick="go(13)">🧠 know us quiz</button>
+        <button class="btn lav2btn" type="button" onclick="go(14)">🏔️ the utah plan</button>
         <button class="btn ghost" type="button" onclick="resetBingo()">↺ new card</button>
       </div>
       <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
@@ -1050,6 +1053,7 @@
       <div class="album-add-row" style="margin-top:12px">
         <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
         <button class="btn lav2btn" type="button" onclick="go(13)">🧠 know us quiz</button>
+        <button class="btn lav2btn" type="button" onclick="go(14)">🏔️ the utah plan</button>
       </div>
       <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
@@ -1084,6 +1088,24 @@
       <div class="q-num" id="quizNum">Q 1 / 1</div>
       <div id="quizCard"></div>
       <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
+    </section>
+
+    <!-- STEP 14 — THE UTAH PLAN (Jul 9-13, no fixed schedule -- tap-to-select menu, not a locked itinerary) -->
+    <section class="step" id="step14">
+      <div class="iti-head" style="margin-top:2px"><div class="big">🏔️💜</div><h2 style="font-size:24px">the utah plan</h2><div class="venue">July 9-13 · no itinerary, just tap whatever sounds good</div></div>
+      <p class="sub" style="margin:-6px 0 16px">Thu + Fri we both work til 5, so daytime's out those two days -- evenings and the whole weekend are wide open. nothing here is locked in or scheduled, just a menu. tap what you're feeling, we'll figure out the order when we get there 💜</p>
+
+      <div class="sectlabel">🌲 out in nature</div>
+      <div class="cards utah-grid" id="utahNature"></div>
+
+      <div class="sectlabel" style="margin-top:20px">🏡 low-key, staying in</div>
+      <div class="cards utah-grid" id="utahLowkey"></div>
+
+      <div class="sectlabel" style="margin-top:20px">💜 just us</div>
+      <div class="cards utah-grid" id="utahIntimate"></div>
+
+      <div class="kit-note" style="margin-top:14px" id="utahCount"></div>
+      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
   </div>
@@ -3135,7 +3157,58 @@ function tapDep(i){
   if(opened.indexOf(i)<0){ opened.push(i); try{localStorage.setItem('wc_dep_open',JSON.stringify(opened));}catch(e){} if(window.burstConfetti)burstConfetti(document.getElementById('depBoard'),{emojis:['🛫','💜','✨'],count:16}); if(window.buzz)buzz(24); }
   renderDepartures();
 }
-renderBingo(); renderQDeck(); renderMissions(); renderKit(); renderDepartures(); renderQuiz();
+/* ---------- THE UTAH PLAN (step14): Jul 9-13, tap-to-select menu, zero fixed schedule ----------
+   nature spots verified as real, currently-operating places near Lehi/Saratoga Springs, UT.
+   "just us" cards are original writing (not sourced quotes) -- PG/R swap like everywhere else. */
+var UTAH_NATURE=[
+  {t:'Ashton Gardens · Thanksgiving Point', d:'paved botanical garden right in Lehi -- fountains, a rose garden, a waterfall. open most evenings til 8-9pm (closed Sundays).', tag:'5-10 min · evenings work'},
+  {t:'North Lake Park', d:'a quick overlook of Utah Lake on the north shore, paved path and benches. good for a fast sunset stop.', tag:'5-10 min · sunset'},
+  {t:'Marina Park · Pelican Bay Trail', d:'Saratoga Springs marina with a paved shoreline trail along Utah Lake, boats coming in as the sun sets.', tag:'15-20 min · sunset'},
+  {t:'Jordan River Parkway Trail', d:'flat, fully paved trail connecting Lehi to Saratoga Springs via Olympic Park. walk a mile or walk ten, our call in the moment.', tag:'10-15 min · walk as far as we want'},
+  {t:'American Fork Canyon', d:'scenic mountain drive up SR-92, plus a short easy nature loop near Tibble Fork Reservoir. needs a ~$10 forest day pass.', tag:'15-25 min · weekend morning'},
+  {t:'Utah Lake State Park', d:'further out toward Provo, but a real local classic for a lake sunset if we want to see something different.', tag:'20-25 min · worth the drive'}
+];
+var UTAH_LOWKEY=[
+  {t:'watch more World Cup', d:'the tournament\'s still going -- quarters and semis land right in this window. jerseys back on, babu.'},
+  {t:'meet the friend group', d:'Ellie, Clayton, whoever\'s around. low-key, no pressure, just hanging.'},
+  {t:'cook something together', d:'no plan, just a kitchen and both of us.'},
+  {t:'just talk, no agenda', d:'a whole evening with nothing to do but be in the same room.'}
+];
+var UTAH_INTIMATE=[
+  {t:'shower together, finally', r:true, d:'you\'ve been asking since February. no flight to catch after, no rush at all.', pgD:'a real slow morning together, coffee and all, nowhere to rush off to.'},
+  {t:'the whole night, no alarm', r:true, d:'nowhere to be and nothing to catch -- just us until we fall asleep and wake up and start over.', pgD:'a full night together with nowhere to be in the morning.'},
+  {t:'pick your favorite from 8 months of texts', r:true, d:'you know exactly which one. we\'ve got a whole quiz full of receipts now -- pick one and let\'s make it real.', pgD:'finally do one of the things we\'ve been talking about doing together for 8 months.'},
+  {t:'make up for every mile', r:true, d:'700 miles of missing each other, paid back in full, in person.', pgD:'700 miles of missing each other, made up for in person.'},
+  {t:'just lie there for a while', r:true, d:'skin on skin, nothing that needs saying.', pgD:'just lie there together and not talk for a while.'}
+];
+function _utahSel(){ try{return JSON.parse(localStorage.getItem('wc_utah_sel')||'{}');}catch(e){return {};} }
+function _utahToggle(cat,i){
+  var sel=_utahSel(), key=cat+i;
+  if(sel[key])delete sel[key]; else sel[key]=1;
+  try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
+  if(!sel[key]){} else if(window.buzz)buzz(18);
+  renderUtah();
+}
+function _utahGrid(id,cat,items){
+  var g=document.getElementById(id); if(!g)return;
+  var sel=_utahSel(), pg=_spiceMode()==='pg';
+  g.innerHTML=items.map(function(it,i){
+    if(pg&&it.r&&!it.pgD)return '';   // R-only with no PG fallback -- skip entirely in PG mode
+    var on=!!sel[cat+i], desc=(pg&&it.pgD)?it.pgD:it.d;
+    return '<div class="card utah-card'+(on?' sel':'')+'" onclick="_utahToggle(\''+cat+'\','+i+')">'+
+      '<span class="emoji">'+(on?'💜':'🤍')+'</span>'+
+      '<div><div class="ttl">'+it.t+'</div><div class="desc">'+desc+'</div>'+(it.tag?'<span class="tag">'+it.tag+'</span>':'')+'</div>'+
+      '</div>';
+  }).join('');
+}
+function renderUtah(){
+  _utahGrid('utahNature','nature',UTAH_NATURE);
+  _utahGrid('utahLowkey','lowkey',UTAH_LOWKEY);
+  _utahGrid('utahIntimate','intimate',UTAH_INTIMATE);
+  var sel=_utahSel(), n=Object.keys(sel).filter(function(k){return sel[k];}).length;
+  var c=document.getElementById('utahCount'); if(c)c.textContent = n ? (n+' thing'+(n===1?'':'s')+' on the maybe list 💜 tap to un-pick anytime') : 'nothing picked yet -- tap whatever sounds good, babu';
+}
+renderBingo(); renderQDeck(); renderMissions(); renderKit(); renderDepartures(); renderQuiz(); renderUtah();
 function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
 function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
