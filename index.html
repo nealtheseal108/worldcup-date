@@ -613,6 +613,7 @@
   .pb-maybe{background:none;border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-family:inherit;font-size:11px;color:var(--muted);cursor:pointer;align-self:center;margin-bottom:9px}
   .pb-maybe.on{border-color:var(--lav);color:var(--lav);font-weight:700;background:#f3ecfc}
   .pb-mrz{border-top:1px dashed var(--line);padding-top:6px;font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;letter-spacing:1.5px;color:#b5a6d6;white-space:nowrap;overflow:hidden}
+  .pb-cover.pb-cover-pos{background:linear-gradient(160deg,#33101f,#571c38);border-color:rgba(255,209,102,.3)}
   .pbook-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:11px}
   .pbook-lbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;min-width:120px;text-align:center}
   @media(prefers-reduced-motion:reduce){.pb-leaf{transition:none}}
@@ -1145,9 +1146,15 @@
       <div class="sectlabel" style="margin-top:20px">💜 just us</div>
       <div class="cards utah-grid" id="utahIntimate"></div>
 
-      <div class="sectlabel" style="margin-top:20px" id="utahPosLabel">📖 position passport · not yet done</div>
-      <div class="pos-note" id="utahPosDone"></div>
-      <div class="cards utah-grid" id="utahPositions"></div>
+      <div class="sectlabel" style="margin-top:20px" id="utahPosLabel">📖 the position passport</div>
+      <div class="pbook" id="posBookWrap">
+        <div class="pbook-stage" id="ppStage"><div class="pb-base"></div></div>
+        <div class="pbook-nav">
+          <button type="button" class="bz-arrow" id="ppPrev" onclick="ppFlip(-1)" title="previous page">‹</button>
+          <span class="pbook-lbl" id="ppLbl">cover</span>
+          <button type="button" class="bz-arrow" id="ppNext" onclick="ppFlip(1)" title="next page">›</button>
+        </div>
+      </div>
 
       <div class="kit-note" style="margin-top:14px" id="utahCount"></div>
       <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
@@ -3253,58 +3260,59 @@ function _utahGrid(id,cat,items){
       '</div>';
   }).join('');
 }
-var UTAH_POS_DONE=['missionary','cowgirl','lotus','doggy style'];   // already stamped, for reference only -- not toggleable
-var UTAH_POSITIONS=[
-  {t:'reverse cowgirl', r:true, d:'not yet. someday soon 😏'},
-  {t:'spooning', r:true, d:'not yet. someday soon 😏'},
-  {t:'standing', r:true, d:'not yet. someday soon 😏'},
-  {t:'wheelbarrow', r:true, d:'not yet. someday soon 😏'},
-  {t:'legs on shoulders', r:true, d:'not yet. someday soon 😏'},
-  {t:'table edge', r:true, d:'not yet. someday soon 😏'},
-  {t:'the bridge', r:true, d:'not yet. someday soon 😏'},
-  {t:'amazon', r:true, d:'not yet. someday soon 😏'},
-  {t:'scissors', r:true, d:'not yet. someday soon 😏'},
-  {t:'the pretzel', r:true, d:'not yet. someday soon 😏'}
-];
-var _posPending=null, _posPendingTimer=null;
-function _utahPosStamp(i){
-  var sel=_utahSel();
-  if(sel['pos'+i]){   // already stamped -- one tap to unstamp, no confirm needed
-    delete sel['pos'+i]; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
-    _posPending=null; renderUtah(); return;
-  }
-  if(_posPending===i){   // second tap on the same card within the window -- actually stamp it
-    clearTimeout(_posPendingTimer); _posPending=null;
-    sel['pos'+i]=1; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
-    if(window.buzz)buzz(28);
-    renderUtah();
-    if(window.burstConfetti){ var el=document.querySelector('.utah-card[data-pos-i="'+i+'"]')||document.getElementById('utahPositions'); burstConfetti(el,{emojis:['💜','✅','📖'],count:16}); }
-    return;
-  }
-  _posPending=i;   // first tap -- ask for real before it counts as a real stamp
-  if(window.buzz)buzz(10);
-  clearTimeout(_posPendingTimer);
-  _posPendingTimer=setTimeout(function(){ _posPending=null; renderUtah(); },4000);
-  renderUtah();
+/* ---------- passport book engine: flippable pages, shared by both books ----------
+   page 0 = cover, pages 1..N. Flip = a single 3D leaf (front face + textured back)
+   rotating on its left edge -- transform-only, so the animation stays on the compositor.
+   setTimeout cleanup (not transitionend) so a throttled tab can't strand a mid-flip leaf. */
+function _mkBook(cfg){   // cfg: {stage,lbl,prev,next,count(),page(i),onFlip()}
+  var B={idx:0,busy:false};
+  B.render=function(){ var b=document.querySelector('#'+cfg.stage+' .pb-base'); if(b)b.innerHTML=cfg.page(B.idx); B.nav(); };
+  B.nav=function(){
+    var l=document.getElementById(cfg.lbl), p=document.getElementById(cfg.prev), n=document.getElementById(cfg.next);
+    if(l)l.textContent = B.idx===0 ? 'cover · tap to open' : ('page '+B.idx+' of '+cfg.count());
+    if(p)p.disabled=B.idx<=0||B.busy;
+    if(n)n.disabled=B.idx>=cfg.count()||B.busy;
+  };
+  B.go=function(dir){
+    if(B.busy)return;
+    var to=B.idx+dir; if(to<0||to>cfg.count())return;
+    var stage=document.getElementById(cfg.stage); if(!stage)return;
+    B.busy=true; if(cfg.onFlip)cfg.onFlip();
+    var leaf=document.createElement('div'); leaf.className='pb-leaf';
+    var base=stage.querySelector('.pb-base');
+    if(dir>0){   // forward: leaf carries the OLD page and peels left, revealing the new page beneath
+      leaf.innerHTML='<div class="pb-face">'+cfg.page(B.idx)+'</div><div class="pb-face pb-back"></div>';
+      B.idx=to; if(base)base.innerHTML=cfg.page(B.idx);
+      stage.appendChild(leaf);
+      requestAnimationFrame(function(){requestAnimationFrame(function(){ leaf.style.transform='rotateY(-180deg)'; });});
+    } else {     // back: leaf carrying the PREVIOUS page sweeps in from the left, covering the current one
+      leaf.innerHTML='<div class="pb-face">'+cfg.page(to)+'</div><div class="pb-face pb-back"></div>';
+      leaf.style.transition='none'; leaf.style.transform='rotateY(-180deg)';
+      stage.appendChild(leaf);
+      requestAnimationFrame(function(){requestAnimationFrame(function(){ leaf.style.transition=''; leaf.style.transform='rotateY(0deg)'; });});
+    }
+    if(window.buzz)buzz(12);
+    B.nav();
+    setTimeout(function(){
+      if(dir<0){ B.idx=to; if(base)base.innerHTML=cfg.page(B.idx); }
+      if(leaf.parentNode)leaf.parentNode.removeChild(leaf);
+      B.busy=false; B.nav();
+    },700);
+  };
+  (function(){   // swipe to flip (horizontal only, so vertical page scroll stays untouched)
+    var s=document.getElementById(cfg.stage); if(!s||s._wired)return; s._wired=true;
+    var x0=null,y0=null;
+    s.addEventListener('touchstart',function(e){ var t=e.touches[0]; x0=t.clientX; y0=t.clientY; },{passive:true});
+    s.addEventListener('touchend',function(e){
+      if(x0==null)return; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0; x0=null;
+      if(Math.abs(dx)>48 && Math.abs(dx)>Math.abs(dy)*1.4) B.go(dx<0?1:-1);
+    },{passive:true});
+  })();
+  return B;
 }
-function _utahPosGrid(){
-  var g=document.getElementById('utahPositions'); if(!g)return;
-  var sel=_utahSel();
-  g.innerHTML=UTAH_POSITIONS.map(function(it,i){
-    var done=!!sel['pos'+i], pending=_posPending===i;
-    var sub = done ? 'stamped ✓' : (pending ? 'tap again if it actually happened 💜' : it.d);
-    return '<div class="card utah-card'+(done?' pos-done':'')+(pending?' pos-pending':'')+'" data-pos-i="'+i+'" onclick="_utahPosStamp('+i+')">'+
-      '<span class="pos-inkstamp">STAMPED</span>'+
-      '<div><div class="ttl">'+it.t+'</div><div class="desc'+(pending?' pos-ask':'')+'">'+sub+'</div></div>'+
-      '</div>';
-  }).join('');
-}
-/* ---------- utah nature passport book: flippable pages, real ink stamps ----------
-   page 0 = cover, pages 1..N = one verified nature spot each. Flip = a single 3D leaf
-   (front face + textured back) rotating on its left edge -- transform-only, so the
-   animation stays on the compositor. Stamps persist in wc_utah_stamps; the "maybe list"
-   pill reuses the same wc_utah_sel keys the old nature grid used, so prior picks survive. */
-var _pbIdx=0,_pbFlipping=false,_pbPend=null,_pbPendTimer=null;
+
+/* ---------- book 1: utah nature passport (GANESH AIR · UTAH EDITION) ---------- */
+var _pbPend=null,_pbPendTimer=null;
 function _pbStamps(){ try{return JSON.parse(localStorage.getItem('wc_utah_stamps')||'{}');}catch(e){return {};} }
 function _pbPageHTML(i){
   if(i===0){
@@ -3330,39 +3338,11 @@ function _pbPageHTML(i){
     '<div class="pb-mrz">P&lt;GANESHAIR&lt;&lt;SIDHYA&lt;&lt;NEAL&lt;&lt;'+it.t.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,10)+'&lt;&lt;&lt;&lt;&lt;&lt;</div>'+
     '</div>';
 }
-function _pbRenderBase(){ var b=document.querySelector('#pbStage .pb-base'); if(b)b.innerHTML=_pbPageHTML(_pbIdx); _pbNav(); }
-function _pbNav(){
-  var l=document.getElementById('pbLbl'), p=document.getElementById('pbPrev'), n=document.getElementById('pbNext');
-  if(l)l.textContent = _pbIdx===0 ? 'cover · tap to open' : ('page '+_pbIdx+' of '+UTAH_NATURE.length);
-  if(p)p.disabled=_pbIdx<=0||_pbFlipping;
-  if(n)n.disabled=_pbIdx>=UTAH_NATURE.length||_pbFlipping;
-}
-function pbFlip(dir){
-  if(_pbFlipping)return;
-  var to=_pbIdx+dir; if(to<0||to>UTAH_NATURE.length)return;
-  var stage=document.getElementById('pbStage'); if(!stage)return;
-  _pbFlipping=true; _pbPend=null; clearTimeout(_pbPendTimer);
-  var leaf=document.createElement('div'); leaf.className='pb-leaf';
-  var base=stage.querySelector('.pb-base');
-  if(dir>0){   // forward: leaf carries the OLD page and peels left, revealing the new page beneath
-    leaf.innerHTML='<div class="pb-face">'+_pbPageHTML(_pbIdx)+'</div><div class="pb-face pb-back"></div>';
-    _pbIdx=to; if(base)base.innerHTML=_pbPageHTML(_pbIdx);
-    stage.appendChild(leaf);
-    requestAnimationFrame(function(){requestAnimationFrame(function(){ leaf.style.transform='rotateY(-180deg)'; });});
-  } else {     // back: leaf carrying the PREVIOUS page sweeps in from the left, covering the current one
-    leaf.innerHTML='<div class="pb-face">'+_pbPageHTML(to)+'</div><div class="pb-face pb-back"></div>';
-    leaf.style.transition='none'; leaf.style.transform='rotateY(-180deg)';
-    stage.appendChild(leaf);
-    requestAnimationFrame(function(){requestAnimationFrame(function(){ leaf.style.transition=''; leaf.style.transform='rotateY(0deg)'; });});
-  }
-  if(window.buzz)buzz(12);
-  _pbNav();
-  setTimeout(function(){   // setTimeout, not transitionend: still fires if the tab throttles mid-flip
-    if(dir<0){ _pbIdx=to; if(base)base.innerHTML=_pbPageHTML(_pbIdx); }
-    if(leaf.parentNode)leaf.parentNode.removeChild(leaf);
-    _pbFlipping=false; _pbNav();
-  },700);
-}
+var NB=_mkBook({stage:'pbStage',lbl:'pbLbl',prev:'pbPrev',next:'pbNext',
+  count:function(){return UTAH_NATURE.length;}, page:_pbPageHTML,
+  onFlip:function(){ _pbPend=null; clearTimeout(_pbPendTimer); }});
+function pbFlip(dir){ NB.go(dir); }
+function _pbRenderBase(){ NB.render(); }
 function _pbStamp(i){
   var st=_pbStamps();
   if(st['n'+i]){ delete st['n'+i]; try{localStorage.setItem('wc_utah_stamps',JSON.stringify(st));}catch(e){} _pbPend=null; _pbRenderBase(); return; }
@@ -3384,29 +3364,90 @@ function _pbMaybe(i){
   try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
   _pbRenderBase(); _utahCount();
 }
-(function(){   // swipe to flip (horizontal only, so vertical page scroll stays untouched)
-  var s=document.getElementById('pbStage'); if(!s||s._wired)return; s._wired=true;
-  var x0=null,y0=null;
-  s.addEventListener('touchstart',function(e){ var t=e.touches[0]; x0=t.clientX; y0=t.clientY; },{passive:true});
-  s.addEventListener('touchend',function(e){
-    if(x0==null)return; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0; x0=null;
-    if(Math.abs(dx)>48 && Math.abs(dx)>Math.abs(dy)*1.4) pbFlip(dx<0?1:-1);
-  },{passive:true});
-})();
+
+/* ---------- book 2: the position passport (NEAL AIR · POSITION EDITION, R-only) ----------
+   pages 1-4 = the originals, permanently stamped. pages 5-14 = someday, two-tap to stamp.
+   someday stamps keep the same wc_utah_sel 'pos'+index keys the old grid used. */
+var PP_DONE=[
+  {t:'missionary', note:'wish we were in missionary, call that visionary 😏'},
+  {t:'cowgirl', note:'one of the originals 💜'},
+  {t:'lotus', note:'one of the originals 💜'},
+  {t:'doggy style', note:'one of the originals 💜'}
+];
+var UTAH_POSITIONS=[
+  {t:'reverse cowgirl'},{t:'spooning'},{t:'standing'},{t:'wheelbarrow'},{t:'legs on shoulders'},
+  {t:'table edge'},{t:'the bridge'},{t:'amazon'},{t:'scissors'},{t:'the pretzel'}
+];
+var _ppPend=null,_ppPendTimer=null;
+function _ppPageHTML(i){
+  var total=PP_DONE.length+UTAH_POSITIONS.length;
+  if(i===0){
+    return '<div class="pb-cover pb-cover-pos" onclick="ppFlip(1)">'+
+      '<div class="pb-crest">📖💜</div><h3>PASSPORT</h3>'+
+      '<div class="pb-sub">NEAL AIR · POSITION EDITION</div>'+
+      '<div class="pb-sub">SIDHYA 💜 NEAL · CLASSIFIED</div>'+
+      '<div class="pb-open">tap or swipe to open 😏</div></div>';
+  }
+  var pn=(i<10?'0':'')+i, pt=(total<10?'0':'')+total, mrz;
+  if(i<=PP_DONE.length){   // the originals: permanently stamped, not toggleable
+    var d=PP_DONE[i-1];
+    mrz=d.t.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,10);
+    return '<div class="pb-page">'+
+      '<div class="pb-head">NEAL AIR ✈ CLASSIFIED</div>'+
+      '<div class="pb-no">STAMPED VISA · PAGE '+pn+' / '+pt+'</div>'+
+      '<div class="pb-name">'+d.t+'</div>'+
+      '<div class="pb-desc">'+d.note+'</div>'+
+      '<div class="pb-stampzone stamped"><span class="pb-ink">STAMPED ✓<small>THE ORIGINALS 💜</small></span></div>'+
+      '<div class="pb-mrz">P&lt;NEALAIR&lt;&lt;SIDHYA&lt;&lt;NEAL&lt;&lt;'+mrz+'&lt;&lt;&lt;&lt;&lt;&lt;</div>'+
+      '</div>';
+  }
+  var j=i-1-PP_DONE.length, it=UTAH_POSITIONS[j], sel=_utahSel();
+  var stamped=!!sel['pos'+j], pending=_ppPend===j;
+  var zone = stamped ? '<span class="pb-ink">STAMPED ✓<small>UTAH · JUL 2026</small></span>'
+    : (pending ? 'tap again if it<br>actually happened 💜' : '🛂 tap to stamp<br>someday soon 😏');
+  mrz=it.t.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,10);
+  return '<div class="pb-page">'+
+    '<div class="pb-head">NEAL AIR ✈ CLASSIFIED</div>'+
+    '<div class="pb-no">PENDING VISA · PAGE '+pn+' / '+pt+'</div>'+
+    '<div class="pb-name">'+it.t+'</div>'+
+    '<div class="pb-desc">'+(stamped?'stamped ✓ no further comment 😏':'not yet. someday soon 😏')+'</div>'+
+    '<button type="button" class="pb-stampzone'+(stamped?' stamped':'')+(pending?' pending':'')+'" onclick="_ppStamp('+j+')">'+zone+'</button>'+
+    '<div class="pb-mrz">P&lt;NEALAIR&lt;&lt;SIDHYA&lt;&lt;NEAL&lt;&lt;'+mrz+'&lt;&lt;&lt;&lt;&lt;&lt;</div>'+
+    '</div>';
+}
+var PPB=_mkBook({stage:'ppStage',lbl:'ppLbl',prev:'ppPrev',next:'ppNext',
+  count:function(){return PP_DONE.length+UTAH_POSITIONS.length;}, page:_ppPageHTML,
+  onFlip:function(){ _ppPend=null; clearTimeout(_ppPendTimer); }});
+function ppFlip(dir){ PPB.go(dir); }
+function _ppStamp(j){
+  var sel=_utahSel();
+  if(sel['pos'+j]){ delete sel['pos'+j]; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){} _ppPend=null; PPB.render(); return; }
+  if(_ppPend===j){   // second tap within the window -- commit the real stamp
+    clearTimeout(_ppPendTimer); _ppPend=null;
+    sel['pos'+j]=1; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
+    if(window.buzz)buzz(28);
+    PPB.render();
+    if(window.burstConfetti)burstConfetti(document.getElementById('ppStage'),{emojis:['📖','💜','✅'],count:16});
+    return;
+  }
+  _ppPend=j; if(window.buzz)buzz(10);
+  clearTimeout(_ppPendTimer); _ppPendTimer=setTimeout(function(){ _ppPend=null; PPB.render(); },4000);
+  PPB.render();
+}
+
 function _utahCount(){
   var sel=_utahSel(), n=Object.keys(sel).filter(function(k){return sel[k];}).length;
   var c=document.getElementById('utahCount'); if(c)c.textContent = n ? (n+' thing'+(n===1?'':'s')+' on the maybe list 💜 tap to un-pick anytime') : 'nothing picked yet -- tap whatever sounds good, babu';
 }
 function renderUtah(){
-  _pbRenderBase();
+  NB.render();
   _utahGrid('utahLowkey','lowkey',UTAH_LOWKEY);
   _utahGrid('utahIntimate','intimate',UTAH_INTIMATE);
-  _utahPosGrid();
+  PPB.render();
   var pg=_spiceMode()==='pg';
-  var lbl=document.getElementById('utahPosLabel'), done=document.getElementById('utahPosDone'), posGrid=document.getElementById('utahPositions');
+  var lbl=document.getElementById('utahPosLabel'), wrap=document.getElementById('posBookWrap');
   if(lbl)lbl.style.display=pg?'none':'';
-  if(done){ done.style.display=pg?'none':''; done.textContent='already stamped: '+UTAH_POS_DONE.join(', ')+' ✓ -- everything below is still someday 😏'; }
-  if(posGrid)posGrid.style.display=pg?'none':'';
+  if(wrap)wrap.style.display=pg?'none':'';
   _utahCount();
 }
 renderBingo(); renderQDeck(); renderMissions(); renderKit(); renderDepartures(); renderQuiz(); renderUtah();
