@@ -32,7 +32,7 @@
   .lovenote{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400}
   .wrap{max-width:680px;margin:0 auto}
   .layout{display:block}
-  .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center}
+  .topbar{display:flex;align-items:center;gap:10px;color:#fff;margin-bottom:16px;justify-content:center;text-align:center;padding-right:58px}   /* reserves clear space so the fixed all-departures chip never overlaps the title text */
   .topbar .ball{font-size:22px;cursor:pointer}
   .topbar h1{font-family:'Courier Prime',ui-monospace,monospace;font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.97}
   .matchup{text-align:center;margin:0 0 16px}
@@ -790,6 +790,58 @@
     .ticket .tk-scan{font-size:16px}
     .ticket .tk-qr{width:130px;height:130px}
   }
+  /* ---------- all-departures menu: hamburger chip + Solari-style board of every date ----------
+     z-index 90 keeps the chip UNDER every full-screen takeover (movie/lightbox/modals 200+,
+     arrivals hall 220, vegas sign 230) so it's automatically hidden/unclickable during those --
+     no extra gating JS needed, just z-order. */
+  #datesChip{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:90;width:44px;height:44px;border-radius:12px;background:#241733;border:1px solid rgba(217,185,104,.55);box-shadow:0 6px 16px rgba(18,8,38,.35);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:0}
+  #datesChip .dc-bar{width:20px;height:2.5px;background:#d9b968;border-radius:1px;position:relative}
+  #datesChip .dc-bar::after{content:"";position:absolute;left:8px;top:0;width:2px;height:100%;background:#241733}
+  #datesChip .dc-bar.dc-flap{animation:dcFlap 7s infinite}
+  #datesChip .dc-badge{position:absolute;bottom:-4px;right:-4px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:#ffd166;color:#241733;font-family:'Courier Prime',ui-monospace,monospace;font-weight:800;font-size:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #241733}
+  @keyframes dcFlap{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.15)}}
+  #datesPanel{position:fixed;inset:0;z-index:235;display:none;background:rgba(10,6,22,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:calc(16px + env(safe-area-inset-top,0px)) 14px 20px;overflow-y:auto}
+  #datesPanel.on{display:block;animation:fade .2s ease}
+  .dp-board{max-width:440px;margin:0 auto;background:#120a26;border-radius:16px;border:1px solid rgba(217,185,104,.3);box-shadow:0 20px 50px rgba(0,0,0,.5);overflow:hidden}
+  .dp-head{padding:18px 18px 4px;text-align:center}
+  .dp-title{font-family:'Courier Prime',ui-monospace,monospace;font-weight:800;font-size:14px;letter-spacing:2.5px;color:#ffd166}
+  .dp-sub{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:15px;color:#cbb7f5;margin-top:3px}
+  .dp-close{position:absolute;top:12px;right:14px;background:none;border:none;color:#8a7ab0;font-size:22px;cursor:pointer;line-height:1;padding:4px}
+  .dp-cols{display:grid;grid-template-columns:1.15fr 1.5fr 1fr 1fr;gap:4px;padding:14px 16px 6px;font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;letter-spacing:1px;color:#7c6aa8}
+  .dp-rows{display:flex;flex-direction:column;gap:2px;padding:0 8px 12px}
+  .dp-row{display:grid;grid-template-columns:1.15fr 1.5fr 1fr 1fr;gap:4px;align-items:center;padding:10px 8px;border-radius:9px;background:rgba(255,255,255,.03);cursor:pointer;border-left:3px solid transparent;animation:dpIn .35s backwards}
+  .dp-row:active{background:rgba(255,255,255,.08)}
+  .dp-row.dp-hero{background:rgba(255,209,102,.08);border-left-color:#ffd166;padding:13px 8px}
+  .dp-flight{font-family:'Courier Prime',ui-monospace,monospace;font-weight:800;font-size:12px;color:#ffd166}
+  .dp-dest{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:13px;color:#fdf6ec;line-height:1.25}
+  .dp-here{display:block;font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;letter-spacing:.8px;color:#9ff2b6;margin-top:2px}
+  .dp-date{font-family:'Courier Prime',ui-monospace,monospace;font-size:10.5px;color:#b79bf0}
+  .dp-status{font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;font-weight:700;letter-spacing:.6px;padding:4px 7px;border-radius:20px;text-align:center;white-space:nowrap}
+  .dp-status.st-boarding,.dp-status.st-flight{background:rgba(255,209,102,.22);color:#ffd166;animation:dpBlink 1.6s infinite}
+  .dp-status.st-landed{background:rgba(159,242,182,.16);color:#9ff2b6}
+  .dp-status.st-ontime{background:rgba(167,139,250,.16);color:#cbb7f5}
+  .dp-empty{padding:10px 16px 16px;text-align:center;font-family:'Courier Prime',ui-monospace,monospace;font-size:10px;font-style:italic;color:#5a4a80;animation:dpFade 2.6s infinite}
+  @keyframes dpIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes dpBlink{0%,100%{opacity:1}50%{opacity:.45}}
+  @keyframes dpFade{0%,100%{opacity:.55}50%{opacity:1}}
+  @media(prefers-reduced-motion:reduce){.dc-flap,.dp-status.st-boarding,.dp-status.st-flight,.dp-empty,.dp-row{animation:none!important}}
+  /* the bellevue pocket boarding pass: reuses .arrivalpass/.ap-* styling, adds a stamp + notes */
+  #bellevuePass{position:fixed;inset:0;z-index:236;display:none;background:rgba(10,6,22,.78);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:20px}
+  #bellevuePass.on{display:flex;animation:fade .2s ease}
+  .bv-wrap{max-width:360px;width:100%;position:relative}
+  .bv-close{position:absolute;top:-40px;right:0;background:rgba(255,255,255,.14);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:17px;cursor:pointer}
+  .bv-foot{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:13px;color:var(--muted);text-align:center;padding:0 18px 14px}
+  .bv-strip{background:#fff;border:1px solid var(--line);border-top:none;border-radius:0 0 14px 14px;margin:-14px auto 12px;max-width:340px;padding:12px 16px 14px;text-align:center;box-shadow:0 8px 22px rgba(53,28,94,.12)}
+  .bv-strip-lbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:1.5px;color:var(--muted)}
+  .bv-strip-val{font-family:'Courier Prime',ui-monospace,monospace;font-weight:800;font-size:19px;color:var(--ink);margin-top:2px}
+  .bv-stampbtn{width:100%;margin-top:12px;background:var(--lav);color:#fff;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+  .bv-stampbtn:disabled{background:#e7ddf7;color:#9b8ab8;cursor:default}
+  .bv-inkstamp{width:100%;display:flex;align-items:center;justify-content:center;margin-top:12px}
+  .bv-inkstamp span{display:inline-block;border:3px solid #3f9e5c;border-radius:9px;color:#3f9e5c;font-family:'Courier Prime',ui-monospace,monospace;font-weight:800;font-size:13px;letter-spacing:1.5px;padding:8px 14px;text-align:center;line-height:1.5;transform:rotate(-7deg) scale(1);animation:bvThunk .4s cubic-bezier(.36,1.8,.4,1) backwards}
+  .bv-inkstamp span small{display:block;font-size:8.5px;letter-spacing:1px}
+  @keyframes bvThunk{0%{transform:rotate(-7deg) scale(2.4);opacity:0}70%{transform:rotate(-7deg) scale(.92);opacity:1}100%{transform:rotate(-7deg) scale(1)}}
+  .bv-notes{width:100%;margin-top:10px;border:1.5px solid var(--line);border-radius:11px;padding:10px 12px;font:inherit;font-size:14px;resize:none;font-family:'Courier Prime',ui-monospace,monospace}
+  .bv-notes-lbl{font-family:'Courier Prime',ui-monospace,monospace;font-size:9.5px;letter-spacing:1.2px;color:var(--muted);margin-top:12px;display:block}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -3670,6 +3722,96 @@ function hideVegas(){
   else setTimeout(hideVegas,5500);
 })();
 
+/* ---------- all departures: hamburger -> GANESH AIR board of every date ----------
+   only 2 flights exist today, so DATES lives inline; add a row here when a new date happens.
+   the hero row (worldcup) isn't time-gated -- it's always "NOW BOARDING" because it IS this
+   whole site (the metaphor is "you're on this flight", not a literal countdown). */
+function _dpStatus(key){
+  if(key==='bellevue'){
+    var now=new Date(), start=new Date(2026,6,4,17,0,0), end=new Date(2026,6,4,19,0,0);
+    if(now<start)return {cls:'st-ontime',label:'ON TIME'};
+    if(now<=end)return {cls:'st-flight',label:'IN FLIGHT'};
+    return {cls:'st-landed',label:'LANDED 💜'};
+  }
+  return {cls:'st-boarding',label:'NOW BOARDING'};
+}
+function renderDatesMenu(){
+  var rows=document.getElementById('dpRows'); if(!rows)return;
+  var DATES=[
+    {flight:'GA 0706', dest:'SEATTLE · WORLD CUP', dateStr:'JUL 6', hero:true, key:'worldcup'},
+    {flight:'GA 0704', dest:'BELLEVUE DOWNTOWN PARK', dateStr:'JUL 4', hero:false, key:'bellevue'}
+  ];
+  var badge=document.getElementById('dcBadge'); if(badge)badge.textContent=String(DATES.length);
+  rows.innerHTML=DATES.map(function(d,i){
+    var st=_dpStatus(d.key);
+    return '<div class="dp-row'+(d.hero?' dp-hero':'')+'" style="animation-delay:'+(i*70)+'ms" onclick="selectDate(\''+d.key+'\')">'+
+      '<span class="dp-flight">'+d.flight+'</span>'+
+      '<span class="dp-dest">'+d.dest+(d.hero?'<span class="dp-here">YOU ARE HERE ✈</span>':'')+'</span>'+
+      '<span class="dp-date">'+d.dateStr+'</span>'+
+      '<span class="dp-status '+st.cls+'">'+st.label+'</span>'+
+      '</div>';
+  }).join('');
+}
+function openDatesMenu(){ if(window.buzz)buzz(14); renderDatesMenu(); var p=document.getElementById('datesPanel'); if(p)p.classList.add('on'); }
+function closeDatesMenu(){ var p=document.getElementById('datesPanel'); if(p)p.classList.remove('on'); }
+function selectDate(key){
+  if(window.buzz)buzz(20);
+  closeDatesMenu();
+  if(key==='worldcup'){ if(window.toast)toast('you\'re already on this flight, babu 💜'); return; }
+  if(key==='bellevue'){ openBellevue(); return; }
+}
+renderDatesMenu();
+
+/* ---------- bellevue pocket boarding pass: july 4, 5-7pm, a small second date ---------- */
+var _bvTimer=null;
+function _pad2(n){return (n<10?'0':'')+n;}
+function openBellevue(){
+  var o=document.getElementById('bellevuePass'); if(!o)return;
+  var b=document.getElementById('bvBars'); if(b&&window.bpBarcode&&!b.querySelector('.bc-row'))b.innerHTML=window.bpBarcode(704,{h:24,color:'#241733',target:300});
+  var n=document.getElementById('bvNotes'); if(n){ try{n.value=localStorage.getItem('wc_bellevue_notes')||'';}catch(e){} }
+  _bvRenderStamp();
+  _bvTick();
+  clearInterval(_bvTimer); _bvTimer=setInterval(_bvTick,1000);   // only ticks while this overlay is open, not all day
+  o.classList.add('on');
+}
+function closeBellevue(){
+  var o=document.getElementById('bellevuePass'); if(o)o.classList.remove('on');
+  clearInterval(_bvTimer); _bvTimer=null;
+  _bvSaveNotes();
+}
+function _bvTick(){
+  var now=new Date(), start=new Date(2026,6,4,17,0,0), end=new Date(2026,6,4,19,0,0);
+  var head=document.getElementById('bvHeadStatus'), lbl=document.getElementById('bvStripLbl'), val=document.getElementById('bvStripVal');
+  if(now<start){
+    var ms=start-now, h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000);
+    if(head)head.textContent='ON TIME'; if(lbl)lbl.textContent='BOARDING IN';
+    if(val)val.textContent=(h>0?h+'H ':'')+_pad2(m)+':'+_pad2(s);
+  } else if(now<=end){
+    var ms2=now-start, h2=Math.floor(ms2/3600000), m2=Math.floor((ms2%3600000)/60000), s2=Math.floor((ms2%60000)/1000);
+    if(head)head.textContent='IN FLIGHT ✈'; if(lbl)lbl.textContent='TIME ALOFT';
+    if(val)val.textContent=_pad2(h2)+':'+_pad2(m2)+':'+_pad2(s2);
+  } else {
+    if(head)head.textContent='LANDED 💜'; if(lbl)lbl.textContent='STATUS'; if(val)val.textContent='LANDED 💜';
+    var already=false; try{already=localStorage.getItem('wc_bellevue_landed_celeb')==='1';}catch(e){}
+    if(!already){ try{localStorage.setItem('wc_bellevue_landed_celeb','1');}catch(e){} if(window.burstConfetti)burstConfetti(document.getElementById('bellevuePass'),{emojis:['🏞️','💜','✈'],count:20}); }
+    clearInterval(_bvTimer); _bvTimer=null;   // landed -- nothing left to count
+  }
+}
+function _bvRenderStamp(){
+  var z=document.getElementById('bvStampZone'); if(!z)return;
+  var stamped=false; try{stamped=localStorage.getItem('wc_bellevue_stamped')==='1';}catch(e){}
+  z.innerHTML = stamped
+    ? '<div class="bv-inkstamp"><span>STAMPED ✓<small>BELLEVUE · 04 JUL 2026</small></span></div>'
+    : '<button type="button" class="bv-stampbtn" onclick="_bvStamp()">🛂 stamp it</button>';
+}
+function _bvStamp(){
+  try{localStorage.setItem('wc_bellevue_stamped','1');}catch(e){}
+  if(window.buzz)buzz(28);
+  _bvRenderStamp();
+  if(window.burstConfetti)burstConfetti(document.getElementById('bvStampZone'),{emojis:['💜','✅','🏞️'],count:16});
+}
+function _bvSaveNotes(){ var n=document.getElementById('bvNotes'); if(n){ try{localStorage.setItem('wc_bellevue_notes',n.value);}catch(e){} } }
+
 function _utahCount(){
   var sel=_utahSel(), n=Object.keys(sel).filter(function(k){return sel[k];}).length;
   var c=document.getElementById('utahCount'); if(c)c.textContent = n ? (n+' thing'+(n===1?'':'s')+' on the maybe list 💜 tap to un-pick anytime') : 'nothing picked yet -- tap whatever sounds good, babu';
@@ -4308,6 +4450,54 @@ window.initTimeline=function(){};
   </div>
 </div>
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
+
+<!-- ALL DEPARTURES: hamburger chip (styled as a mini split-flap board) opens a GANESH AIR
+     departures screen listing every date; z-index sits under every takeover so it auto-hides -->
+<button id="datesChip" type="button" onclick="openDatesMenu()" aria-label="all our dates" title="all our dates">
+  <span class="dc-bar"></span><span class="dc-bar dc-flap"></span><span class="dc-bar"></span>
+  <span class="dc-badge" id="dcBadge">2</span>
+</button>
+<div id="datesPanel" role="dialog" aria-label="all departures" onclick="if(event.target===this)closeDatesMenu()">
+  <div class="dp-board" style="position:relative">
+    <button class="dp-close" type="button" onclick="closeDatesMenu()">✕</button>
+    <div class="dp-head">
+      <div class="dp-title">GANESH AIR ✈ ALL DEPARTURES</div>
+      <div class="dp-sub">every flight we've ever boarded together</div>
+    </div>
+    <div class="dp-cols"><span>FLIGHT</span><span>DESTINATION</span><span>DATE</span><span>STATUS</span></div>
+    <div class="dp-rows" id="dpRows"></div>
+    <div class="dp-empty">···· more flights being scheduled ····</div>
+  </div>
+</div>
+
+<!-- the bellevue pocket boarding pass: a small second date, today, july 4 5-7pm -->
+<div id="bellevuePass" role="dialog" aria-label="bellevue downtown park boarding pass" onclick="if(event.target===this)closeBellevue()">
+  <div class="bv-wrap">
+    <button class="bv-close" type="button" onclick="closeBellevue()">✕</button>
+    <div class="arrivalpass">
+      <div class="ap-head"><span class="ap-air"><span class="ap-mark">🏞️</span>GANESH AIR</span><span class="ap-status" id="bvHeadStatus">ON TIME</span></div>
+      <div class="ap-route">
+        <div class="ap-port"><b>SEA</b><span>dep 5:00 PM</span></div>
+        <div class="ap-plane"><i>✈</i></div>
+        <div class="ap-port"><b>BLV</b><span>arr 7:00 PM</span></div>
+      </div>
+      <div class="ap-meta">
+        <div><span>SEAT</span><b>1A + 1B</b></div>
+        <div><span>FLIGHT</span><b>GA 0704</b></div>
+        <div><span>GATE</span><b>GRASS</b></div>
+      </div>
+      <div class="ap-bars" id="bvBars"></div>
+    </div>
+    <div class="bv-strip">
+      <div class="bv-strip-lbl" id="bvStripLbl">BOARDING IN</div>
+      <div class="bv-strip-val" id="bvStripVal">--:--</div>
+    </div>
+    <div class="bv-foot">a short-haul flight. still first class ✈💜</div>
+    <div id="bvStampZone"></div>
+    <label class="bv-notes-lbl">flight notes</label>
+    <textarea class="bv-notes" id="bvNotes" rows="2" placeholder="how'd it go, babu?" onblur="_bvSaveNotes()"></textarea>
+  </div>
+</div>
 
 <!-- VEGAS-STYLE NEON ENTRY SIGN: shows on every load, tap anywhere (or wait) to enter -->
 <div id="vegasSign" role="dialog" aria-label="welcome to fabulous seattle sidhya" onclick="hideVegas()">
