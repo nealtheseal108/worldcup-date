@@ -1178,7 +1178,7 @@
         <button class="btn lav2btn" type="button" onclick="renderPhotos(true)">↻ refresh</button>
       </div>
       <div class="album-grid" id="albumGrid"><div class="album-empty">loading our photos…</div></div>
-      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoPicked(event)">
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="onPhotoPicked(event)">
 
       <div class="sectlabel" style="margin-top:20px">🏷️ photo missions<span class="album-count" id="missionCount"></span></div>
       <div class="mission-grid" id="missionGrid"></div>
@@ -3059,7 +3059,34 @@ function _esc7(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){retu
 function openTracker(){ go(7); renderPhotos(true); updateTracker(); if(!window._trkTimer){ window._trkTimer=setInterval(function(){ var s=document.getElementById('step7'); if(s&&s.classList.contains('active')){ updateTracker(); } },30000); } }
 function pickPhoto(){ var i=document.getElementById('photoInput'); if(i)i.click(); }
 function _downscaleImg(file,maxDim,q){ return new Promise(function(res){ try{ var img=new Image(),url=URL.createObjectURL(file); img.onload=function(){ var w=img.width||1,h=img.height||1,sc=Math.min(1,maxDim/Math.max(w,h)); var cv=document.createElement('canvas'); cv.width=Math.max(1,Math.round(w*sc)); cv.height=Math.max(1,Math.round(h*sc)); try{cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);}catch(e){} URL.revokeObjectURL(url); cv.toBlob(function(b){res(b&&b.size?b:file);},'image/jpeg',q||0.85); }; img.onerror=function(){URL.revokeObjectURL(url);res(file);}; img.src=url; }catch(e){res(file);} }); }
-function onPhotoPicked(ev){ var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value=''; if(!f)return; hint('adding your photo… 📸'); _downscaleImg(f,1400,0.85).then(function(blob){ var rec={sec:'photo',blob:blob,t:Date.now(),who:_whoTag()}; if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).then(function(r){ hint(r?'added to our album 📸💜':'saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }).catch(function(){ hint('saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }); } else { diaryAdd(rec).then(function(){ hint('added to our album 📸💜'); renderPhotos(true); }).catch(function(){ hint('could not add the photo 😭'); }); } }); }
+/* shared multi-photo importer: 1..N files in one pick, uploaded sequentially (not all at once --
+   a cold Render instance waking up shouldn't get hammered with a burst of parallel requests).
+   Each photo is tagged with ITS OWN real timestamp (file.lastModified) instead of "now", so a
+   batch of already-taken photos imported later still sorts in the order they were actually
+   taken -- essential for backfilling a whole date's worth of camera-roll photos at once. */
+function _importPhotos(files,sec,onProgress,onDone){
+  var list=Array.prototype.slice.call(files||[]).filter(function(f){return f&&f.type&&f.type.indexOf('image/')===0;});
+  var i=0,ok=0;
+  function next(){
+    if(i>=list.length){ onDone(ok,list.length); return; }
+    var f=list[i++];
+    onProgress(i,list.length);
+    _downscaleImg(f,1400,0.85).then(function(blob){
+      var rec={sec:sec,blob:blob,t:(f.lastModified||Date.now()),who:_whoTag()};
+      if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).then(function(r){ if(r)ok++; next(); }).catch(function(){ next(); }); }
+      else { diaryAdd(rec).then(function(){ ok++; next(); }).catch(function(){ next(); }); }
+    }).catch(function(){ next(); });
+  }
+  next();
+}
+function onPhotoPicked(ev){
+  var files=ev.target&&ev.target.files; if(ev.target)ev.target.value=''; if(!files||!files.length)return;
+  var n=files.length; hint(n>1?('adding '+n+' photos… 📸'):'adding your photo… 📸');
+  _importPhotos(files,'photo',function(i,total){ if(total>1)hint('adding photo '+i+' of '+total+'… 📸'); },function(ok,total){
+    hint(ok<total ? ('added '+ok+' of '+total+' -- some saved on your phone only (cloud hiccup) 💜') : (total>1?('added all '+total+' photos to our album 📸💜'):'added to our album 📸💜'));
+    renderPhotos(true);
+  });
+}
 var _albumUrls=[], _albumBusy=false;
 function renderPhotos(force){ var grid=document.getElementById('albumGrid'); if(!grid)return; if(_albumBusy&&!force)return; _albumBusy=true; gatherPhotos().then(function(photos){ _albumBusy=false; _albumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _albumUrls=[]; var cnt=document.getElementById('albumCount'); if(cnt)cnt.textContent=photos.length?('· '+photos.length+' photo'+(photos.length>1?'s':'')):''; if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet, tap ➕ to add the first one 📸💜<br>every pic you add shows up here for both of us</div>'; return; } grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _albumUrls.push(u); var who=_whoLabel(p.who); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="our date">'+(who?'<span class="album-who">'+who+'</span>':'')+'</button>'; }).join(''); }).catch(function(){ _albumBusy=false; }); }
 function openLightbox(u){ var o=document.getElementById('lightbox'),i=document.getElementById('lightboxImg'); if(o&&i){ i.src=u; o.style.display='flex'; } }
@@ -3888,16 +3915,11 @@ function openBellevue(){
    date's album (sec='photo') and out of that date's movie clip gatherer (_isPhotoSec above) */
 function pickBellevuePhoto(){ var i=document.getElementById('bvPhotoInput'); if(i)i.click(); }
 function onBellevuePhotoPicked(ev){
-  var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value=''; if(!f)return;
-  if(window.toast)toast('adding your photo… 📸');
-  _downscaleImg(f,1400,0.85).then(function(blob){
-    var rec={sec:'bv-photo',blob:blob,t:Date.now(),who:_whoTag()};
-    if(cloudOn()){
-      diaryAdd(rec).catch(function(){});
-      cloudUpload(rec).then(function(r){ if(window.toast)toast(r?'added to the bellevue album 📸💜':'saved on your phone (cloud hiccup) 💜'); renderBellevueAlbum(true); }).catch(function(){ if(window.toast)toast('saved on your phone (cloud hiccup) 💜'); renderBellevueAlbum(true); });
-    } else {
-      diaryAdd(rec).then(function(){ if(window.toast)toast('added to the bellevue album 📸💜'); renderBellevueAlbum(true); }).catch(function(){ if(window.toast)toast('could not add the photo 😭'); });
-    }
+  var files=ev.target&&ev.target.files; if(ev.target)ev.target.value=''; if(!files||!files.length)return;
+  var n=files.length; if(window.toast)toast(n>1?('adding '+n+' photos… 📸'):'adding your photo… 📸');
+  _importPhotos(files,'bv-photo',function(i,total){ if(total>1&&window.toast)toast('adding photo '+i+' of '+total+'… 📸'); },function(ok,total){
+    if(window.toast)toast(ok<total ? ('added '+ok+' of '+total+' -- some saved on your phone only (cloud hiccup) 💜') : (total>1?('added all '+total+' photos to the bellevue album 📸💜'):'added to the bellevue album 📸💜'));
+    renderBellevueAlbum(true);
   });
 }
 var _bvAlbumUrls=[], _bvAlbumBusy=false;
@@ -4661,7 +4683,7 @@ window.initTimeline=function(){};
     <label class="bv-notes-lbl">📸 our album<span class="album-count" id="bvAlbumCount"></span></label>
     <div class="album-add-row"><button class="btn primary" type="button" onclick="pickBellevuePhoto()">➕ add a photo</button></div>
     <div class="album-grid" id="bvAlbumGrid"><div class="album-empty">loading our photos…</div></div>
-    <input type="file" id="bvPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="onBellevuePhotoPicked(event)">
+    <input type="file" id="bvPhotoInput" accept="image/*" multiple style="display:none" onchange="onBellevuePhotoPicked(event)">
   </div>
 </div>
 
