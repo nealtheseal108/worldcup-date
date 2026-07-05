@@ -484,7 +484,7 @@
   .album-add-row{display:flex;gap:10px;margin:4px 0 12px}
   .album-add-row .btn{flex:1}
   .album-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-  .album-cell{padding:0;border:none;background:#efe7fb;border-radius:12px;overflow:hidden;aspect-ratio:1;cursor:pointer;box-shadow:0 3px 10px rgba(53,28,94,.12)}
+  .album-cell{position:relative;padding:0;border:none;background:#efe7fb;border-radius:12px;overflow:hidden;aspect-ratio:1;cursor:pointer;box-shadow:0 3px 10px rgba(53,28,94,.12)}
   .album-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
   .album-cell:active img{transform:scale(.96)}
   .album-empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:28px 12px;background:#f6f1ff;border:1px dashed var(--line);border-radius:12px;line-height:1.5}
@@ -804,6 +804,12 @@
      z-index 90 keeps the chip UNDER every full-screen takeover (movie/lightbox/modals 200+,
      arrivals hall 220, vegas sign 230) so it's automatically hidden/unclickable during those --
      no extra gating JS needed, just z-order. */
+  /* lightweight identity: a badge chip (top-left, mirrors the dates chip on the right) that
+     opens a "just type your name" gate. nealp108/sidhya6 resolve to the two real identities;
+     anything else is a guest. no password -- this whole site's security model is already
+     "public key + unguessable URL", so this is attribution, not authentication. */
+  #idBadge{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:12px;z-index:90;display:none;align-items:center;gap:5px;height:44px;padding:0 13px;border-radius:22px;background:#241733;border:1px solid rgba(217,185,104,.4);box-shadow:0 6px 16px rgba(18,8,38,.35);color:#fdf6ec;font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;font-weight:700;cursor:pointer}
+  .album-who{position:absolute;left:4px;bottom:4px;background:rgba(20,10,35,.72);color:#fdf6ec;font-size:9px;font-weight:700;padding:2.5px 6px;border-radius:8px;font-family:'Courier Prime',ui-monospace,monospace;letter-spacing:.3px;pointer-events:none;max-width:calc(100% - 8px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #datesChip{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:90;width:44px;height:44px;border-radius:12px;background:#241733;border:1px solid rgba(217,185,104,.55);box-shadow:0 6px 16px rgba(18,8,38,.35);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:0}
   #datesChip .dc-bar{width:20px;height:2.5px;background:#d9b968;border-radius:1px;position:relative}
   #datesChip .dc-bar::after{content:"";position:absolute;left:8px;top:0;width:2px;height:100%;background:#241733}
@@ -2877,13 +2883,50 @@ function showRecWait(){
   _recModalAt=Date.now(); m.style.display='flex';
 }
 function closeRecWait(){var m=document.getElementById('recWaitModal');if(m)m.style.display='none';if(recWaitTimer){clearInterval(recWaitTimer);recWaitTimer=null;}}
+/* ---------- lightweight identity: no passwords, just a username ----------
+   nealp108 -> neal, sidhya6 -> sidhya, anything else -> a guest (their typed name kept as
+   a label). purely for photo/clip attribution -- this site's whole security model is
+   already "public key + unguessable URL", so this is not real authentication. */
+function _myIdentity(){ try{var s=JSON.parse(localStorage.getItem('wc_identity')||'null'); if(s&&s.role)return s;}catch(e){} return null; }
+function _setIdentity(id){ try{localStorage.setItem('wc_identity',JSON.stringify(id));}catch(e){} }
+function _resolveUsername(raw){
+  var u=(raw||'').trim(), key=u.toLowerCase();
+  if(key==='nealp108')return {role:'neal',name:'Neal'};
+  if(key==='sidhya6')return {role:'sidhya',name:'Sidhya'};
+  return {role:'guest',name:u.slice(0,24)||'a guest'};
+}
+function _whoTag(){ var id=_myIdentity(); if(!id)return ''; return id.role==='guest' ? 'guest:'+id.name : id.role; }
+function _whoLabel(who){
+  if(!who)return '';
+  if(who==='neal')return 'Neal'; if(who==='sidhya')return 'Sidhya';
+  if(who.indexOf('guest:')===0)return who.slice(6)||'a guest';
+  return '';
+}
+function openIdentityGate(){ var i=document.getElementById('idInput'); if(i)i.value=''; var m=document.getElementById('identityModal'); if(m)m.style.display='flex'; setTimeout(function(){if(i)i.focus();},60); }
+function closeIdentityGate(){ var m=document.getElementById('identityModal'); if(m)m.style.display='none'; }
+function _identitySkip(){ if(!_myIdentity())_setIdentity({role:'guest',name:'a guest'}); closeIdentityGate(); _renderIdentityBadge(); }
+function confirmIdentity(){
+  var i=document.getElementById('idInput'), id=_resolveUsername(i?i.value:'');
+  _setIdentity(id); closeIdentityGate(); _renderIdentityBadge();
+  if(window.buzz)buzz(18);
+  if(window.toast)toast(id.role==='guest' ? ('hey '+id.name+' 👋') : ('welcome back, '+id.name+' 💜'));
+}
+function _renderIdentityBadge(){
+  var b=document.getElementById('idBadge'); if(!b)return;
+  var id=_myIdentity();
+  if(!id){ b.style.display='none'; return; }
+  b.style.display='flex';
+  b.textContent = id.role==='neal' ? '💜 Neal' : id.role==='sidhya' ? '💜 Sidhya' : '👋 '+id.name;
+}
+_renderIdentityBadge();
+
 /* ---------- cloud diary sync: a shared backend so both phones see the same clips ---------- */
 var CLOUD={url:'https://worldcup-diary.onrender.com', key:'wcd_d1ary_Kq7Fz9mR2pX8sV4nL6tB3'};   // Render cloud-diary backend
 function cloudOn(){return !!(CLOUD.url&&CLOUD.url.indexOf('http')===0);}
 function cloudHeaders(){return {'X-Diary-Key':CLOUD.key};}
 function cloudClipUrl(id){return CLOUD.url+'/api/clip/'+id+'?key='+encodeURIComponent(CLOUD.key);}
 function cloudList(){return fetch(CLOUD.url+'/api/clips',{headers:cloudHeaders()}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];});}
-function cloudUpload(rec){var fd=new FormData();fd.append('video',rec.blob,'clip.webm');fd.append('sec',rec.sec);fd.append('t',String(rec.t));if(rec.lat!=null)fd.append('lat',String(rec.lat));if(rec.lng!=null)fd.append('lng',String(rec.lng));return fetch(CLOUD.url+'/api/clip',{method:'POST',headers:cloudHeaders(),body:fd}).then(function(r){return r.ok?r.json():null;});}
+function cloudUpload(rec){var fd=new FormData();fd.append('video',rec.blob,'clip.webm');fd.append('sec',rec.sec);fd.append('t',String(rec.t));fd.append('who',rec.who||_whoTag());if(rec.lat!=null)fd.append('lat',String(rec.lat));if(rec.lng!=null)fd.append('lng',String(rec.lng));return fetch(CLOUD.url+'/api/clip',{method:'POST',headers:cloudHeaders(),body:fd}).then(function(r){return r.ok?r.json():null;});}
 function cloudDelete(id,sec){return fetch(CLOUD.url+'/api/clip/'+id,{method:'DELETE',headers:cloudHeaders()}).then(function(){renderDiary(sec);}).catch(function(){hint('could not delete from the cloud 💜');});}
 /* time capsule: pull EVERY clip + photo out of the cloud diary onto this device, one download per
    memory. The cloud db is temporary (free-tier Postgres); this is how the day survives it. */
@@ -2965,7 +3008,7 @@ function gatherPhotos(){   // PHOTOS for the album (shared via the same cloud, s
       var ph=(list||[]).filter(function(c){return c.sec==='photo';});
       if(!ph.length) return loc();
       ph.sort(function(a,b){return (a.t||0)-(b.t||0);});
-      return Promise.all(ph.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {id:c.id,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:loc();});
+      return Promise.all(ph.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {id:c.id,t:c.t,blob:b,who:c.who};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:loc();});
     }).catch(function(){return loc();});
   }
   return loc();
@@ -2977,9 +3020,9 @@ function _esc7(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){retu
 function openTracker(){ go(7); renderPhotos(true); updateTracker(); if(!window._trkTimer){ window._trkTimer=setInterval(function(){ var s=document.getElementById('step7'); if(s&&s.classList.contains('active')){ updateTracker(); } },30000); } }
 function pickPhoto(){ var i=document.getElementById('photoInput'); if(i)i.click(); }
 function _downscaleImg(file,maxDim,q){ return new Promise(function(res){ try{ var img=new Image(),url=URL.createObjectURL(file); img.onload=function(){ var w=img.width||1,h=img.height||1,sc=Math.min(1,maxDim/Math.max(w,h)); var cv=document.createElement('canvas'); cv.width=Math.max(1,Math.round(w*sc)); cv.height=Math.max(1,Math.round(h*sc)); try{cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);}catch(e){} URL.revokeObjectURL(url); cv.toBlob(function(b){res(b&&b.size?b:file);},'image/jpeg',q||0.85); }; img.onerror=function(){URL.revokeObjectURL(url);res(file);}; img.src=url; }catch(e){res(file);} }); }
-function onPhotoPicked(ev){ var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value=''; if(!f)return; hint('adding your photo… 📸'); _downscaleImg(f,1400,0.85).then(function(blob){ var rec={sec:'photo',blob:blob,t:Date.now()}; if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).then(function(r){ hint(r?'added to our album 📸💜':'saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }).catch(function(){ hint('saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }); } else { diaryAdd(rec).then(function(){ hint('added to our album 📸💜'); renderPhotos(true); }).catch(function(){ hint('could not add the photo 😭'); }); } }); }
+function onPhotoPicked(ev){ var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value=''; if(!f)return; hint('adding your photo… 📸'); _downscaleImg(f,1400,0.85).then(function(blob){ var rec={sec:'photo',blob:blob,t:Date.now(),who:_whoTag()}; if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).then(function(r){ hint(r?'added to our album 📸💜':'saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }).catch(function(){ hint('saved on your phone (cloud hiccup) 💜'); renderPhotos(true); }); } else { diaryAdd(rec).then(function(){ hint('added to our album 📸💜'); renderPhotos(true); }).catch(function(){ hint('could not add the photo 😭'); }); } }); }
 var _albumUrls=[], _albumBusy=false;
-function renderPhotos(force){ var grid=document.getElementById('albumGrid'); if(!grid)return; if(_albumBusy&&!force)return; _albumBusy=true; gatherPhotos().then(function(photos){ _albumBusy=false; _albumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _albumUrls=[]; var cnt=document.getElementById('albumCount'); if(cnt)cnt.textContent=photos.length?('· '+photos.length+' photo'+(photos.length>1?'s':'')):''; if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet, tap ➕ to add the first one 📸💜<br>every pic you add shows up here for both of us</div>'; return; } grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _albumUrls.push(u); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="our date"></button>'; }).join(''); }).catch(function(){ _albumBusy=false; }); }
+function renderPhotos(force){ var grid=document.getElementById('albumGrid'); if(!grid)return; if(_albumBusy&&!force)return; _albumBusy=true; gatherPhotos().then(function(photos){ _albumBusy=false; _albumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _albumUrls=[]; var cnt=document.getElementById('albumCount'); if(cnt)cnt.textContent=photos.length?('· '+photos.length+' photo'+(photos.length>1?'s':'')):''; if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet, tap ➕ to add the first one 📸💜<br>every pic you add shows up here for both of us</div>'; return; } grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _albumUrls.push(u); var who=_whoLabel(p.who); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="our date">'+(who?'<span class="album-who">'+who+'</span>':'')+'</button>'; }).join(''); }).catch(function(){ _albumBusy=false; }); }
 function openLightbox(u){ var o=document.getElementById('lightbox'),i=document.getElementById('lightboxImg'); if(o&&i){ i.src=u; o.style.display='flex'; } }
 function closeLightbox(){ var o=document.getElementById('lightbox'); if(o)o.style.display='none'; }
 function _laMins(){ try{ var s=new Date().toLocaleTimeString('en-US',{timeZone:'America/Los_Angeles',hour12:false,hour:'2-digit',minute:'2-digit'}); var m=s.match(/(\d+):(\d+)/); return m?(+m[1]*60 + +m[2]):null; }catch(e){ return new Date().getHours()*60+new Date().getMinutes(); } }
@@ -3108,7 +3151,7 @@ function onMissionPicked(ev){
   var id=_missionPick; _missionPick=null; if(!f||!id)return;
   hint('stamping your mission… 🏷️');
   _downscaleImg(f,1400,0.85).then(function(big){
-    var rec={sec:'photo',blob:big,t:Date.now()};
+    var rec={sec:'photo',blob:big,t:Date.now(),who:_whoTag()};
     if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).catch(function(){}); } else { diaryAdd(rec).catch(function(){}); }   // missions feed the shared album (+ local backup)
     return _downscaleImg(f,240,0.6);
   }).then(function(small){
@@ -3739,12 +3782,14 @@ function _flogRender(){
 function hideVegas(){
   try{sessionStorage.setItem('wc_vegas_seen','1');}catch(e){}
   var v=document.getElementById('vegasSign'); if(v){ v.classList.add('gone'); setTimeout(function(){ if(v.parentNode)v.parentNode.removeChild(v); },650); }
+  _maybeAskIdentity();
 }
 (function(){
   var seen=false; try{seen=sessionStorage.getItem('wc_vegas_seen')==='1';}catch(e){}
-  if(seen){ var v=document.getElementById('vegasSign'); if(v&&v.parentNode)v.parentNode.removeChild(v); }
+  if(seen){ var v=document.getElementById('vegasSign'); if(v&&v.parentNode)v.parentNode.removeChild(v); _maybeAskIdentity(); }
   else setTimeout(hideVegas,5500);
 })();
+function _maybeAskIdentity(){ if(_myIdentity())return; setTimeout(function(){ if(!_myIdentity())openIdentityGate(); },700); }   // a beat after the sign clears, not stacked on top of it
 
 /* ---------- all departures: hamburger -> GANESH AIR board of every date ----------
    only 2 flights exist today, so DATES lives inline; add a row here when a new date happens.
@@ -3807,7 +3852,7 @@ function onBellevuePhotoPicked(ev){
   var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value=''; if(!f)return;
   if(window.toast)toast('adding your photo… 📸');
   _downscaleImg(f,1400,0.85).then(function(blob){
-    var rec={sec:'bv-photo',blob:blob,t:Date.now()};
+    var rec={sec:'bv-photo',blob:blob,t:Date.now(),who:_whoTag()};
     if(cloudOn()){
       diaryAdd(rec).catch(function(){});
       cloudUpload(rec).then(function(r){ if(window.toast)toast(r?'added to the bellevue album 📸💜':'saved on your phone (cloud hiccup) 💜'); renderBellevueAlbum(true); }).catch(function(){ if(window.toast)toast('saved on your phone (cloud hiccup) 💜'); renderBellevueAlbum(true); });
@@ -3824,7 +3869,7 @@ function gatherBellevuePhotos(){
       var ph=(list||[]).filter(function(c){return c.sec==='bv-photo';});
       if(!ph.length) return loc();
       ph.sort(function(a,b){return (a.t||0)-(b.t||0);});
-      return Promise.all(ph.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {id:c.id,t:c.t,blob:b};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:loc();});
+      return Promise.all(ph.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {id:c.id,t:c.t,blob:b,who:c.who};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:loc();});
     }).catch(function(){return loc();});
   }
   return loc();
@@ -3837,7 +3882,7 @@ function renderBellevueAlbum(force){
     _bvAlbumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _bvAlbumUrls=[];
     var cnt=document.getElementById('bvAlbumCount'); if(cnt)cnt.textContent=photos.length?('· '+photos.length+' photo'+(photos.length>1?'s':'')):'';
     if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet, tap ➕ to add the first one 📸💜</div>'; return; }
-    grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _bvAlbumUrls.push(u); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="bellevue park date"></button>'; }).join('');
+    grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _bvAlbumUrls.push(u); var who=_whoLabel(p.who); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="bellevue park date">'+(who?'<span class="album-who">'+who+'</span>':'')+'</button>'; }).join('');
   }).catch(function(){ _bvAlbumBusy=false; });
 }
 function closeBellevue(){
@@ -4514,6 +4559,20 @@ window.initTimeline=function(){};
   </div>
 </div>
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
+
+<!-- lightweight identity chip: tap to sign in / switch. hidden until an identity is set. -->
+<button id="idBadge" type="button" onclick="openIdentityGate()" aria-label="who's using this" title="who's this?"></button>
+<div id="identityModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeIdentityGate()">
+  <div class="modal-card">
+    <div class="modal-title">👋 who's this?</div>
+    <div class="modal-sub">just your username, no password needed 💜</div>
+    <input id="idInput" class="modal-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="your username" onkeydown="if(event.key==='Enter')confirmIdentity()">
+    <div class="modal-row">
+      <button class="btn ghost" onclick="_identitySkip()">just visiting</button>
+      <button class="btn primary" onclick="confirmIdentity()">let's go 💜</button>
+    </div>
+  </div>
+</div>
 
 <!-- ALL DEPARTURES: hamburger chip (styled as a mini split-flap board) opens a GANESH AIR
      departures screen listing every date; z-index sits under every takeover so it auto-hides -->

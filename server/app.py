@@ -2,10 +2,14 @@
 
 Endpoints (all gated by a shared key via the X-Diary-Key header or ?key=):
   GET    /api/health         -> {ok, hasDb}
-  GET    /api/clips          -> [{id, sec, lat, lng, t, mime, created}]   (metadata only)
-  POST   /api/clip           -> {id}      multipart: video=<blob>, sec, lat, lng, t
+  GET    /api/clips          -> [{id, sec, lat, lng, t, mime, created, who}]   (metadata only)
+  POST   /api/clip           -> {id}      multipart: video=<blob>, sec, lat, lng, t, who
   GET    /api/clip/<id>      -> the video bytes
   DELETE /api/clip/<id>      -> {ok}
+
+`who` is a lightweight attribution string ("neal" / "sidhya" / "guest:<name>"), resolved
+client-side from a username (no passwords -- this is a private gift site, not a real
+account system). The backend just stores and echoes it back for display.
 """
 import os, time, uuid
 from flask import Flask, request, jsonify, abort, Response
@@ -33,6 +37,7 @@ def init_db():
             id TEXT PRIMARY KEY, sec TEXT, lat DOUBLE PRECISION, lng DOUBLE PRECISION,
             t BIGINT, mime TEXT, created BIGINT, data BYTEA)"""
     )
+    cur.execute("ALTER TABLE clips ADD COLUMN IF NOT EXISTS who TEXT")  # older rows just come back who=NULL
     c.commit()
     cur.close()
     c.close()
@@ -65,10 +70,10 @@ def health():
 def list_clips():
     check_key()
     c = conn(); cur = c.cursor()
-    cur.execute("SELECT id,sec,lat,lng,t,mime,created FROM clips ORDER BY created ASC")
+    cur.execute("SELECT id,sec,lat,lng,t,mime,created,who FROM clips ORDER BY created ASC")
     rows = cur.fetchall(); cur.close(); c.close()
     return jsonify([
-        dict(id=r[0], sec=r[1], lat=r[2], lng=r[3], t=r[4], mime=r[5], created=r[6])
+        dict(id=r[0], sec=r[1], lat=r[2], lng=r[3], t=r[4], mime=r[5], created=r[6], who=r[7])
         for r in rows
     ])
 
@@ -85,13 +90,14 @@ def add_clip():
     cid = uuid.uuid4().hex
     sec = request.form.get("sec", "s0")
     lat = request.form.get("lat"); lng = request.form.get("lng"); t = request.form.get("t")
+    who = (request.form.get("who") or "")[:60]  # "neal" / "sidhya" / "guest:<name>", resolved client-side
     mime = f.mimetype or "video/webm"
     now = int(time.time() * 1000)
     c = conn(); cur = c.cursor()
     cur.execute(
-        "INSERT INTO clips(id,sec,lat,lng,t,mime,created,data) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)",
+        "INSERT INTO clips(id,sec,lat,lng,t,mime,created,data,who) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)",
         (cid, sec, float(lat) if lat else None, float(lng) if lng else None,
-         int(t) if t else now, mime, now, psycopg2.Binary(data)),
+         int(t) if t else now, mime, now, psycopg2.Binary(data), who),
     )
     c.commit(); cur.close(); c.close()
     return jsonify(id=cid)
