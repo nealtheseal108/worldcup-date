@@ -2,12 +2,16 @@
 
 Endpoints (all gated by a shared key via the X-Diary-Key header or ?key=):
   GET    /api/health         -> {ok, hasDb}
-  GET    /api/clips          -> [{id, sec, lat, lng, t, mime, created, who}]   (metadata only)
-  POST   /api/clip           -> {id}      multipart: video=<blob>, sec, lat, lng, t, who
+  GET    /api/clips          -> [{id, sec, lat, lng, t, mime, created, who, score, minute, play}]
+  POST   /api/clip           -> {id}      multipart: video=<blob>, sec, lat, lng, t, who, score, minute, play
   GET    /api/clip/<id>      -> the video bytes
   DELETE /api/clip/<id>      -> {ok}
   GET    /api/state          -> {key: {v, who, updated}}   every synced interactive-state key
   PUT    /api/state/<key>    -> {ok}      json body: {v: <any json-able value>, who}
+
+`score`/`minute`/`play` are an optional live-match snapshot the client attaches at capture time
+(e.g. "USA 1-0 BEL", "34'", "⚽ Goal · 31'") -- only present when a photo/clip was taken while
+the couple's tracked match was actually live. Plain strings, opaque to the backend.
 
 `who` is a lightweight attribution string ("neal" / "sidhya" / "guest:<name>"), resolved
 client-side from a username (no passwords -- this is a private gift site, not a real
@@ -46,6 +50,9 @@ def init_db():
             t BIGINT, mime TEXT, created BIGINT, data BYTEA)"""
     )
     cur.execute("ALTER TABLE clips ADD COLUMN IF NOT EXISTS who TEXT")  # older rows just come back who=NULL
+    cur.execute("ALTER TABLE clips ADD COLUMN IF NOT EXISTS score TEXT")
+    cur.execute("ALTER TABLE clips ADD COLUMN IF NOT EXISTS minute TEXT")
+    cur.execute("ALTER TABLE clips ADD COLUMN IF NOT EXISTS play TEXT")
     cur.execute(
         """CREATE TABLE IF NOT EXISTS state(
             k TEXT PRIMARY KEY, v TEXT, who TEXT, updated BIGINT)"""
@@ -82,10 +89,11 @@ def health():
 def list_clips():
     check_key()
     c = conn(); cur = c.cursor()
-    cur.execute("SELECT id,sec,lat,lng,t,mime,created,who FROM clips ORDER BY created ASC")
+    cur.execute("SELECT id,sec,lat,lng,t,mime,created,who,score,minute,play FROM clips ORDER BY created ASC")
     rows = cur.fetchall(); cur.close(); c.close()
     return jsonify([
-        dict(id=r[0], sec=r[1], lat=r[2], lng=r[3], t=r[4], mime=r[5], created=r[6], who=r[7])
+        dict(id=r[0], sec=r[1], lat=r[2], lng=r[3], t=r[4], mime=r[5], created=r[6], who=r[7],
+             score=r[8], minute=r[9], play=r[10])
         for r in rows
     ])
 
@@ -103,13 +111,17 @@ def add_clip():
     sec = request.form.get("sec", "s0")
     lat = request.form.get("lat"); lng = request.form.get("lng"); t = request.form.get("t")
     who = (request.form.get("who") or "")[:60]  # "neal" / "sidhya" / "guest:<name>", resolved client-side
+    score = (request.form.get("score") or "")[:40] or None
+    minute = (request.form.get("minute") or "")[:20] or None
+    play = (request.form.get("play") or "")[:200] or None
     mime = f.mimetype or "video/webm"
     now = int(time.time() * 1000)
     c = conn(); cur = c.cursor()
     cur.execute(
-        "INSERT INTO clips(id,sec,lat,lng,t,mime,created,data,who) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+        """INSERT INTO clips(id,sec,lat,lng,t,mime,created,data,who,score,minute,play)
+           VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
         (cid, sec, float(lat) if lat else None, float(lng) if lng else None,
-         int(t) if t else now, mime, now, psycopg2.Binary(data), who),
+         int(t) if t else now, mime, now, psycopg2.Binary(data), who, score, minute, play),
     )
     c.commit(); cur.close(); c.close()
     return jsonify(id=cid)
