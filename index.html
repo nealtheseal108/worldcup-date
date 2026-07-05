@@ -1649,6 +1649,7 @@ function USER_VENUE_ART(){return '<svg class="art" viewBox="0 0 400 118" preserv
 function addUserPlace(kind, p, skipSave){
   if(!p||p.lat==null||p.lng==null||isNaN(p.lat)||isNaN(p.lng))return;
   if(kind==='venue'){
+    if(USER_VENUES.some(function(k){return VENUES[k]&&VENUES[k].name===p.name;})){ if(skipSave)try{venueCards();}catch(e){} return; }   // already added -- safe to call loadUserPlaces() more than once (e.g. after a late cloud sync)
     var base='u_'+(p.name.replace(/[^a-z0-9]/gi,'').toLowerCase()).slice(0,16), key=base, i=2;
     while(VENUE_LL[key])key=base+(i++);
     VENUE_LL[key]=[p.lat,p.lng]; VENUE_LABEL[key]=p.name; ART[key]=USER_VENUE_ART();
@@ -1657,16 +1658,18 @@ function addUserPlace(kind, p, skipSave){
     if(skipSave){ try{venueCards();}catch(e){} }
     else { try{ var _vit=Object.assign({},VENUES[key]); _vit.key=key; _swApplyPick('venue', _vit); }catch(e){ try{venueCards();}catch(_){} } }
   } else {
+    var arr=(kind==='after'?USER_AFTER:USER_DURING);
+    if(arr.some(function(it){return it.t===p.name;})){ if(skipSave)try{ if(pick.venue) foodCards(kind); }catch(e){} return; }   // already added
     REST_LL[p.name]=[p.lat,p.lng];
     var _ni={e:'📍', t:p.name, d:'your pick babu 💜', p:'$$', dishes:[], userAdded:true};
-    (kind==='after'?USER_AFTER:USER_DURING).push(_ni);
+    arr.push(_ni);
     if(skipSave){ try{ if(pick.venue) foodCards(kind); }catch(e){} }
     else { try{ if(pick.venue) _swApplyPick(kind, _ni); else foodCards(kind); }catch(e){} }
   }
   if(!skipSave)saveUserPlaces();
 }
 function saveUserPlaces(){try{
-  localStorage.setItem('wc_user_places',JSON.stringify({
+  _syncSet('wc_user_places',JSON.stringify({
     during:USER_DURING.map(function(it){return {name:it.t,lat:REST_LL[it.t][0],lng:REST_LL[it.t][1]};}),
     after:USER_AFTER.map(function(it){return {name:it.t,lat:REST_LL[it.t][0],lng:REST_LL[it.t][1]};}),
     venues:USER_VENUES.map(function(k){return {name:VENUE_LABEL[k],lat:VENUE_LL[k][0],lng:VENUE_LL[k][1]};})
@@ -1878,7 +1881,7 @@ function _swRenderChosen(stepKey, cont, items){
 
 /* picks survive a closed tab: the whole day's plan hangs off `pick`, so losing it mid-date
    (Safari purging the tab at the stadium) would blank the pass + lock the add-ons. */
-function _persistPick(){ try{localStorage.setItem('wc_pick',JSON.stringify({v:pick.venue,d:pick.during,a:pick.after}));}catch(e){} }
+function _persistPick(){ try{_syncSet('wc_pick',JSON.stringify({v:pick.venue,d:pick.during,a:pick.after}));}catch(e){} }
 function _restorePick(){
   try{
     var s=JSON.parse(localStorage.getItem('wc_pick')||'null'); if(!s)return;
@@ -2093,7 +2096,7 @@ _restorePick();   // bring back a saved plan before the first render, so a purge
 venueCards();
 /* LDR arrival boarding pass on the welcome screen: editable origin, saved on her phone */
 function loadArrival(){var el=document.getElementById('apFrom');if(el){var v=localStorage.getItem('wc_arrival_from');if(v)el.textContent=v;}var b=document.querySelector('#arrivalPass .ap-bars');if(b&&window.bpBarcode&&!b.querySelector('.bc-row'))b.innerHTML=window.bpBarcode(706,{h:24,color:'#241733',target:300});}
-function editArrivalFrom(){var cur=localStorage.getItem('wc_arrival_from')||'';var v=prompt('where did you fly into seattle from, babu? ✈\n(city or airport code)',cur);if(v===null)return;v=v.trim().toUpperCase().slice(0,9)||'HOME';localStorage.setItem('wc_arrival_from',v);var el=document.getElementById('apFrom');if(el)el.textContent=v;}
+function editArrivalFrom(){var cur=localStorage.getItem('wc_arrival_from')||'';var v=prompt('where did you fly into seattle from, babu? ✈\n(city or airport code)',cur);if(v===null)return;v=v.trim().toUpperCase().slice(0,9)||'HOME';try{_syncSet('wc_arrival_from',v);}catch(e){}var el=document.getElementById('apFrom');if(el)el.textContent=v;}
 loadArrival();
 /* ============ LIVE FLIGHT STATUS: reunion countdown -> together counter -> since-we-met ============ */
 /* EDIT if any are off. metDate is my best guess from the site's "8 months" framing (Nov 6 2025). */
@@ -2610,7 +2613,7 @@ function parseYouTubeId(u){
   if(/^[A-Za-z0-9_-]{11}$/.test(u))return u;
   return null;
 }
-function saveUserSongs(){try{localStorage.setItem('wc_user_songs',JSON.stringify(MUSIC.filter(function(m){return m.userAdded;}).map(function(m){return m.id;})));}catch(e){}}
+function saveUserSongs(){try{_syncSet('wc_user_songs',JSON.stringify(MUSIC.filter(function(m){return m.userAdded;}).map(function(m){return m.id;})));}catch(e){}}
 function loadUserSongs(){try{(JSON.parse(localStorage.getItem('wc_user_songs')||'[]')||[]).forEach(function(id){if(/^[A-Za-z0-9_-]{11}$/.test(id)&&!MUSIC.some(function(m){return m.id===id;}))MUSIC.push({id:id,title:'your pick 🎵',artist:'added by you',userAdded:true});});}catch(e){}}
 function addSong(){
   var m=document.getElementById('addSongModal'), i=document.getElementById('addSongInput'), e=document.getElementById('addSongErr');
@@ -2928,6 +2931,42 @@ function cloudClipUrl(id){return CLOUD.url+'/api/clip/'+id+'?key='+encodeURIComp
 function cloudList(){return fetch(CLOUD.url+'/api/clips',{headers:cloudHeaders()}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];});}
 function cloudUpload(rec){var fd=new FormData();fd.append('video',rec.blob,'clip.webm');fd.append('sec',rec.sec);fd.append('t',String(rec.t));fd.append('who',rec.who||_whoTag());if(rec.lat!=null)fd.append('lat',String(rec.lat));if(rec.lng!=null)fd.append('lng',String(rec.lng));return fetch(CLOUD.url+'/api/clip',{method:'POST',headers:cloudHeaders(),body:fd}).then(function(r){return r.ok?r.json():null;});}
 function cloudDelete(id,sec){return fetch(CLOUD.url+'/api/clip/'+id,{method:'DELETE',headers:cloudHeaders()}).then(function(){renderDiary(sec);}).catch(function(){hint('could not delete from the cloud 💜');});}
+
+/* ---------- shared interactive state: every click, saved to the cloud, for both phones ----------
+   picks, bingo, missions, passport stamps, flight log, etc. are all "ours", not per-device --
+   if she picks the venue on her phone, his phone needs to show the same pick. _syncSet is a
+   drop-in replacement for localStorage.setItem: writes locally as always, and for any key in
+   SYNCED_KEYS, also mirrors the exact string to the cloud (fire-and-forget). On load, a single
+   GET /api/state pulls every key back so a fresh device (or one that was offline) catches up. */
+var SYNCED_KEYS=['wc_pick','wc_bingo','wc_bingo_seed','wc_missions','wc_utah_sel','wc_utah_stamps',
+  'wc_flightlog','wc_bellevue_stamped','wc_bellevue_landed_celeb','wc_return_no','wc_return_date',
+  'wc_arrival_from','wc_user_places','wc_user_songs'];
+function cloudStateAll(){ if(!cloudOn())return Promise.resolve({}); return fetch(CLOUD.url+'/api/state',{headers:cloudHeaders()}).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};}); }
+function cloudStateSet(key,val){ if(!cloudOn())return; fetch(CLOUD.url+'/api/state/'+encodeURIComponent(key),{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},cloudHeaders()),body:JSON.stringify({v:val,who:_whoTag()})}).catch(function(){}); }
+function _syncSet(key,val){ localStorage.setItem(key,val); if(SYNCED_KEYS.indexOf(key)>=0)cloudStateSet(key,val); }   // throws exactly like a raw setItem would (e.g. quota exceeded) -- callers keep their own try/catch/retry behavior
+function _cloudStateRace(timeoutMs){   // real data if the (possibly cold) backend answers in time, empty otherwise -- never blocks first paint for long
+  if(!cloudOn())return Promise.resolve({});
+  var to=new Promise(function(res){setTimeout(function(){res({});},timeoutMs);});
+  return Promise.race([cloudStateAll(),to]);
+}
+var _cloudBootP=_cloudStateRace(1800).then(function(all){
+  Object.keys(all||{}).forEach(function(k){
+    if(SYNCED_KEYS.indexOf(k)>=0&&all[k]&&typeof all[k].v==='string'){ try{localStorage.setItem(k,all[k].v);}catch(e){} }
+  });
+  return all;
+}).then(function(all){
+  /* the page already rendered once with whatever was in localStorage (no blank-screen wait on
+     a cold backend) -- this is the catch-up pass, re-running every render/load call that's
+     safe to call twice, now that a synced value may have just landed. every function below
+     fully rebuilds its own output (or has its own dedup guard), so calling it again is a no-op
+     when nothing changed and a silent correction when something did. */
+  if(all&&Object.keys(all).length){
+    try{_restorePick();venueCards();}catch(e){}
+    try{loadArrival();}catch(e){}
+    try{loadUserSongs();loadUserPlaces();}catch(e){}
+    try{renderBingo();renderQDeck();renderMissions();renderKit();renderDepartures();renderQuiz();renderUtah();}catch(e){}
+  }
+});
 /* time capsule: pull EVERY clip + photo out of the cloud diary onto this device, one download per
    memory. The cloud db is temporary (free-tier Postgres); this is how the day survives it. */
 var _backupBusy=false;
@@ -3059,7 +3098,7 @@ var BINGO_POOL=[
   'spot the exact moment the crowd goes from silent to erupting 📢','count how many people are wearing your team\'s jersey 👕','ask each other who you think wins it all this year 🏆','rate our couple energy out of 10, between us 💯'
 ];
 function _bingoRnd(seed){ var s=(seed>>>0)||1; return function(){ s=(s*1103515245+12345)&0x7fffffff; return s/0x7fffffff; }; }
-function _bingoSeed(){ var s=null; try{s=localStorage.getItem('wc_bingo_seed');}catch(e){} if(!s){ s=String((Date.now()%997)*7919+13); try{localStorage.setItem('wc_bingo_seed',s);}catch(e){} } return +s; }
+function _bingoSeed(){ var s=null; try{s=localStorage.getItem('wc_bingo_seed');}catch(e){} if(!s){ s=String((Date.now()%997)*7919+13); try{_syncSet('wc_bingo_seed',s);}catch(e){} } return +s; }
 function _bingoCells(){ var rnd=_bingoRnd(_bingoSeed()), a=BINGO_POOL.slice(); for(var i=a.length-1;i>0;i--){ var j=(rnd()*(i+1))|0, t=a[i]; a[i]=a[j]; a[j]=t; } return a.slice(0,25); }
 function _bingoOn(){ try{return JSON.parse(localStorage.getItem('wc_bingo')||'[]');}catch(e){return [];} }
 function _bingoLines(on){ var L=[[0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24],[0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],[0,6,12,18,24],[4,8,12,16,20]]; return L.filter(function(l){ return l.every(function(i){return on.indexOf(i)>=0;}); }).length; }
@@ -3073,7 +3112,7 @@ function renderBingo(){
 function tapBingo(i){
   var on=_bingoOn(), was=_bingoLines(on), k=on.indexOf(i);
   if(k>=0)on.splice(k,1); else on.push(i);
-  try{localStorage.setItem('wc_bingo',JSON.stringify(on));}catch(e){}
+  try{_syncSet('wc_bingo',JSON.stringify(on));}catch(e){}
   if(window.buzz)buzz(12);
   renderBingo();
   var now=_bingoLines(on);
@@ -3156,8 +3195,8 @@ function onMissionPicked(ev){
     return _downscaleImg(f,240,0.6);
   }).then(function(small){
     var fr=new FileReader();
-    fr.onload=function(){ var st=_missionState(); st[id]={t:Date.now(),thumb:String(fr.result)}; try{localStorage.setItem('wc_missions',JSON.stringify(st));}catch(e){ st[id]={t:Date.now()}; try{localStorage.setItem('wc_missions',JSON.stringify(st));}catch(e2){} } renderMissions(); renderPhotos(true); if(window.burstConfetti)burstConfetti(document.getElementById('missionGrid'),{emojis:['🏷️','💜','📸'],count:16}); if(window.buzz)buzz(24); hint('mission APPROVED 🏷️💜 it\'s in our album'); };
-    fr.onerror=function(){ var st=_missionState(); st[id]={t:Date.now()}; try{localStorage.setItem('wc_missions',JSON.stringify(st));}catch(e){} renderMissions(); renderPhotos(true); hint('mission APPROVED 🏷️💜'); };
+    fr.onload=function(){ var st=_missionState(); st[id]={t:Date.now(),thumb:String(fr.result)}; try{_syncSet('wc_missions',JSON.stringify(st));}catch(e){ st[id]={t:Date.now()}; try{_syncSet('wc_missions',JSON.stringify(st));}catch(e2){} } renderMissions(); renderPhotos(true); if(window.burstConfetti)burstConfetti(document.getElementById('missionGrid'),{emojis:['🏷️','💜','📸'],count:16}); if(window.buzz)buzz(24); hint('mission APPROVED 🏷️💜 it\'s in our album'); };
+    fr.onerror=function(){ var st=_missionState(); st[id]={t:Date.now()}; try{_syncSet('wc_missions',JSON.stringify(st));}catch(e){} renderMissions(); renderPhotos(true); hint('mission APPROVED 🏷️💜'); };
     fr.readAsDataURL(small);
   }).catch(function(){ hint('could not stamp that one, try again 💜'); });
 }
@@ -3495,7 +3534,7 @@ function _utahSel(){ try{return JSON.parse(localStorage.getItem('wc_utah_sel')||
 function _utahToggle(cat,i){
   var sel=_utahSel(), key=cat+i;
   if(sel[key])delete sel[key]; else sel[key]=1;
-  try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
+  try{_syncSet('wc_utah_sel',JSON.stringify(sel));}catch(e){}
   if(!sel[key]){} else if(window.buzz)buzz(18);
   renderUtah();
 }
@@ -3617,10 +3656,10 @@ function pbFlip(dir){ NB.go(dir); }
 function _pbRenderBase(){ NB.render(); }
 function _pbStamp(i){
   var st=_pbStamps();
-  if(st['n'+i]){ delete st['n'+i]; try{localStorage.setItem('wc_utah_stamps',JSON.stringify(st));}catch(e){} _pbPend=null; _pbRenderBase(); return; }
+  if(st['n'+i]){ delete st['n'+i]; try{_syncSet('wc_utah_stamps',JSON.stringify(st));}catch(e){} _pbPend=null; _pbRenderBase(); return; }
   if(_pbPend===i){   // second tap within the window -- commit the real stamp
     clearTimeout(_pbPendTimer); _pbPend=null;
-    st['n'+i]=1; try{localStorage.setItem('wc_utah_stamps',JSON.stringify(st));}catch(e){}
+    st['n'+i]=1; try{_syncSet('wc_utah_stamps',JSON.stringify(st));}catch(e){}
     if(window.buzz)buzz(28);
     _pbRenderBase();
     if(window.burstConfetti)burstConfetti(document.getElementById('pbStage'),{emojis:['🛂','💜','🏔️'],count:16});
@@ -3633,7 +3672,7 @@ function _pbStamp(i){
 function _pbMaybe(i){
   var sel=_utahSel(), k='nature'+i;
   if(sel[k])delete sel[k]; else { sel[k]=1; if(window.buzz)buzz(16); }
-  try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
+  try{_syncSet('wc_utah_sel',JSON.stringify(sel));}catch(e){}
   _pbRenderBase(); _utahCount();
 }
 
@@ -3705,10 +3744,10 @@ var PPB=_mkBook({stage:'ppStage',lbl:'ppLbl',prev:'ppPrev',next:'ppNext',
 function ppFlip(dir){ PPB.go(dir); }
 function _ppStamp(j){
   var sel=_utahSel();
-  if(sel['pos'+j]){ delete sel['pos'+j]; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){} _ppPend=null; PPB.render(); return; }
+  if(sel['pos'+j]){ delete sel['pos'+j]; try{_syncSet('wc_utah_sel',JSON.stringify(sel));}catch(e){} _ppPend=null; PPB.render(); return; }
   if(_ppPend===j){   // second tap within the window -- commit the real stamp
     clearTimeout(_ppPendTimer); _ppPend=null;
-    sel['pos'+j]=1; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){}
+    sel['pos'+j]=1; try{_syncSet('wc_utah_sel',JSON.stringify(sel));}catch(e){}
     if(window.buzz)buzz(28);
     PPB.render();
     if(window.burstConfetti)burstConfetti(document.getElementById('ppStage'),{emojis:['📖','💜','✅'],count:16});
@@ -3723,7 +3762,7 @@ function _ppStamp(j){
    each entry = {t, who, how}. Logging a landing in a someday position auto-stamps that page
    in the position passport (same wc_utah_sel 'pos'+j keys), so the two features stay in sync. */
 function _flog(){ try{return JSON.parse(localStorage.getItem('wc_flightlog')||'[]');}catch(e){return [];} }
-function _flogSet(a){ try{localStorage.setItem('wc_flightlog',JSON.stringify(a));}catch(e){} }
+function _flogSet(a){ try{_syncSet('wc_flightlog',JSON.stringify(a));}catch(e){} }
 var FLOG_WHO=['sidhya 💜','neal','both 😌'];
 function _flogHowList(){   // positions first (originals + someday), then the non-position classics
   return PP_DONE.map(function(p){return p.t;})
@@ -3754,7 +3793,7 @@ function flogSave(){
   // a landing in a someday position counts as the real thing -- stamp its passport page too
   var j=-1; UTAH_POSITIONS.forEach(function(p,k){ if(p.t===how)j=k; });
   var sel=_utahSel(), newStamp=false;
-  if(j>=0 && !sel['pos'+j]){ sel['pos'+j]=1; try{localStorage.setItem('wc_utah_sel',JSON.stringify(sel));}catch(e){} newStamp=true; PPB.render(); }
+  if(j>=0 && !sel['pos'+j]){ sel['pos'+j]=1; try{_syncSet('wc_utah_sel',JSON.stringify(sel));}catch(e){} newStamp=true; PPB.render(); }
   flogClose(); _flogRender();
   if(window.buzz)buzz(28);
   if(window.burstConfetti)burstConfetti(document.getElementById('flogWrap'),{emojis:['🛬','💜','😏'],count:16});
@@ -3903,7 +3942,7 @@ function _bvTick(){
   } else {
     if(head)head.textContent='LANDED 💜'; if(lbl)lbl.textContent='STATUS'; if(val)val.textContent='LANDED 💜';
     var already=false; try{already=localStorage.getItem('wc_bellevue_landed_celeb')==='1';}catch(e){}
-    if(!already){ try{localStorage.setItem('wc_bellevue_landed_celeb','1');}catch(e){} if(window.burstConfetti)burstConfetti(document.getElementById('bellevuePass'),{emojis:['🏞️','💜','✈'],count:20}); }
+    if(!already){ try{_syncSet('wc_bellevue_landed_celeb','1');}catch(e){} if(window.burstConfetti)burstConfetti(document.getElementById('bellevuePass'),{emojis:['🏞️','💜','✈'],count:20}); }
     clearInterval(_bvTimer); _bvTimer=null;   // landed -- nothing left to count
   }
 }
@@ -3915,7 +3954,7 @@ function _bvRenderStamp(){
     : '<button type="button" class="bv-stampbtn" onclick="_bvStamp()">🛂 stamp it</button>';
 }
 function _bvStamp(){
-  try{localStorage.setItem('wc_bellevue_stamped','1');}catch(e){}
+  try{_syncSet('wc_bellevue_stamped','1');}catch(e){}
   if(window.buzz)buzz(28);
   _bvRenderStamp();
   if(window.burstConfetti)burstConfetti(document.getElementById('bvStampZone'),{emojis:['💜','✅','🏞️'],count:16});
@@ -4014,10 +4053,10 @@ function loadReturn(){
 function editReturn(){
   var rn=localStorage.getItem('wc_return_no')||'';
   var v=prompt('your flight home ✈ what flight is it? (e.g. DL 2017)',rn);
-  if(v!==null){v=v.trim().toUpperCase().slice(0,12)||'GA ····';localStorage.setItem('wc_return_no',v);var no=document.getElementById('apBackNo');if(no)no.textContent=v;}
+  if(v!==null){v=v.trim().toUpperCase().slice(0,12)||'GA ····';try{_syncSet('wc_return_no',v);}catch(e){}var no=document.getElementById('apBackNo');if(no)no.textContent=v;}
   var rd=localStorage.getItem('wc_return_date')||'';
   var d=prompt('what day do you fly home, babu? 💜 (e.g. 9 JUL)',rd);
-  if(d!==null){d=d.trim().toUpperCase().slice(0,12)||'tap to set';localStorage.setItem('wc_return_date',d);var dt=document.getElementById('apBackDate');if(dt)dt.textContent=d;}
+  if(d!==null){d=d.trim().toUpperCase().slice(0,12)||'tap to set';try{_syncSet('wc_return_date',d);}catch(e){}var dt=document.getElementById('apBackDate');if(dt)dt.textContent=d;}
 }
 /* scannable QR on the shareable card -> opens the easter egg */
 var EGG_URL='https://worldcup-date.onrender.com/?egg=1';

@@ -6,10 +6,18 @@ Endpoints (all gated by a shared key via the X-Diary-Key header or ?key=):
   POST   /api/clip           -> {id}      multipart: video=<blob>, sec, lat, lng, t, who
   GET    /api/clip/<id>      -> the video bytes
   DELETE /api/clip/<id>      -> {ok}
+  GET    /api/state          -> {key: {v, who, updated}}   every synced interactive-state key
+  PUT    /api/state/<key>    -> {ok}      json body: {v: <any json-able value>, who}
 
 `who` is a lightweight attribution string ("neal" / "sidhya" / "guest:<name>"), resolved
 client-side from a username (no passwords -- this is a private gift site, not a real
 account system). The backend just stores and echoes it back for display.
+
+`/api/state` is a small generic key-value store: every interactive bit of shared state
+(picks, bingo, missions, passport stamps, flight log, etc.) is written here the moment it
+changes on either phone, so both devices converge on the same values instead of each
+holding its own localStorage silo. One row per key -- the whole app has maybe a dozen keys,
+so a single "give me everything" GET is simpler and cheap enough than per-key fetches.
 """
 import os, time, uuid
 from flask import Flask, request, jsonify, abort, Response
@@ -38,6 +46,10 @@ def init_db():
             t BIGINT, mime TEXT, created BIGINT, data BYTEA)"""
     )
     cur.execute("ALTER TABLE clips ADD COLUMN IF NOT EXISTS who TEXT")  # older rows just come back who=NULL
+    cur.execute(
+        """CREATE TABLE IF NOT EXISTS state(
+            k TEXT PRIMARY KEY, v TEXT, who TEXT, updated BIGINT)"""
+    )
     c.commit()
     cur.close()
     c.close()
@@ -119,6 +131,34 @@ def del_clip(cid):
     check_key()
     c = conn(); cur = c.cursor()
     cur.execute("DELETE FROM clips WHERE id=%s", (cid,))
+    c.commit(); cur.close(); c.close()
+    return jsonify(ok=True)
+
+
+@app.route("/api/state")
+def get_state():
+    check_key()
+    c = conn(); cur = c.cursor()
+    cur.execute("SELECT k,v,who,updated FROM state")
+    rows = cur.fetchall(); cur.close(); c.close()
+    return jsonify({r[0]: dict(v=r[1], who=r[2], updated=r[3]) for r in rows})
+
+
+@app.route("/api/state/<key>", methods=["PUT"])
+def put_state(key):
+    check_key()
+    body = request.get_json(silent=True) or {}
+    v = body.get("v")
+    if v is None:
+        abort(400, "no v")
+    who = (body.get("who") or "")[:60]
+    now = int(time.time() * 1000)
+    c = conn(); cur = c.cursor()
+    cur.execute(
+        """INSERT INTO state(k,v,who,updated) VALUES(%s,%s,%s,%s)
+           ON CONFLICT (k) DO UPDATE SET v=EXCLUDED.v, who=EXCLUDED.who, updated=EXCLUDED.updated""",
+        (key, str(v), who, now),
+    )
     c.commit(); cur.close(); c.close()
     return jsonify(ok=True)
 
