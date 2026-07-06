@@ -829,17 +829,11 @@
   /* page-bottom flourish: sits right after the last bit of copy on every screen, glowing against
      the purple background, and physically dissolves into it near its own bottom edge (mask, not
      a scroll listener -- compositor-friendly, no scroll-jack) rather than having a hard cutoff.
-     On mobile every step's content reliably exceeds the viewport height (narrow-column text wraps
-     into many lines), so in-flow reads fine. On wide desktop the SAME content wraps into far
-     fewer lines and can be shorter than the viewport, which left this floating awkwardly high
-     with a big empty gap below it -- so past a desktop breakpoint it switches to pinning against
-     the true bottom of the viewport (above the fixed player/ticker) instead. */
+     Static/in-flow everywhere, never fixed -- a fixed version stayed glued to one spot on screen
+     while real content scrolled underneath it, visually colliding with whatever happened to pass
+     by (the name field, buttons, etc.), which read as broken/stuck. */
   .pike-sign-foot{display:flex;justify-content:center;margin:22px 0 6px;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 62%,transparent 96%);mask-image:linear-gradient(to bottom,#000 0%,#000 62%,transparent 96%)}
   .pike-sign-foot svg{width:190px;height:auto}
-  @media(min-width:900px){
-    .pike-sign-foot{position:fixed;left:0;right:0;bottom:calc(var(--player) + var(--tick));z-index:5;margin:0;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 55%,transparent 92%);mask-image:linear-gradient(to bottom,#000 0%,#000 55%,transparent 92%)}
-    .pike-sign-foot svg{width:120px}
-  }
   #datesChip{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:90;width:44px;height:44px;border-radius:12px;background:#241733;border:1px solid rgba(217,185,104,.55);box-shadow:0 6px 16px rgba(18,8,38,.35);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:0}
   #datesChip .dc-bar{width:20px;height:2.5px;background:#d9b968;border-radius:1px;position:relative}
   #datesChip .dc-bar::after{content:"";position:absolute;left:8px;top:0;width:2px;height:100%;background:#241733}
