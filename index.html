@@ -2400,8 +2400,8 @@ function applyCheekyGate(){
 }
 applyCheekyGate();
 /* World Cup matchup, Seattle R16 = Match 94 (W81 vs W82). update when the teams are set. */
-var MATCHUP = "BEL/SEN 🆚 USA/BIH";   // July 6 R16 slot = winner(BEL v SEN) vs winner(USA v BIH); resolved LIVE from the score feed
-var MATCHUP_NOTE = "🇺🇸 could be us!";
+var MATCHUP = "USA 🆚 Belgium";   // July 6 R16 slot (Match 94) resolved: USA beat BIH, Belgium beat SEN
+var MATCHUP_NOTE = "🇺🇸 it's us!!";
 var R16_FEEDERS = [['BEL','SEN'],['USA','BIH']];   // the two feeder matches for our July 6 slot; edit if the bracket differs
 function applyMatchup(){
   var t=document.getElementById('muText');if(t)t.textContent=MATCHUP;
