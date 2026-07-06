@@ -30,7 +30,7 @@ import psycopg2
 
 DB_URL = os.environ.get("DATABASE_URL", "")
 KEY = os.environ.get("DIARY_KEY", "")
-MAX_BYTES = 40 * 1024 * 1024  # 40 MB per clip
+MAX_BYTES = 80 * 1024 * 1024  # 80 MB per clip -- real camera-roll videos run bigger than the app's own short recordings
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_BYTES + 1024 * 1024

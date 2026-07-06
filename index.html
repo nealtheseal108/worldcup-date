@@ -485,13 +485,14 @@
   .album-add-row .btn{flex:1}
   .album-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
   .album-cell{position:relative;padding:0;border:none;background:#efe7fb;border-radius:12px;overflow:hidden;aspect-ratio:1;cursor:pointer;box-shadow:0 3px 10px rgba(53,28,94,.12)}
-  .album-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
-  .album-cell:active img{transform:scale(.96)}
+  .album-cell img,.album-cell video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+  .album-cell:active img,.album-cell:active video{transform:scale(.96)}
+  .vid-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6);pointer-events:none}
   .album-empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:28px 12px;background:#f6f1ff;border:1px dashed var(--line);border-radius:12px;line-height:1.5}
   .trk-actions{margin-top:16px}
   .trk-actions .btn{width:100%}
   #lightbox{position:fixed;inset:0;z-index:240;background:rgba(20,10,35,.93);display:none;align-items:center;justify-content:center;padding:16px}   /* above the bellevue pass (236) so its album photos open on top, not behind it */
-  #lightbox img{max-width:100%;max-height:86vh;border-radius:12px;box-shadow:0 20px 55px rgba(0,0,0,.55)}
+  #lightbox img,#lightbox video{max-width:100%;max-height:86vh;border-radius:12px;box-shadow:0 20px 55px rgba(0,0,0,.55)}
   .lb-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.16);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:19px;cursor:pointer;line-height:1}
   /* vegas-style neon entry sign: WELCOME to fabulous SEATTLE · SIDHYA. shows on every load,
      tap anywhere or auto-dismiss. all glow is text-shadow + opacity keyframes (compositor-cheap).
@@ -902,7 +903,7 @@
         <div class="arrivalpass" id="arrivalPass">
           <div class="ap-head"><span class="ap-air"><span class="ap-mark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 4 L21.5 20 L2.5 20 Z" fill="#fff"/><path d="M12 4 L21.5 20 L12 20 Z" fill="rgba(255,255,255,.6)"/></svg></span>DELTA</span><span class="ap-status">LANDED 💜</span></div>
           <div class="ap-route">
-            <div class="ap-port"><b>SLC</b><span>dep 7:40 PM</span></div>
+            <div class="ap-port"><b class="ap-edit" id="apFrom" onclick="editArrivalFrom()" title="tap to set where you flew in from">SLC</b><span>dep 7:40 PM</span></div>
             <div class="ap-plane" onclick="showOrigin()" role="button" title="tap for the real story" style="cursor:pointer"><i>✈</i></div>
             <div class="ap-port"><b>SEA</b><span>arr 9:00 PM</span></div>
           </div>
@@ -1075,7 +1076,7 @@
       <div class="merge">💜 Our paths cross: we meet on the 2 Line around 3:00 PM and ride into Seattle together!</div>
 
       <div class="sectlabel deck-label">🛫 your boarding passes · the whole day, leg by leg</div>
-      <div class="diaryintro">📔 <b>our date diary</b>, hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild from 6:00-7:15 around full time, record as much as you want. it all stays just on your phone 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <span style="font-size:12px;color:var(--muted)">your movie unlocks at the end of the night 🎬</span></div>
+      <div class="diaryintro">📔 <b>our date diary</b>, hit record at each moment and i'll tag where we are, so we've got a lil video diary of the whole day. just a minute of footage every 20 min so we actually stay present, but go wild from 5:00-7:15 around kickoff and full time, record as much as you want. it syncs to our shared cloud album so we both see it 💜 <button class="diarybtn" type="button" id="geoBtn" onclick="connectLocation()">📍 connect location</button> <span style="font-size:12px;color:var(--muted)">your movie unlocks at the end of the night 🎬</span></div>
       <div id="timeline"></div>
 
       <div class="sectlabel">🎒 what to prepare</div>
@@ -1186,6 +1187,14 @@
       </div>
       <div class="album-grid" id="albumGrid"><div class="album-empty">loading our photos…</div></div>
       <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="onPhotoPicked(event)">
+
+      <div class="sectlabel" style="margin-top:20px">🎥 our videos<span class="album-count" id="videoAlbumCount"></span></div>
+      <div class="album-add-row">
+        <button class="btn primary" type="button" onclick="pickVideo()">➕ add videos</button>
+        <button class="btn lav2btn" type="button" onclick="renderVideos(true)">↻ refresh</button>
+      </div>
+      <div class="album-grid" id="videoAlbumGrid"><div class="album-empty">loading our videos…</div></div>
+      <input type="file" id="videoAlbumInput" accept="video/*" multiple style="display:none" onchange="onVideoAlbumPicked(event)">
 
       <div class="sectlabel" style="margin-top:20px">🏷️ photo missions<span class="album-count" id="missionCount"></span></div>
       <div class="mission-grid" id="missionGrid"></div>
@@ -1382,8 +1391,34 @@ const ART = {
     <!-- great wheel -->
     <g stroke="#fff" stroke-width="2.5" fill="none" opacity=".95"><circle cx="320" cy="56" r="28"/><line x1="320" y1="28" x2="320" y2="84"/><line x1="292" y1="56" x2="348" y2="56"/><line x1="300" y1="36" x2="340" y2="76"/><line x1="340" y1="36" x2="300" y2="76"/></g>
     <rect x="316" y="84" width="8" height="20" fill="#fff" opacity=".9"/>
-    <!-- market sign -->
-    <rect x="120" y="40" width="86" height="20" rx="3" fill="#c0392b"/><text x="163" y="54" font-family="Arial" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">PUBLIC MARKET</text>
+    <!-- market sign: Public Market Center homage (reader-board + hanging clock) -->
+    <g transform="translate(0,-14)">
+      <defs><filter id="neonGlow2" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="1.3"/></filter></defs>
+      <rect x="98" y="28" width="130" height="36" rx="3" fill="#2e2a2b"/>
+      <rect x="101" y="31" width="124" height="30" rx="2" fill="#bfe3de"/>
+      <g stroke="#33565b" stroke-width="0.6" opacity="0.22">
+        <line x1="108" y1="31" x2="108" y2="61"/><line x1="118" y1="31" x2="118" y2="61"/><line x1="128" y1="31" x2="128" y2="61"/><line x1="138" y1="31" x2="138" y2="61"/><line x1="148" y1="31" x2="148" y2="61"/><line x1="158" y1="31" x2="158" y2="61"/><line x1="168" y1="31" x2="168" y2="61"/><line x1="178" y1="31" x2="178" y2="61"/><line x1="188" y1="31" x2="188" y2="61"/><line x1="198" y1="31" x2="198" y2="61"/><line x1="208" y1="31" x2="208" y2="61"/><line x1="218" y1="31" x2="218" y2="61"/>
+        <line x1="101" y1="41" x2="225" y2="41"/><line x1="101" y1="51" x2="225" y2="51"/>
+      </g>
+      <g filter="url(#neonGlow2)" fill="#fff3d6" opacity="0.9" font-family="Arial" font-weight="bold" text-anchor="middle">
+        <text x="163" y="45" font-size="11" letter-spacing="0.5">PUBLIC MARKET</text>
+        <text x="164" y="56" font-size="8" letter-spacing="3">CENTER</text>
+      </g>
+      <g fill="#d7302a" font-family="Arial" font-weight="bold" text-anchor="middle">
+        <text x="163" y="45" font-size="11" letter-spacing="0.5">PUBLIC MARKET</text>
+        <text x="164" y="56" font-size="8" letter-spacing="3">CENTER</text>
+      </g>
+      <rect x="161.5" y="61" width="3" height="4" fill="#2e2a2b"/>
+      <circle cx="163" cy="72" r="11" fill="#2e2a2b"/>
+      <circle cx="163" cy="72" r="9" fill="#fdf8ec"/>
+      <g stroke="#d7302a" stroke-width="1.1" stroke-linecap="round">
+        <line x1="163" y1="64.6" x2="163" y2="66.6"/><line x1="163" y1="77.4" x2="163" y2="79.4"/>
+        <line x1="155.6" y1="72" x2="157.6" y2="72"/><line x1="168.4" y1="72" x2="170.4" y2="72"/>
+      </g>
+      <line x1="163" y1="72" x2="159.2" y2="69.8" stroke="#d7302a" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="163" y1="72" x2="163" y2="66" stroke="#d7302a" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="163" cy="72" r="1.2" fill="#d7302a"/>
+    </g>
   </svg>`,
   occidental:`<svg class="art" viewBox="0 0 400 118" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs><linearGradient id="skyO" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a98ee8"/><stop offset="1" stop-color="#e7dcff"/></linearGradient></defs>
@@ -2605,7 +2640,7 @@ var MUSIC=[
   {id:'1_w9ZtbHj_E', title:'Link Up', artist:'Don Toliver'},
   {id:'nfJReXaXkTY', title:'Passionfruit (slowed + reverb)', artist:'Drake', start:72},
   {id:'wTPWI3qkx5c', title:'Heat Waves (8D slowed)', artist:'Glass Animals'},
-  {id:'l8KS5HiMXn4', title:'Babydoll (slowed + reverb)', artist:'Dominic Fike'},
+  {id:'-J2rSm8K9_Y', title:'Babydoll', artist:'Dominic Fike'},
   {id:'ISsxv6i9f_k', title:'Kiss Me More (slowed + reverb)', artist:'Doja Cat & SZA'},
   {id:'y9NPx6NDA6M', title:'Ay No Puedo', artist:'The Marías'},
   {id:'_9hkXCYiEjc', title:'No One Noticed', artist:'The Marías'},
@@ -2782,7 +2817,7 @@ function openStats(){renderStats();var m=document.getElementById('statsModal');i
 function closeStats(){var m=document.getElementById('statsModal');if(m)m.style.display='none';}
 /* ---------- date diary: a video clip + your location for each moment, saved on-device (IndexedDB) ---------- */
 var DIARY_DB=null, diaryGeo=null, diaryStream=null, diaryRec=null, diaryChunks=[], diaryCurSec=null;
-// recording allowance: 1 minute of footage per 20-minute window, lifted 6:00-7:15 PM (around full time)
+// recording allowance: 1 minute of footage per 20-minute window, lifted 5:00-7:15 PM (kickoff through full time)
 var REC_WIN_MS=20*60*1000, REC_CAP=60, recStopTimer=null, recTickTimer=null, recStartT=0, _recWaitIdx=null, recWaitTimer=null, _recModalAt=0;
 function recFreeWindow(d){if(/[?&]rec=1/.test(location.search))return true;d=d||new Date();var t=d.getHours()*60+d.getMinutes();return t>=1020&&t<=1155;}  // 5:00 PM (1020, kickoff) -> 7:15 PM (1155): any length, any number of clips. TEST: ?rec=1 bypasses the window entirely
 function recWinKey(){return Math.floor(Date.now()/REC_WIN_MS);}
@@ -2958,29 +2993,33 @@ var SYNCED_KEYS=['wc_pick','wc_bingo','wc_bingo_seed','wc_missions','wc_utah_sel
 function cloudStateAll(){ if(!cloudOn())return Promise.resolve({}); return fetch(CLOUD.url+'/api/state',{headers:cloudHeaders()}).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};}); }
 function cloudStateSet(key,val){ if(!cloudOn())return; fetch(CLOUD.url+'/api/state/'+encodeURIComponent(key),{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},cloudHeaders()),body:JSON.stringify({v:val,who:_whoTag()})}).catch(function(){}); }
 function _syncSet(key,val){ localStorage.setItem(key,val); if(SYNCED_KEYS.indexOf(key)>=0)cloudStateSet(key,val); }   // throws exactly like a raw setItem would (e.g. quota exceeded) -- callers keep their own try/catch/retry behavior
-function _cloudStateRace(timeoutMs){   // real data if the (possibly cold) backend answers in time, empty otherwise -- never blocks first paint for long
-  if(!cloudOn())return Promise.resolve({});
-  var to=new Promise(function(res){setTimeout(function(){res({});},timeoutMs);});
-  return Promise.race([cloudStateAll(),to]);
-}
-var _cloudBootP=_cloudStateRace(1800).then(function(all){
-  Object.keys(all||{}).forEach(function(k){
+var _cloudApplied=false;
+function _applyCloudState(all){
+  if(_cloudApplied||!all||!Object.keys(all).length)return;
+  _cloudApplied=true;
+  Object.keys(all).forEach(function(k){
     if(SYNCED_KEYS.indexOf(k)>=0&&all[k]&&typeof all[k].v==='string'){ try{localStorage.setItem(k,all[k].v);}catch(e){} }
   });
-  return all;
-}).then(function(all){
   /* the page already rendered once with whatever was in localStorage (no blank-screen wait on
      a cold backend) -- this is the catch-up pass, re-running every render/load call that's
      safe to call twice, now that a synced value may have just landed. every function below
      fully rebuilds its own output (or has its own dedup guard), so calling it again is a no-op
      when nothing changed and a silent correction when something did. */
-  if(all&&Object.keys(all).length){
-    try{_restorePick();venueCards();}catch(e){}
-    try{loadArrival();}catch(e){}
-    try{loadUserSongs();loadUserPlaces();}catch(e){}
-    try{renderBingo();renderQDeck();renderMissions();renderKit();renderDepartures();renderQuiz();renderUtah();}catch(e){}
-  }
+  try{_restorePick();venueCards();}catch(e){}
+  try{loadArrival();}catch(e){}
+  try{loadUserSongs();loadUserPlaces();}catch(e){}
+  try{renderBingo();renderQDeck();renderMissions();renderKit();renderDepartures();renderQuiz();renderUtah();}catch(e){}
+}
+/* fires the instant the page loads -- this IS the "wake a sleeping backend up" call, it doesn't
+   wait for anything else first. It keeps running past the 1.8s window below, so a cold Render
+   instance that takes 30-60s to boot still gets its answer applied the moment it lands, instead
+   of that answer being silently thrown away just because the race below already timed out. */
+var _cloudStateP=cloudStateAll();
+var _cloudBootP=Promise.race([_cloudStateP, new Promise(function(res){setTimeout(function(){res(null);},1800);})]).then(function(all){
+  if(all)_applyCloudState(all);
+  return all;
 });
+_cloudStateP.then(_applyCloudState);   // self-heals a lost race once the slow/cold real answer finally arrives -- no manual reload needed
 /* time capsule: pull EVERY clip + photo out of the cloud diary onto this device, one download per
    memory. The cloud db is temporary (free-tier Postgres); this is how the day survives it. */
 var _backupBusy=false;
@@ -3041,7 +3080,7 @@ function localItems(pred){   // this phone's IndexedDB backups (optionally filte
   return diaryOpen().then(function(db){return new Promise(function(res){var all=[],tx=db.transaction('clips','readonly'),cur=tx.objectStore('clips').openCursor();cur.onsuccess=function(e){var c=e.target.result;if(c){if(!pred||pred(c.value))all.push(c.value);c.continue();}else{res(all);}};cur.onerror=function(){res(all);};});}).catch(function(){return [];});
 }
 function bySection(a,b){var sa=parseInt((a.sec||'s0').slice(1))||0,sb=parseInt((b.sec||'s0').slice(1))||0;return sa-sb||a.t-b.t;}
-function _isPhotoSec(sec){ return sec==='photo'||sec==='bv-photo'; }   // any still-image bucket -- keep OUT of the video-clip gatherer below
+function _isPhotoSec(sec){ return sec==='photo'||sec==='bv-photo'||sec==='video'||sec==='bv-video'; }   // any date-album media bucket (stills or free-standing clips) -- keep OUT of the per-leg movie gatherer below
 function localClips(){ return localItems(function(c){return !_isPhotoSec(c.sec);}).then(function(a){a.sort(bySection);return a;}); }
 function gatherClips(){   // VIDEO clips for the movie (photos excluded)
   if(cloudOn()){
@@ -3066,11 +3105,23 @@ function gatherPhotos(){   // PHOTOS for the album (shared via the same cloud, s
   }
   return loc();
 }
+function gatherAlbumVideos(){   // free-standing (not per-leg) VIDEOS for the album, sec='video'
+  function loc(){ return localItems(function(c){return c.sec==='video';}).then(function(a){a.sort(function(x,y){return (x.t||0)-(y.t||0);});return a;}); }
+  if(cloudOn()){
+    return cloudList().then(function(list){
+      var vd=(list||[]).filter(function(c){return c.sec==='video';});
+      if(!vd.length) return loc();
+      vd.sort(function(a,b){return (a.t||0)-(b.t||0);});
+      return Promise.all(vd.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {id:c.id,t:c.t,blob:b,who:c.who,score:c.score,minute:c.minute,play:c.play};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:loc();});
+    }).catch(function(){return loc();});
+  }
+  return loc();
+}
 function compileMovie(){gatherClips().then(function(all){if(!all.length){hint("record a few moments first, then i'll cut our movie 🎬💜");return;}movieClips=all;openMovie();});}
 
 /* ---------- live date tracker + shared photo album (step7) ---------- */
 function _esc7(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-function openTracker(){ go(7); renderPhotos(true); updateTracker(); if(!window._trkTimer){ window._trkTimer=setInterval(function(){ var s=document.getElementById('step7'); if(s&&s.classList.contains('active')){ updateTracker(); } },30000); } }
+function openTracker(){ go(7); renderPhotos(true); renderVideos(true); updateTracker(); if(!window._trkTimer){ window._trkTimer=setInterval(function(){ var s=document.getElementById('step7'); if(s&&s.classList.contains('active')){ updateTracker(); } },30000); } }
 function pickPhoto(){ var i=document.getElementById('photoInput'); if(i)i.click(); }
 function _downscaleImg(file,maxDim,q){ return new Promise(function(res){ try{ var img=new Image(),url=URL.createObjectURL(file); img.onload=function(){ var w=img.width||1,h=img.height||1,sc=Math.min(1,maxDim/Math.max(w,h)); var cv=document.createElement('canvas'); cv.width=Math.max(1,Math.round(w*sc)); cv.height=Math.max(1,Math.round(h*sc)); try{cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);}catch(e){} URL.revokeObjectURL(url); cv.toBlob(function(b){res(b&&b.size?b:file);},'image/jpeg',q||0.85); }; img.onerror=function(){URL.revokeObjectURL(url);res(file);}; img.src=url; }catch(e){res(file);} }); }
 /* shared multi-photo importer: 1..N files in one pick, uploaded sequentially (not all at once --
@@ -3106,6 +3157,37 @@ function onPhotoPicked(ev){
     renderPhotos(true);
   },true);
 }
+function pickVideo(){ var i=document.getElementById('videoAlbumInput'); if(i)i.click(); }
+var MAX_VIDEO_BYTES=80*1024*1024;   // matches the server's MAX_BYTES -- skip files too big to ever upload rather than fail after a long wait
+/* shared multi-video importer: mirrors _importPhotos (sequential, real file timestamps, one
+   live-match snapshot for the whole batch) but with no downscale step -- video can't be
+   cheaply re-encoded client-side, so oversize files are skipped up front instead. */
+function _importVideos(files,sec,onProgress,onDone,attachMatch){
+  var list=Array.prototype.slice.call(files||[]).filter(function(f){return f&&f.type&&f.type.indexOf('video/')===0;});
+  var i=0,ok=0,skipped=0;
+  (attachMatch?refreshLiveMatchSnap():Promise.resolve(null)).then(function(snap){
+    function next(){
+      if(i>=list.length){ onDone(ok,list.length,skipped); return; }
+      var f=list[i++];
+      onProgress(i,list.length);
+      if(f.size>MAX_VIDEO_BYTES){ skipped++; next(); return; }
+      var rec={sec:sec,blob:f,t:(f.lastModified||Date.now()),who:_whoTag()};
+      if(snap){ rec.score=snap.score; rec.minute=snap.minute; rec.play=snap.play; }
+      if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).then(function(r){ if(r)ok++; next(); }).catch(function(){ next(); }); }
+      else { diaryAdd(rec).then(function(){ ok++; next(); }).catch(function(){ next(); }); }
+    }
+    next();
+  });
+}
+function onVideoAlbumPicked(ev){
+  var files=ev.target&&ev.target.files; if(ev.target)ev.target.value=''; if(!files||!files.length)return;
+  var n=files.length; hint(n>1?('adding '+n+' videos… 🎥'):'adding your video… 🎥');
+  _importVideos(files,'video',function(i,total){ if(total>1)hint('adding video '+i+' of '+total+'… 🎥'); },function(ok,total,skipped){
+    var msg = ok<total ? ('added '+ok+' of '+total+(skipped?(', '+skipped+' too big to upload'):' -- some saved on your phone only (cloud hiccup)')+' 💜') : (total>1?('added all '+total+' videos to our album 🎥💜'):'added to our album 🎥💜');
+    hint(msg);
+    renderVideos(true);
+  },true);
+}
 var _albumUrls=[], _albumBusy=false;
 /* live-match badge: score/minute/most-significant-recent-play, only present on photos/clips
    taken while our tracked match was actually live -- shared by the album grid and the diary. */
@@ -3114,8 +3196,10 @@ function _matchBadgeHTML(p){
   return '<span class="clip-match"><b>'+_esc(p.score)+'</b>'+(p.minute?' <i>'+_esc(p.minute)+'</i>':'')+(p.play?'<small>'+_esc(p.play)+'</small>':'')+'</span>';
 }
 function renderPhotos(force){ var grid=document.getElementById('albumGrid'); if(!grid)return; if(_albumBusy&&!force)return; _albumBusy=true; gatherPhotos().then(function(photos){ _albumBusy=false; _albumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _albumUrls=[]; var cnt=document.getElementById('albumCount'); if(cnt)cnt.textContent=photos.length?('· '+photos.length+' photo'+(photos.length>1?'s':'')):''; if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet, tap ➕ to add the first one 📸💜<br>every pic you add shows up here for both of us</div>'; return; } grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _albumUrls.push(u); var who=_whoLabel(p.who); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="our date">'+(who?'<span class="album-who">'+who+'</span>':'')+_matchBadgeHTML(p)+'</button>'; }).join(''); }).catch(function(){ _albumBusy=false; }); }
-function openLightbox(u){ var o=document.getElementById('lightbox'),i=document.getElementById('lightboxImg'); if(o&&i){ i.src=u; o.style.display='flex'; } }
-function closeLightbox(){ var o=document.getElementById('lightbox'); if(o)o.style.display='none'; }
+var _videoAlbumUrls=[], _videoAlbumBusy=false;
+function renderVideos(force){ var grid=document.getElementById('videoAlbumGrid'); if(!grid)return; if(_videoAlbumBusy&&!force)return; _videoAlbumBusy=true; gatherAlbumVideos().then(function(vids){ _videoAlbumBusy=false; _videoAlbumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _videoAlbumUrls=[]; var cnt=document.getElementById('videoAlbumCount'); if(cnt)cnt.textContent=vids.length?('· '+vids.length+' video'+(vids.length>1?'s':'')):''; if(!vids.length){ grid.innerHTML='<div class="album-empty">no videos yet, tap ➕ to add the first one 🎥💜<br>every clip you add shows up here for both of us</div>'; return; } grid.innerHTML=vids.map(function(p){ var u=URL.createObjectURL(p.blob); _videoAlbumUrls.push(u); var who=_whoLabel(p.who); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\',true)"><video src="'+u+'" preload="metadata" muted playsinline></video><span class="vid-play">▶</span>'+(who?'<span class="album-who">'+who+'</span>':'')+_matchBadgeHTML(p)+'</button>'; }).join(''); }).catch(function(){ _videoAlbumBusy=false; }); }
+function openLightbox(u,isVideo){ var o=document.getElementById('lightbox'),i=document.getElementById('lightboxImg'),v=document.getElementById('lightboxVideo'); if(!o)return; if(isVideo){ if(i)i.style.display='none'; if(v){v.style.display='block'; v.src=u; v.play().catch(function(){});} } else { if(v){v.style.display='none'; v.pause(); v.src='';} if(i){i.style.display='block'; i.src=u;} } o.style.display='flex'; }
+function closeLightbox(){ var o=document.getElementById('lightbox'),v=document.getElementById('lightboxVideo'); if(o)o.style.display='none'; if(v){v.pause();} }
 function _laMins(){ try{ var s=new Date().toLocaleTimeString('en-US',{timeZone:'America/Los_Angeles',hour12:false,hour:'2-digit',minute:'2-digit'}); var m=s.match(/(\d+):(\d+)/); return m?(+m[1]*60 + +m[2]):null; }catch(e){ return new Date().getHours()*60+new Date().getMinutes(); } }
 function _laToday(){ try{ var p=new Date().toLocaleDateString('en-US',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}); var m=p.match(/(\d+)\/(\d+)\/(\d+)/); return m?(m[3]+m[1]+m[2]):''; }catch(e){ return ''; } }
 function _ourMatch(){ var gs=window.ftGames||[]; if(typeof MATCHUP==='undefined')return null; var parts=MATCHUP.split('🆚').map(function(x){return x.trim();}); if(parts.length<2)return null; var A=parts[0],B=parts[1]; if(!A||!B||A.indexOf('/')>=0||B.indexOf('/')>=0)return null; for(var i=0;i<gs.length;i++){ var s=[gs[i].h,gs[i].a]; if(s.indexOf(A)>=0&&s.indexOf(B)>=0)return gs[i]; } return null; }
@@ -3969,6 +4053,7 @@ function openBellevue(){
   var b=document.getElementById('bvBars'); if(b&&window.bpBarcode&&!b.querySelector('.bc-row'))b.innerHTML=window.bpBarcode(704,{h:24,color:'#241733',target:300});
   _bvRenderStamp();
   renderBellevueAlbum(true);
+  renderBellevueVideoAlbum(true);
   _bvTick();
   clearInterval(_bvTimer); _bvTimer=setInterval(_bvTick,1000);   // only ticks while this overlay is open, not all day
   o.classList.add('on');
@@ -4007,6 +4092,39 @@ function renderBellevueAlbum(force){
     if(!photos.length){ grid.innerHTML='<div class="album-empty">no photos yet, tap ➕ to add the first one 📸💜</div>'; return; }
     grid.innerHTML=photos.map(function(p){ var u=URL.createObjectURL(p.blob); _bvAlbumUrls.push(u); var who=_whoLabel(p.who); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\')"><img src="'+u+'" loading="lazy" alt="bellevue park date">'+(who?'<span class="album-who">'+who+'</span>':'')+'</button>'; }).join('');
   }).catch(function(){ _bvAlbumBusy=false; });
+}
+function pickBellevueVideo(){ var i=document.getElementById('bvVideoInput'); if(i)i.click(); }
+function onBellevueVideoPicked(ev){
+  var files=ev.target&&ev.target.files; if(ev.target)ev.target.value=''; if(!files||!files.length)return;
+  var n=files.length; if(window.toast)toast(n>1?('adding '+n+' videos… 🎥'):'adding your video… 🎥');
+  _importVideos(files,'bv-video',function(i,total){ if(total>1&&window.toast)toast('adding video '+i+' of '+total+'… 🎥'); },function(ok,total,skipped){
+    if(window.toast)toast(ok<total ? ('added '+ok+' of '+total+(skipped?(', '+skipped+' too big to upload'):' -- some saved on your phone only (cloud hiccup)')+' 💜') : (total>1?('added all '+total+' videos to the bellevue album 🎥💜'):'added to the bellevue album 🎥💜'));
+    renderBellevueVideoAlbum(true);
+  });
+}
+var _bvVideoAlbumUrls=[], _bvVideoAlbumBusy=false;
+function gatherBellevueVideos(){
+  function loc(){ return localItems(function(c){return c.sec==='bv-video';}).then(function(a){a.sort(function(x,y){return (x.t||0)-(y.t||0);});return a;}); }
+  if(cloudOn()){
+    return cloudList().then(function(list){
+      var vd=(list||[]).filter(function(c){return c.sec==='bv-video';});
+      if(!vd.length) return loc();
+      vd.sort(function(a,b){return (a.t||0)-(b.t||0);});
+      return Promise.all(vd.map(function(c){return fetch(cloudClipUrl(c.id)).then(function(r){return r.blob();}).then(function(b){return {id:c.id,t:c.t,blob:b,who:c.who};}).catch(function(){return null;});})).then(function(arr){arr=arr.filter(Boolean);return arr.length?arr:loc();});
+    }).catch(function(){return loc();});
+  }
+  return loc();
+}
+function renderBellevueVideoAlbum(force){
+  var grid=document.getElementById('bvVideoAlbumGrid'); if(!grid)return;
+  if(_bvVideoAlbumBusy&&!force)return; _bvVideoAlbumBusy=true;
+  gatherBellevueVideos().then(function(vids){
+    _bvVideoAlbumBusy=false;
+    _bvVideoAlbumUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}}); _bvVideoAlbumUrls=[];
+    var cnt=document.getElementById('bvVideoAlbumCount'); if(cnt)cnt.textContent=vids.length?('· '+vids.length+' video'+(vids.length>1?'s':'')):'';
+    if(!vids.length){ grid.innerHTML='<div class="album-empty">no videos yet, tap ➕ to add the first one 🎥💜</div>'; return; }
+    grid.innerHTML=vids.map(function(p){ var u=URL.createObjectURL(p.blob); _bvVideoAlbumUrls.push(u); var who=_whoLabel(p.who); return '<button class="album-cell" type="button" onclick="openLightbox(\''+u+'\',true)"><video src="'+u+'" preload="metadata" muted playsinline></video><span class="vid-play">▶</span>'+(who?'<span class="album-who">'+who+'</span>':'')+'</button>'; }).join('');
+  }).catch(function(){ _bvVideoAlbumBusy=false; });
 }
 function closeBellevue(){
   var o=document.getElementById('bellevuePass'); if(o)o.classList.remove('on');
@@ -4096,15 +4214,20 @@ function exportMovie(){
   rec.onstop=function(){var blob=new Blob(chunks,{type:'video/webm'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='sidhya-neal-date-movie.webm';document.body.appendChild(a);a.click();a.remove();dl.disabled=false;dl.textContent='⬇ save the movie';hint('movie saved to your downloads 🎬💜');movieShowCard('<div class="mc-big">🎬💜</div><div class="mc-title">saved!</div><div class="mc-sub2">check your downloads</div>');};
   function card(lines,emoji){ctx.fillStyle='#2e1f47';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='140px sans-serif';ctx.fillText(emoji,W/2,H/2-130);lines.forEach(function(l,i){ctx.fillStyle=i===0?'#fff':'#c4b5fd';ctx.font=(i===0?'bold 62px':'38px')+' sans-serif';ctx.fillText(l,W/2,H/2+i*72);});}
   function frame(c){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);var vw=off.videoWidth||W,vh=off.videoHeight||H,s=Math.min(W/vw,H/vh),dw=vw*s,dh=vh*s;try{ctx.drawImage(off,(W-dw)/2,(H-dh)/2,dw,dh);}catch(e){}var g=ctx.createLinearGradient(0,H-240,0,H);g.addColorStop(0,'rgba(18,12,34,0)');g.addColorStop(1,'rgba(18,12,34,.88)');ctx.fillStyle=g;ctx.fillRect(0,H-240,W,240);ctx.textAlign='left';ctx.fillStyle='#fff';ctx.font='bold 46px sans-serif';ctx.fillText(movieActivity(c),50,H-128,W-100);var place=placeWithCoords(c.lat,c.lng);if(place){ctx.fillStyle='#c4b5fd';ctx.font='32px sans-serif';ctx.fillText('📍 '+place,50,H-76,W-100);}}
-  var phase=0,ci=0,t0=performance.now(),raf;
+  /* setInterval, not requestAnimationFrame: rAF can silently stop firing the moment the tab
+     loses foreground focus (screen lock, app-switch) and this render can run several seconds --
+     confirmed in testing that rAF stalls after a single frame in exactly that scenario, hanging
+     the export forever with the button stuck on "rendering...". setInterval keeps ticking
+     (throttled, not stopped) even backgrounded, so the export always eventually finishes. */
+  var phase=0,ci=0,t0=performance.now(),tickTimer=null;
+  function stopTick(){ if(tickTimer){clearInterval(tickTimer);tickTimer=null;} }
   function tick(){
-    if(movieAbort&&phase!==0){/* keep rendering the export even though in-app player is aborted */}
-    if(phase===0){card([movieName()+' & Neal','July 6 2026','our date 🎬'],'⚽💜');if(performance.now()-t0>2600){phase=1;startClip(0);}raf=requestAnimationFrame(tick);return;}
-    if(phase===1){if(movieClips[ci])frame(movieClips[ci]);raf=requestAnimationFrame(tick);return;}
-    if(phase===2){card(['the end',MATCHUP,'made with love 💜'],'💜');if(performance.now()-t0>2600){cancelAnimationFrame(raf);try{rec.stop();}catch(e){}try{off.pause();}catch(e){}return;}raf=requestAnimationFrame(tick);return;}
+    if(phase===0){card([movieName()+' & Neal','July 6 2026','our date 🎬'],'⚽💜');if(performance.now()-t0>2600){phase=1;startClip(0);}return;}
+    if(phase===1){if(movieClips[ci])frame(movieClips[ci]);return;}
+    if(phase===2){card(['the end',MATCHUP,'made with love 💜'],'💜');if(performance.now()-t0>2600){stopTick();try{rec.stop();}catch(e){}try{off.pause();}catch(e){}return;}return;}
   }
   function startClip(i){ci=i;off.src=URL.createObjectURL(movieClips[i].blob);off.onended=function(){if(i+1<movieClips.length)startClip(i+1);else{phase=2;t0=performance.now();}};var p=off.play();if(p&&p.then)p.then(function(){if(actx&&actx.state==='suspended')actx.resume();}).catch(function(){if(i+1<movieClips.length)startClip(i+1);else{phase=2;t0=performance.now();}});}
-  rec.start();t0=performance.now();tick();
+  rec.start();t0=performance.now();tickTimer=setInterval(tick,33);
 }
 /* autoplay policies: kick off on the first interaction anywhere */
 document.addEventListener('click',function once(){startMusic();document.removeEventListener('click',once);},{once:true});
@@ -4681,7 +4804,7 @@ window.initTimeline=function(){};
     <button class="btn primary" type="button" onclick="hideOrigin()">back to the pass ✨</button>
   </div>
 </div>
-<div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"></div>
+<div id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="lb-close" type="button" onclick="closeLightbox()">✕</button><img id="lightboxImg" src="" alt="our date photo"><video id="lightboxVideo" src="" controls playsinline style="display:none"></video></div>
 
 <!-- lightweight identity chip: tap to sign in / switch. hidden until an identity is set. -->
 <button id="idBadge" type="button" onclick="openIdentityGate()" aria-label="who's using this" title="who's this?"></button>
@@ -4746,6 +4869,11 @@ window.initTimeline=function(){};
     <div class="album-add-row"><button class="btn primary" type="button" onclick="pickBellevuePhoto()">➕ add a photo</button></div>
     <div class="album-grid" id="bvAlbumGrid"><div class="album-empty">loading our photos…</div></div>
     <input type="file" id="bvPhotoInput" accept="image/*" multiple style="display:none" onchange="onBellevuePhotoPicked(event)">
+
+    <label class="bv-notes-lbl" style="margin-top:14px">🎥 our videos<span class="album-count" id="bvVideoAlbumCount"></span></label>
+    <div class="album-add-row"><button class="btn primary" type="button" onclick="pickBellevueVideo()">➕ add videos</button></div>
+    <div class="album-grid" id="bvVideoAlbumGrid"><div class="album-empty">loading our videos…</div></div>
+    <input type="file" id="bvVideoInput" accept="video/*" multiple style="display:none" onchange="onBellevueVideoPicked(event)">
   </div>
 </div>
 
