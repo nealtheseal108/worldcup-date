@@ -481,8 +481,8 @@
   .trk-match-teams{font-family:'Inter',system-ui,sans-serif;font-size:23px;font-weight:800;margin-top:5px;letter-spacing:-.01em}
   .trk-match-info{font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:#b79bf0;margin-top:4px;letter-spacing:.5px}
   .album-count{font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;margin-left:7px}
-  .album-add-row{display:flex;gap:10px;margin:4px 0 12px}
-  .album-add-row .btn{flex:1}
+  .album-add-row{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 12px}
+  .album-add-row .btn{flex:1 1 42%;min-width:0}
   .album-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
   .album-cell{position:relative;padding:0;border:none;background:#efe7fb;border-radius:12px;overflow:hidden;aspect-ratio:1;cursor:pointer;box-shadow:0 3px 10px rgba(53,28,94,.12)}
   .album-cell img,.album-cell video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
@@ -4611,7 +4611,16 @@ function _applyZoom(){
     var minX=Infinity,maxX=-Infinity;
     visCols.forEach(function(c){ var r=c.getBoundingClientRect(); minX=Math.min(minX,r.left-br.left); maxX=Math.max(maxX,r.right-br.left); });
     var fw=Math.max(1,maxX-minX), vw=scroller.clientWidth;
-    var scale=Math.min(vw/fw, 1.8);   // width-fit only; height auto-shrinks via flex stretch, capped so desktop doesn't blow the cards up absurdly
+    var scale=Math.min(vw/fw, 1.8);   // width-fit only, capped so a narrow zoomed view doesn't blow the cards up absurdly
+    /* the column height is sized against the FULL round-of-32 baseline regardless of zoom level, so a
+       2-column zoom (e.g. quarterfinals+semifinals, only 4-6 real cells) is already sparse before any
+       scaling -- on a wide desktop viewport the width-fit ratio above easily hits the 1.8x cap, which
+       then blows that sparse column up into a wall of empty space many screens tall (reported as the
+       bracket "not working" past the quarterfinals). Re-cap so the scaled result never exceeds roughly
+       2.2 screens tall -- still zooms in on mobile (where fw/vw rarely pushes past that), just stops
+       compounding the sparseness into something that reads as broken on wide screens. */
+    var maxH=window.innerHeight*2.2;
+    if(br.height*scale>maxH)scale=maxH/br.height;
     scroller.style.height=(br.height*scale)+'px';   // transform doesn't affect layout size, so the scroller must be told explicitly how tall the SCALED content will paint, or it clips/balloons
     box.style.transformOrigin='0 0';
     box.style.transform='scale('+scale.toFixed(3)+')';
