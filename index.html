@@ -826,6 +826,12 @@
   .neon-flicker-a{animation:neonFlicker 4.6s infinite}
   .neon-flicker-b{animation:neonFlicker 5.8s infinite .6s}
   .pike-sign{display:block;margin:14px auto 4px}
+  /* page-bottom flourish: sits right after the last bit of copy on every screen, glowing against
+     the purple background, and physically dissolves into it near its own bottom edge (mask, not
+     a scroll listener -- stays compositor-friendly / doesn't scroll-jack) rather than having a
+     hard cutoff. */
+  .pike-sign-foot{display:flex;justify-content:center;margin:22px 0 6px;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 62%,transparent 96%);mask-image:linear-gradient(to bottom,#000 0%,#000 62%,transparent 96%)}
+  .pike-sign-foot svg{width:190px;height:auto}
   #datesChip{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:90;width:44px;height:44px;border-radius:12px;background:#241733;border:1px solid rgba(217,185,104,.55);box-shadow:0 6px 16px rgba(18,8,38,.35);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:0}
   #datesChip .dc-bar{width:20px;height:2.5px;background:#d9b968;border-radius:1px;position:relative}
   #datesChip .dc-bar::after{content:"";position:absolute;left:8px;top:0;width:2px;height:100%;background:#241733}
@@ -1354,6 +1360,7 @@
   </div>
   </div>
   <div class="foot">no car needed babu, every leg is train + bus on the 2 line.<br>it runs til midnight so there's never a rush home 💜</div>
+  <div class="pike-sign-foot" id="pikeSignFoot"></div>
 </div>
 
 <script>
@@ -1482,33 +1489,47 @@ const ART = {
 /* standalone, bigger Public Market Center homage (die-cut badge, 3-line layout, clock breaking
    out past the right edge like the real sign) -- used as a flourish on the Pier 62/Pike Place
    leg specifically, alongside the smaller version baked into that venue's card art above. */
-const PIKE_SIGN_BIG = `<svg class="pike-sign" viewBox="0 0 280 190" width="230" height="156" xmlns="http://www.w3.org/2000/svg" aria-label="Public Market Center neon sign">
-  <path d="M46,22 L206,22 A14,14 0 0 1 220,36 L220,156 A14,14 0 0 1 206,170 L34,170 A14,14 0 0 1 20,156 L20,46 Z" fill="#2e2a2b"/>
-  <path d="M48,26 L204,26 A10,10 0 0 1 214,36 L214,152 A10,10 0 0 1 204,162 L38,162 A10,10 0 0 1 28,152 L28,50 Z" fill="#bfe3de"/>
-  <g stroke="#33565b" stroke-width="0.8" opacity="0.22">
-    <line x1="60" y1="26" x2="60" y2="162"/><line x1="92" y1="26" x2="92" y2="162"/><line x1="124" y1="26" x2="124" y2="162"/><line x1="156" y1="26" x2="156" y2="162"/><line x1="188" y1="26" x2="188" y2="162"/>
-    <line x1="28" y1="66" x2="214" y2="66"/><line x1="28" y1="106" x2="214" y2="106"/><line x1="28" y1="146" x2="214" y2="146"/>
+const PIKE_SIGN_BIG = `<svg class="pike-sign" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Public Market Center neon sign">
+  <path d="M 22 20 L 150 20 L 150 32 L 190 32 Q 198 32 198 40 L 198 62 A 52 52 0 1 1 198 144 L 198 178 Q 198 186 190 186 L 22 186 Q 14 186 14 178 L 14 100 L 26 100 L 26 72 L 14 72 L 14 28 Q 14 20 22 20 Z" fill="#aedce8" stroke="#26262a" stroke-width="9" stroke-linejoin="round"/>
+  <g stroke="#26262a" stroke-width="1.1" opacity="0.22">
+    <line x1="44" y1="25" x2="44" y2="181"/>
+    <line x1="72" y1="25" x2="72" y2="181"/>
+    <line x1="100" y1="25" x2="100" y2="181"/>
+    <line x1="128" y1="25" x2="128" y2="181"/>
+    <line x1="156" y1="34" x2="156" y2="181"/>
+    <line x1="30" y1="80" x2="176" y2="80"/>
+    <line x1="30" y1="126" x2="176" y2="126"/>
   </g>
-  <g class="neon-flicker-a" filter="url(#neonGlowBig)" fill="#fff3d6" opacity="0.9" font-family="Arial" font-weight="bold" text-anchor="middle">
-    <text x="121" y="55" font-size="26" letter-spacing="1">PUBLIC</text>
-    <text x="105" y="95" font-size="26" letter-spacing="1">MARKET</text>
-    <text x="121" y="135" font-size="21" letter-spacing="5">CENTER</text>
+  <g font-family="Impact,'Arial Narrow','Franklin Gothic Medium',Arial,sans-serif" font-weight="700" font-size="40" lengthAdjust="spacingAndGlyphs">
+    <g class="neon-flicker-a" fill="#7f1013">
+      <text x="21.3" y="71.3" textLength="152">PUBLIC</text>
+      <text x="21.3" y="118.3" textLength="152">MARKET</text>
+      <text x="21.3" y="165.3" textLength="152">CENTER</text>
+    </g>
+    <g class="neon-flicker-b" fill="#d21f26" stroke="#5c0e12" stroke-width="1" paint-order="stroke">
+      <text x="20" y="70" textLength="152">PUBLIC</text>
+      <text x="20" y="117" textLength="152">MARKET</text>
+      <text x="20" y="164" textLength="152">CENTER</text>
+    </g>
   </g>
-  <g class="neon-flicker-b" fill="#d7302a" font-family="Arial" font-weight="bold" text-anchor="middle">
-    <text x="121" y="55" font-size="26" letter-spacing="1">PUBLIC</text>
-    <text x="105" y="95" font-size="26" letter-spacing="1">MARKET</text>
-    <text x="121" y="135" font-size="21" letter-spacing="5">CENTER</text>
+  <circle cx="230" cy="103" r="52" fill="#f7f2e3" stroke="#26262a" stroke-width="9"/>
+  <g fill="#d21f26">
+    <circle cx="230" cy="65" r="3.2"/>
+    <circle cx="249" cy="70.1" r="3.2"/>
+    <circle cx="262.9" cy="84" r="3.2"/>
+    <circle cx="268" cy="103" r="3.2"/>
+    <circle cx="262.9" cy="122" r="3.2"/>
+    <circle cx="249" cy="135.9" r="3.2"/>
+    <circle cx="230" cy="141" r="3.2"/>
+    <circle cx="211" cy="135.9" r="3.2"/>
+    <circle cx="197.1" cy="122" r="3.2"/>
+    <circle cx="192" cy="103" r="3.2"/>
+    <circle cx="197.1" cy="84" r="3.2"/>
+    <circle cx="211" cy="70.1" r="3.2"/>
   </g>
-  <defs><filter id="neonGlowBig" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="2"/></filter></defs>
-  <circle cx="214" cy="92" r="34" fill="#2e2a2b"/>
-  <circle cx="214" cy="92" r="29" fill="#fdf8ec"/>
-  <g fill="#d7302a">
-    <circle cx="214" cy="63" r="2.6"/><circle cx="235.5" cy="70.5" r="2.6"/><circle cx="243" cy="92" r="2.6"/><circle cx="235.5" cy="113.5" r="2.6"/>
-    <circle cx="214" cy="121" r="2.6"/><circle cx="192.5" cy="113.5" r="2.6"/><circle cx="185" cy="92" r="2.6"/><circle cx="192.5" cy="70.5" r="2.6"/>
-  </g>
-  <line x1="214" y1="92" x2="207" y2="76" stroke="#d7302a" stroke-width="2.6" stroke-linecap="round"/>
-  <line x1="214" y1="92" x2="230" y2="86" stroke="#d7302a" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="214" cy="92" r="2.4" fill="#d7302a"/>
+  <line x1="230" y1="103" x2="215" y2="77" stroke="#d21f26" stroke-width="3.8" stroke-linecap="round"/>
+  <line x1="230" y1="103" x2="240.3" y2="83.6" stroke="#d21f26" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="230" cy="103" r="4.5" fill="#d21f26" stroke="#5c0e12" stroke-width="0.8"/>
 </svg>`;
 
 /* ---------- share-card thumbnails: instantly-recognizable Seattle landmarks per venue ---------- */
@@ -2176,6 +2197,7 @@ function reveal(){
 }
 _restorePick();   // bring back a saved plan before the first render, so a purged tab costs nothing
 venueCards();
+(function(){ var f=document.getElementById('pikeSignFoot'); if(f&&typeof PIKE_SIGN_BIG!=='undefined')f.innerHTML=PIKE_SIGN_BIG; })();
 /* LDR arrival boarding pass on the welcome screen: editable origin, saved on her phone */
 function loadArrival(){var el=document.getElementById('apFrom');if(el){var v=localStorage.getItem('wc_arrival_from');if(v)el.textContent=v;}var b=document.querySelector('#arrivalPass .ap-bars');if(b&&window.bpBarcode&&!b.querySelector('.bc-row'))b.innerHTML=window.bpBarcode(706,{h:24,color:'#241733',target:300});}
 function editArrivalFrom(){var cur=localStorage.getItem('wc_arrival_from')||'';var v=prompt('where did you fly into seattle from, babu? ✈\n(city or airport code)',cur);if(v===null)return;v=v.trim().toUpperCase().slice(0,9)||'HOME';try{_syncSet('wc_arrival_from',v);}catch(e){}var el=document.getElementById('apFrom');if(el)el.textContent=v;}
