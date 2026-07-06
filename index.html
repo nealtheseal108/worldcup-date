@@ -2169,6 +2169,7 @@ function reveal(){
       `<div class="bp-fold"><div class="bp-body">`+
         `<div class="bp-desc">${r[2]}</div>`+
         `<button class="diarybtn" type="button" onclick="openRecord(${i})">📹 record this moment</button>`+
+        `<button class="diarybtn" type="button" onclick="pickLegVideo(${i})">🎥 add a video</button>`+
         `<a class="diarybtn gcalbtn" href="${legGcalUrl(i,rows)}" target="_blank" rel="noopener">📅 add to my calendar</a>`+
         `<div class="diary-row" id="diary-s${i}"></div>`+
       `</div>`+
@@ -2935,6 +2936,25 @@ function renderDiary(sec){
   });
 }
 function renderAllDiary(){document.querySelectorAll('[id^="diary-s"]').forEach(function(b){renderDiary(b.id.replace('diary-',''));});}
+var _legVideoIdx=0;
+/* per-leg "add an existing video" -- mirrors the album's mass-video-upload, but tagged with THIS
+   leg's own sec (sN) so it lands in the same diary row as anything recorded live, and feeds the
+   end-of-night movie the same way. One shared file input for all 10 legs; pickLegVideo just
+   remembers which leg the picker was opened from. */
+function pickLegVideo(i){
+  if(i===0 && _spiceMode()==='r'){ toast('GANESH AIR retains no footage of the stolen hour 😏'); if(window.buzz)buzz(15); return; }
+  _legVideoIdx=i;
+  var el=document.getElementById('legVideoInput'); if(el)el.click();
+}
+function onLegVideoPicked(ev){
+  var files=ev.target&&ev.target.files; if(ev.target)ev.target.value=''; if(!files||!files.length)return;
+  var i=_legVideoIdx, sec='s'+i;
+  var n=files.length; hint(n>1?('adding '+n+' videos… 🎥'):'adding your video… 🎥');
+  _importVideos(files,sec,function(j,total){ if(total>1)hint('adding video '+j+' of '+total+'… 🎥'); },function(ok,total,skipped){
+    hint(ok<total ? ('added '+ok+' of '+total+(skipped?(', '+skipped+' too big to upload'):' -- some saved on your phone only (cloud hiccup)')+' 💜') : (total>1?('added all '+total+' videos to this moment 🎥💜'):'added to this moment 🎥💜'));
+    renderDiary(sec);
+  },true);
+}
 function openRecord(i){
   if(i===0 && _spiceMode()==='r'){ toast('GANESH AIR retains no footage of the stolen hour 😏'); if(window.buzz)buzz(15); return; }   // the joke IS the lack of documentation
   diaryCurSec='s'+i;
@@ -4827,6 +4847,7 @@ window.initTimeline=function(){};
     </div>
   </div>
 </div>
+<input type="file" id="legVideoInput" accept="video/*" multiple style="display:none" onchange="onLegVideoPicked(event)">
 <div id="recModal" class="modal-bg" style="display:none" onclick="if(event.target===this&&Date.now()-_recModalAt>350)closeRecord()">
   <div class="modal-card">
     <div class="modal-title">🎥 record <span id="recLabel">this moment</span></div>
