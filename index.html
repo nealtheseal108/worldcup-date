@@ -818,6 +818,14 @@
   .clip-match b{font-size:9.5px;color:#fdf6ec}
   .clip-match i{font-style:normal;font-size:8px;color:#ffd166;margin-left:3px}
   .clip-match small{display:block;font-size:7.5px;color:#cbb7f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* neon flicker: a real tube dims unevenly rather than pulsing smoothly -- a couple of quick
+     dips per cycle, never fully dark so the lettering stays legible. Two variants at slightly
+     different durations/offsets so multiple flickering parts on the same sign don't sync up
+     into one uniform pulse. */
+  @keyframes neonFlicker{0%,18%,21%,54%,58%,100%{opacity:1}19%{opacity:.55}20%{opacity:.85}56%{opacity:.65}57%{opacity:.9}}
+  .neon-flicker-a{animation:neonFlicker 4.6s infinite}
+  .neon-flicker-b{animation:neonFlicker 5.8s infinite .6s}
+  .pike-sign{display:block;margin:14px auto 4px}
   #datesChip{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:90;width:44px;height:44px;border-radius:12px;background:#241733;border:1px solid rgba(217,185,104,.55);box-shadow:0 6px 16px rgba(18,8,38,.35);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:0}
   #datesChip .dc-bar{width:20px;height:2.5px;background:#d9b968;border-radius:1px;position:relative}
   #datesChip .dc-bar::after{content:"";position:absolute;left:8px;top:0;width:2px;height:100%;background:#241733}
@@ -1400,11 +1408,11 @@ const ART = {
         <line x1="108" y1="31" x2="108" y2="61"/><line x1="118" y1="31" x2="118" y2="61"/><line x1="128" y1="31" x2="128" y2="61"/><line x1="138" y1="31" x2="138" y2="61"/><line x1="148" y1="31" x2="148" y2="61"/><line x1="158" y1="31" x2="158" y2="61"/><line x1="168" y1="31" x2="168" y2="61"/><line x1="178" y1="31" x2="178" y2="61"/><line x1="188" y1="31" x2="188" y2="61"/><line x1="198" y1="31" x2="198" y2="61"/><line x1="208" y1="31" x2="208" y2="61"/><line x1="218" y1="31" x2="218" y2="61"/>
         <line x1="101" y1="41" x2="225" y2="41"/><line x1="101" y1="51" x2="225" y2="51"/>
       </g>
-      <g filter="url(#neonGlow2)" fill="#fff3d6" opacity="0.9" font-family="Arial" font-weight="bold" text-anchor="middle">
+      <g class="neon-flicker-a" filter="url(#neonGlow2)" fill="#fff3d6" opacity="0.9" font-family="Arial" font-weight="bold" text-anchor="middle">
         <text x="163" y="45" font-size="11" letter-spacing="0.5">PUBLIC MARKET</text>
         <text x="164" y="56" font-size="8" letter-spacing="3">CENTER</text>
       </g>
-      <g fill="#d7302a" font-family="Arial" font-weight="bold" text-anchor="middle">
+      <g class="neon-flicker-b" fill="#d7302a" font-family="Arial" font-weight="bold" text-anchor="middle">
         <text x="163" y="45" font-size="11" letter-spacing="0.5">PUBLIC MARKET</text>
         <text x="164" y="56" font-size="8" letter-spacing="3">CENTER</text>
       </g>
@@ -1470,6 +1478,38 @@ const ART = {
     <g fill="#1f1335"><g transform="translate(150,0)"><circle cx="0" cy="80" r="6"/><path d="M-7 92 L-6 84 Q0 79 6 84 L7 92 Z"/></g><g transform="translate(168,0)"><circle cx="0" cy="80" r="6"/><path d="M-7 92 L-6 84 Q0 79 6 84 L7 92 Z"/></g></g>
   </svg>`
 };
+
+/* standalone, bigger Public Market Center homage (die-cut badge, 3-line layout, clock breaking
+   out past the right edge like the real sign) -- used as a flourish on the Pier 62/Pike Place
+   leg specifically, alongside the smaller version baked into that venue's card art above. */
+const PIKE_SIGN_BIG = `<svg class="pike-sign" viewBox="0 0 280 190" width="230" height="156" xmlns="http://www.w3.org/2000/svg" aria-label="Public Market Center neon sign">
+  <path d="M46,22 L206,22 A14,14 0 0 1 220,36 L220,156 A14,14 0 0 1 206,170 L34,170 A14,14 0 0 1 20,156 L20,46 Z" fill="#2e2a2b"/>
+  <path d="M48,26 L204,26 A10,10 0 0 1 214,36 L214,152 A10,10 0 0 1 204,162 L38,162 A10,10 0 0 1 28,152 L28,50 Z" fill="#bfe3de"/>
+  <g stroke="#33565b" stroke-width="0.8" opacity="0.22">
+    <line x1="60" y1="26" x2="60" y2="162"/><line x1="92" y1="26" x2="92" y2="162"/><line x1="124" y1="26" x2="124" y2="162"/><line x1="156" y1="26" x2="156" y2="162"/><line x1="188" y1="26" x2="188" y2="162"/>
+    <line x1="28" y1="66" x2="214" y2="66"/><line x1="28" y1="106" x2="214" y2="106"/><line x1="28" y1="146" x2="214" y2="146"/>
+  </g>
+  <g class="neon-flicker-a" filter="url(#neonGlowBig)" fill="#fff3d6" opacity="0.9" font-family="Arial" font-weight="bold" text-anchor="middle">
+    <text x="121" y="55" font-size="26" letter-spacing="1">PUBLIC</text>
+    <text x="105" y="95" font-size="26" letter-spacing="1">MARKET</text>
+    <text x="121" y="135" font-size="21" letter-spacing="5">CENTER</text>
+  </g>
+  <g class="neon-flicker-b" fill="#d7302a" font-family="Arial" font-weight="bold" text-anchor="middle">
+    <text x="121" y="55" font-size="26" letter-spacing="1">PUBLIC</text>
+    <text x="105" y="95" font-size="26" letter-spacing="1">MARKET</text>
+    <text x="121" y="135" font-size="21" letter-spacing="5">CENTER</text>
+  </g>
+  <defs><filter id="neonGlowBig" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="2"/></filter></defs>
+  <circle cx="214" cy="92" r="34" fill="#2e2a2b"/>
+  <circle cx="214" cy="92" r="29" fill="#fdf8ec"/>
+  <g fill="#d7302a">
+    <circle cx="214" cy="63" r="2.6"/><circle cx="235.5" cy="70.5" r="2.6"/><circle cx="243" cy="92" r="2.6"/><circle cx="235.5" cy="113.5" r="2.6"/>
+    <circle cx="214" cy="121" r="2.6"/><circle cx="192.5" cy="113.5" r="2.6"/><circle cx="185" cy="92" r="2.6"/><circle cx="192.5" cy="70.5" r="2.6"/>
+  </g>
+  <line x1="214" y1="92" x2="207" y2="76" stroke="#d7302a" stroke-width="2.6" stroke-linecap="round"/>
+  <line x1="214" y1="92" x2="230" y2="86" stroke="#d7302a" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="214" cy="92" r="2.4" fill="#d7302a"/>
+</svg>`;
 
 /* ---------- share-card thumbnails: instantly-recognizable Seattle landmarks per venue ---------- */
 const TKICON = {
@@ -2065,7 +2105,7 @@ function reveal(){
     ['~3:15 PM','<b>Stolen hour, just us 😏💜</b>', _spiceMode()==='r' ? "i pull up to your place in Crossroads and we disappear for an hour before anything else, clothes optional, quiet not guaranteed 😈 then we fix our hair and act completely normal on the train like nothing happened." : "i pull up to your place in Crossroads, and before anything else we slip away somewhere quiet, just the two of us. i can't promise i'll keep my hands to myself once i've got you alone."],
     ['~4:00 PM','<b>Redmond Tech, all aboard 🚆</b>', "we (reluctantly) pull ourselves together and tap onto the 2 Line, headed for the match together 💜"],
     ['~4:45 PM','<b>Arrive '+arriveAt+'.</b>', v.transferLine],
-    ['5:00 PM','<b>Kickoff, Round of 16! ⚽</b>','Watch party at '+v.name+'. Jerseys on! 💜'],
+    ['5:00 PM','<b>Kickoff, Round of 16! ⚽</b>','Watch party at '+v.name+'. Jerseys on! 💜'+(pick.venue==='pier'?PIKE_SIGN_BIG:'')],
     ['~5:20 PM',`<b>First-half snack: ${pick.during.t}!</b>`, pick.during.d+' we tuck into it once the first half is underway.'],
     ['~6:55 PM','<b>full time!</b>','wraps up around 6:55. soak up the vibes, grab some pics, and let the first crowd wave clear out (a lil later if it goes to extra time + pens).'],
     ['7:30 PM',`<b>Dinner: ${pick.after.t}!</b>`, pick.after.d],
