@@ -587,16 +587,6 @@
   .bc-team .bc-pens{color:var(--muted);font-weight:600;font-style:normal;font-size:10px}
   .bc-tbd{letter-spacing:.6px}
   .bc-meta{font-family:'Courier Prime',ui-monospace,monospace;font-size:8.5px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:.4px;text-transform:uppercase}
-  /* babu bingo (step9) */
-  .bingo-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;max-width:100%}
-  .bingo-sq{position:relative;min-width:0;overflow:hidden;overflow-wrap:break-word;border:1.5px solid var(--line);background:#fff;border-radius:9px;aspect-ratio:1;padding:4px 3px;font-family:'Courier Prime',ui-monospace,monospace;font-size:8.6px;line-height:1.18;color:#3a2a63;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;box-shadow:0 3px 9px rgba(53,28,94,.09);transition:transform .12s}
-  .bingo-sq:active{transform:scale(.94)}
-  .bingo-sq .bs-stamp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;opacity:0;transform:scale(2.2) rotate(-24deg);pointer-events:none;transition:opacity .18s,transform .22s cubic-bezier(.2,.9,.3,1.4)}
-  .bingo-sq.on{border-color:var(--lav);background:#f3ecfe}
-  .bingo-sq.on span:first-child{opacity:.38}
-  .bingo-sq.on .bs-stamp{opacity:.92;transform:scale(1) rotate(-14deg)}
-  .bingo-stat{font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;color:var(--muted);text-align:center;margin-top:11px}
-  .bingo-stat b{color:var(--lav)}
   /* halftime question deck (step10) */
   .q-progress{height:5px;background:#e9e1f8;border-radius:4px;overflow:hidden;margin:2px 0 6px}
   .q-bar{display:block;height:100%;width:7%;background:linear-gradient(90deg,var(--lav),var(--lav2));border-radius:4px;transition:width .25s ease}
@@ -619,18 +609,6 @@
   .quiz-done{text-align:center;padding:20px 8px}
   .quiz-done .qd-score{font-family:'Inter',system-ui,sans-serif;font-size:38px;font-weight:800;color:var(--lav);letter-spacing:-.02em}
   .quiz-done .qd-line{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.5}
-  /* photo missions: baggage tags on the live tracker */
-  .mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-  .mission-tag{position:relative;border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 11px 10px 20px;cursor:pointer;text-align:left;box-shadow:0 3px 10px rgba(53,28,94,.1);font-family:'Courier Prime',ui-monospace,monospace;overflow:hidden}
-  .mission-tag::before{content:'';position:absolute;left:7px;top:0;bottom:0;border-left:1.5px dashed var(--line)}
-  .mission-tag::after{content:'';position:absolute;left:1.5px;top:50%;width:7px;height:7px;border-radius:50%;background:var(--paper);border:1px solid var(--line);transform:translateY(-50%)}
-  .mission-tag .mt-air{font-size:7.5px;letter-spacing:1.2px;color:var(--lav);font-weight:700}
-  .mission-tag .mt-title{font-size:11.5px;font-weight:700;color:#3a2a63;line-height:1.3;margin-top:3px;min-height:30px}
-  .mission-tag .mt-thumb{margin-top:7px;height:64px;border-radius:7px;background:#f2ecfd;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--lav);overflow:hidden}
-  .mission-tag .mt-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .mission-tag .mt-stamp{position:absolute;right:7px;top:34px;border:2.5px solid #16a34a;color:#16a34a;font-weight:800;font-size:9.5px;letter-spacing:1.6px;padding:3px 7px;border-radius:5px;transform:rotate(-14deg);background:rgba(255,255,255,.86);display:none}
-  .mission-tag.done{border-color:#bfe8cd}
-  .mission-tag.done .mt-stamp{display:block}
   /* comfort kit: sealed open-when envelopes (step11) */
   .kit-note{font-family:'Courier Prime',ui-monospace,monospace;font-size:12px;color:var(--muted);text-align:center;margin:0 0 14px}
   .pos-note{margin:-6px 0 12px;font-family:'Courier Prime',ui-monospace,monospace;font-size:11px;color:var(--muted);text-align:center}
@@ -1071,7 +1049,6 @@
 
       <button class="btn primary trk-cta" type="button" onclick="openTracker()">📸 our live date tracker<span>photos, the score & where we're at, live 💜</span></button>
       <div class="album-add-row" style="margin:-8px 0 18px">
-        <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
         <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime Qs</button>
         <button class="btn lav2btn" type="button" onclick="go(13)">🧠 how well do you know us</button>
         <button class="btn lav2btn" type="button" onclick="go(14)">🏔️ the utah plan</button>
@@ -1213,16 +1190,12 @@
       <div class="album-grid" id="videoAlbumGrid"><div class="album-empty">loading our videos…</div></div>
       <input type="file" id="videoAlbumInput" accept="video/*" multiple style="display:none" onchange="onVideoAlbumPicked(event)">
 
-      <div class="sectlabel" style="margin-top:20px">🏷️ photo missions<span class="album-count" id="missionCount"></span></div>
-      <div class="mission-grid" id="missionGrid"></div>
-      <input type="file" id="missionInput" accept="image/*" capture="environment" style="display:none" onchange="onMissionPicked(event)">
 
       <div class="trk-actions">
         <button class="btn lav2btn" type="button" onclick="go(5)">🎬 date diary &amp; movie</button>
         <button class="btn lav2btn" type="button" onclick="backupDiary()">⬇ back up every clip &amp; photo</button>
       </div>
       <div class="album-add-row" style="margin-top:10px">
-        <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
         <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime Qs</button>
         <button class="btn lav2btn" type="button" onclick="go(14)">🏔️ the utah plan</button>
         <button class="btn lav2btn" type="button" onclick="go(15)">🏆 world cup trivia</button>
@@ -1243,21 +1216,6 @@
       <div class="printrow" style="margin-top:16px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
     </section>
 
-    <!-- STEP 9 — BABU BINGO (offline in-flight match bingo) -->
-    <section class="step" id="step9">
-      <div class="iti-head" style="margin-top:2px"><div class="big">🎲💜</div><h2 style="font-size:24px">babu bingo</h2><div class="venue">match stuff + us stuff · first to a row wins a kiss</div></div>
-      <div class="bingo-grid" id="bingoGrid"></div>
-      <div class="bingo-stat" id="bingoStat"></div>
-      <div class="album-add-row" style="margin-top:12px">
-        <button class="btn lav2btn" type="button" onclick="go(10)">🪑 halftime questions</button>
-        <button class="btn lav2btn" type="button" onclick="go(13)">🧠 know us quiz</button>
-        <button class="btn lav2btn" type="button" onclick="go(14)">🏔️ the utah plan</button>
-        <button class="btn lav2btn" type="button" onclick="go(15)">🏆 world cup trivia</button>
-        <button class="btn ghost" type="button" onclick="resetBingo()">↺ new card</button>
-      </div>
-      <div class="printrow" style="margin-top:14px"><button class="btn ghost" onclick="backToDate()">← back to our date</button></div>
-    </section>
-
     <!-- STEP 10 — ROW 25, SEATS A & B (halftime question deck) -->
     <section class="step" id="step10">
       <div class="iti-head" style="margin-top:2px"><div class="big">🪑💜</div><h2 style="font-size:24px">row 25, seats A &amp; B</h2><div class="venue">seatback entertainment for exactly one halftime</div></div>
@@ -1266,7 +1224,6 @@
       <div class="q-deck" id="qDeck"></div>
       <div class="q-hint">swipe → · one each, no skipping babu 💜</div>
       <div class="album-add-row" style="margin-top:12px">
-        <button class="btn lav2btn" type="button" onclick="go(9)">🎲 babu bingo</button>
         <button class="btn lav2btn" type="button" onclick="go(13)">🧠 know us quiz</button>
         <button class="btn lav2btn" type="button" onclick="go(14)">🏔️ the utah plan</button>
         <button class="btn lav2btn" type="button" onclick="go(15)">🏆 world cup trivia</button>
@@ -3079,12 +3036,12 @@ function cloudUpload(rec){var fd=new FormData();fd.append('video',rec.blob,'clip
 function cloudDelete(id,sec){return fetch(CLOUD.url+'/api/clip/'+id,{method:'DELETE',headers:cloudHeaders()}).then(function(){renderDiary(sec);}).catch(function(){hint('could not delete from the cloud 💜');});}
 
 /* ---------- shared interactive state: every click, saved to the cloud, for both phones ----------
-   picks, bingo, missions, passport stamps, flight log, etc. are all "ours", not per-device --
+   picks, passport stamps, flight log, etc. are all "ours", not per-device --
    if she picks the venue on her phone, his phone needs to show the same pick. _syncSet is a
    drop-in replacement for localStorage.setItem: writes locally as always, and for any key in
    SYNCED_KEYS, also mirrors the exact string to the cloud (fire-and-forget). On load, a single
    GET /api/state pulls every key back so a fresh device (or one that was offline) catches up. */
-var SYNCED_KEYS=['wc_pick','wc_bingo','wc_bingo_seed','wc_missions','wc_utah_sel','wc_utah_stamps',
+var SYNCED_KEYS=['wc_pick','wc_utah_sel','wc_utah_stamps',
   'wc_flightlog','wc_bellevue_stamped','wc_bellevue_landed_celeb','wc_return_no','wc_return_date',
   'wc_arrival_from','wc_user_places','wc_user_songs'];
 function cloudStateAll(){ if(!cloudOn())return Promise.resolve({}); return fetch(CLOUD.url+'/api/state',{headers:cloudHeaders()}).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};}); }
@@ -3105,7 +3062,7 @@ function _applyCloudState(all){
   try{_restorePick();venueCards();}catch(e){}
   try{loadArrival();}catch(e){}
   try{loadUserSongs();loadUserPlaces();}catch(e){}
-  try{renderBingo();renderQDeck();renderMissions();renderKit();renderDepartures();renderQuiz();renderUtah();}catch(e){}
+  try{renderQDeck();renderKit();renderDepartures();renderQuiz();renderUtah();}catch(e){}
 }
 /* fires the instant the page loads -- this IS the "wake a sleeping backend up" call, it doesn't
    wait for anything else first. It keeps running past the 1.8s window below, so a cold Render
@@ -3355,38 +3312,6 @@ function updateTracker(){
   if(info){ var g=_ourMatch(); if(g){ info.innerHTML=(g.state==='in'?'🔴 LIVE · ':'')+((g.state!=='pre')?(_esc7(g.h)+' '+_esc7(g.hs)+' - '+_esc7(g.as)+' '+_esc7(g.a)+' · '):'')+_esc7(g.detail); } else { info.textContent='Round of 16 · Kickoff 5:00 PM'; } }
 }
 
-/* ---------- BABU BINGO (step9): offline, localStorage, confetti on a new line ---------- */
-var BINGO_POOL=[
-  'yell GOOOAL louder than everyone around us ⚽','argue a yellow card was way too harsh 🟨','guess how many minutes get added for stoppage time ⏱️','celebrate a corner kick like it\'s a goal 🚩','give the keeper a standing ovation for a save 🧤','call the free kick result before it happens 🔮','guess the next substitution before it\'s made 🔁','call whether the next foul gets a card or just a warning 🟨',
-  'someone says "babu" 💜','she calls him hot 🔥','purple thing spotted 💜','dance to the watch party music 💃','share a snack 🍕','kiss on a goal 😚','hold hands a whole attack 🤝','selfie with the big screen 🤳','jersey compliment 👕','explain offside wrong on purpose 😤',
-  'do the wave just the two of you, no shame 🌊','spot someone in full face paint or a costume 🎨','teach each other the chant, badly 🎤','make up a completely fake stat and say it with total confidence 😏','notice the big screen glitch or lag, even for a second 📺',
-  'quietly narrate the game to each other like a nature documentary 🎙️💜','invent a secret handshake for every goal, use it if we score 🤝','spot someone glued to their phone during a boring stretch 📱','recreate our first photo together, right here 📸','trade a quiet fist bump every time we survive a scary defensive moment 👊',
-  'spot a kid wearing a jersey way too big for them 👶','record a 10-second message to future us 🎥','count how many times the ball goes out of bounds in one minute ⏱️','staring contest, loser buys the next snack 😂','call the final score out loud right now, no changing it after 🔮',
-  'guess who scores the game-winner before it happens ⚽','spot someone crying, happy or sad, doesn\'t matter 😭','cheesy couple pose, full effort, no laughing 📷','whisper something that actually makes her blush 😳','let her make every call for the next 20 minutes, no vetoes 💜',
-  'spot the exact moment the crowd goes from silent to erupting 📢','count how many people are wearing your team\'s jersey 👕','ask each other who you think wins it all this year 🏆','rate our couple energy out of 10, between us 💯'
-];
-function _bingoRnd(seed){ var s=(seed>>>0)||1; return function(){ s=(s*1103515245+12345)&0x7fffffff; return s/0x7fffffff; }; }
-function _bingoSeed(){ var s=null; try{s=localStorage.getItem('wc_bingo_seed');}catch(e){} if(!s){ s=String((Date.now()%997)*7919+13); try{_syncSet('wc_bingo_seed',s);}catch(e){} } return +s; }
-function _bingoCells(){ var rnd=_bingoRnd(_bingoSeed()), a=BINGO_POOL.slice(); for(var i=a.length-1;i>0;i--){ var j=(rnd()*(i+1))|0, t=a[i]; a[i]=a[j]; a[j]=t; } return a.slice(0,25); }
-function _bingoOn(){ try{return JSON.parse(localStorage.getItem('wc_bingo')||'[]');}catch(e){return [];} }
-function _bingoLines(on){ var L=[[0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24],[0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],[0,6,12,18,24],[4,8,12,16,20]]; return L.filter(function(l){ return l.every(function(i){return on.indexOf(i)>=0;}); }).length; }
-function renderBingo(){
-  var g=document.getElementById('bingoGrid'); if(!g)return;
-  var cells=_bingoCells(), on=_bingoOn();
-  g.innerHTML=cells.map(function(c,i){ return '<button type="button" class="bingo-sq'+(on.indexOf(i)>=0?' on':'')+'" onclick="tapBingo('+i+')"><span>'+c+'</span><span class="bs-stamp">💜</span></button>'; }).join('');
-  var lines=_bingoLines(on), st=document.getElementById('bingoStat');
-  if(st)st.innerHTML=on.length+'/25 stamped · <b>'+lines+' bingo'+(lines===1?'':'s')+'</b>'+(lines>0?' · that\'s '+lines+' kiss'+(lines===1?'':'es')+' owed 😚':'');
-}
-function tapBingo(i){
-  var on=_bingoOn(), was=_bingoLines(on), k=on.indexOf(i);
-  if(k>=0)on.splice(k,1); else on.push(i);
-  try{_syncSet('wc_bingo',JSON.stringify(on));}catch(e){}
-  if(window.buzz)buzz(12);
-  renderBingo();
-  var now=_bingoLines(on);
-  if(now>was){ if(window.burstConfetti)burstConfetti(document.getElementById('bingoGrid'),{emojis:['💜','⚽','✨'],count:24}); if(window.buzz)buzz(40); hint('BINGO babu!! 💜 collect your kiss'); }
-}
-function resetBingo(){ try{localStorage.removeItem('wc_bingo');localStorage.removeItem('wc_bingo_seed');}catch(e){} renderBingo(); hint('fresh card dealt 🎲💜'); }
 
 /* ---------- ROW 25 halftime question deck (step10): static, offline, scroll-snap ---------- */
 var Q_DECK=[
@@ -3426,49 +3351,6 @@ function renderQDeck(){
     if(num)num.textContent='Q '+(i+1)+' / '+cur.length;
     if(bar)bar.style.width=(((i+1)/cur.length)*100)+'%';
   }); },{passive:true});
-}
-/* ---------- PHOTO MISSIONS (tracker page): baggage-tag challenges that feed the shared album ---------- */
-var MISSIONS=[
-  {id:'train', t:'2 Line window selfie 🚆'},
-  {id:'cone',  t:'Salt & Straw held like a trophy 🍦🏆'},
-  {id:'purple',t:'something purple in the wild 💜'},
-  {id:'dance', t:'her dancing, anywhere 💃'},
-  {id:'jersey',t:'both jerseys in one frame 👕👕'},
-  {id:'pitch', t:'the pitch from our spot ⚽'},
-  {id:'first', t:'recreate our first photo 🥹'},
-  {id:'kiss',  t:'kiss cam, self-serve 😚'}
-];
-var _missionPick=null;
-function _missionState(){ try{return JSON.parse(localStorage.getItem('wc_missions')||'{}');}catch(e){return {};} }
-function renderMissions(){
-  var g=document.getElementById('missionGrid'); if(!g)return;
-  var st=_missionState(), done=0;
-  g.innerHTML=MISSIONS.map(function(m){
-    var d=st[m.id]; if(d)done++;
-    return '<button type="button" class="mission-tag'+(d?' done':'')+'" onclick="pickMission(\''+m.id+'\')">'+
-      '<div class="mt-air">GANESH AIR · CLAIM TAG</div><div class="mt-title">'+m.t+'</div>'+
-      '<div class="mt-thumb">'+(d&&d.thumb?('<img src="'+d.thumb+'" alt="">'):'📷')+'</div>'+
-      '<div class="mt-stamp">APPROVED</div></button>';
-  }).join('');
-  var c=document.getElementById('missionCount'); if(c)c.textContent='· '+done+'/'+MISSIONS.length+' approved';
-}
-function pickMission(id){ _missionPick=id; var i=document.getElementById('missionInput'); if(i)i.click(); }
-function onMissionPicked(ev){
-  var f=ev.target&&ev.target.files&&ev.target.files[0]; if(ev.target)ev.target.value='';
-  var id=_missionPick; _missionPick=null; if(!f||!id)return;
-  hint('stamping your mission… 🏷️');
-  Promise.all([_downscaleImg(f,1400,0.85),refreshLiveMatchSnap()]).then(function(r){
-    var big=r[0],snap=r[1];
-    var rec={sec:'photo',blob:big,t:Date.now(),who:_whoTag()};
-    if(snap){ rec.score=snap.score; rec.minute=snap.minute; rec.play=snap.play; }
-    if(cloudOn()){ diaryAdd(rec).catch(function(){}); cloudUpload(rec).catch(function(){}); } else { diaryAdd(rec).catch(function(){}); }   // missions feed the shared album (+ local backup)
-    return _downscaleImg(f,240,0.6);
-  }).then(function(small){
-    var fr=new FileReader();
-    fr.onload=function(){ var st=_missionState(); st[id]={t:Date.now(),thumb:String(fr.result)}; try{_syncSet('wc_missions',JSON.stringify(st));}catch(e){ st[id]={t:Date.now()}; try{_syncSet('wc_missions',JSON.stringify(st));}catch(e2){} } renderMissions(); renderPhotos(true); if(window.burstConfetti)burstConfetti(document.getElementById('missionGrid'),{emojis:['🏷️','💜','📸'],count:16}); if(window.buzz)buzz(24); hint('mission APPROVED 🏷️💜 it\'s in our album'); };
-    fr.onerror=function(){ var st=_missionState(); st[id]={t:Date.now()}; try{_syncSet('wc_missions',JSON.stringify(st));}catch(e){} renderMissions(); renderPhotos(true); hint('mission APPROVED 🏷️💜'); };
-    fr.readAsDataURL(small);
-  }).catch(function(){ hint('could not stamp that one, try again 💜'); });
 }
 /* ---------- HOW WELL DO YOU KNOW US (step13): interactive quiz, every "receipt" is a verbatim line from our real thread ----------
    sourced from a fresh grep of the actual export -- verified sender + date on every real quote before it went in here. */
@@ -4416,7 +4298,7 @@ function renderUtah(){
   });
   _utahCount();
 }
-renderBingo(); renderQDeck(); renderMissions(); renderKit(); renderDepartures(); renderQuiz(); renderUtah(); renderFifaQuiz();
+renderQDeck(); renderKit(); renderDepartures(); renderQuiz(); renderUtah(); renderFifaQuiz();
 function openMovie(){go(6);try{if(musicOn&&ytPlayer&&ytPlayer.pauseVideo){ytPlayer.pauseVideo();_movieResumeMusic=true;}}catch(e){}movieAbort=false;moviePlayIntro();}
 function movieShowCard(html){var c=document.getElementById('movieCard');c.style.display='flex';c.innerHTML=html;document.getElementById('movieVideo').style.display='none';document.getElementById('movieCap').style.display='none';}
 function moviePlayIntro(){movieShowCard('<div class="mc-big">⚽💜</div><div class="mc-title">'+_esc(movieName())+' & Neal</div><div class="mc-sub">July 6, 2026 · Round of 16</div><div class="mc-sub2">our date 🎬</div>');movieTimer=setTimeout(function(){if(!movieAbort)moviePlayClip(0);},3000);}
